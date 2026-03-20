@@ -1,0 +1,123 @@
+---
+title: Trigger Workflow
+description: Tìm hiểu về các trigger khác nhau để khởi động workflow.
+---
+
+## Về Trigger
+
+Workflow luôn bắt đầu với một trigger duy nhất xác định khi nào tự động hóa nên chạy.
+
+<img src="/images/user-guide/workflows/workflow_triggers.png" style={{width:'100%'}}/>
+
+<Tip>
+**Hỗ trợ đối tượng nâng cao!** Ngoài các đối tượng CRM tiêu chuẩn (Người, Công ty, Cơ hội), bạn cũng có thể kích hoạt workflow và thực hiện hành động trên:
+- Thành viên không gian làm việc
+- Sự kiện lịch
+- Tin nhắn (Email)
+- Tác vụ, Ghi chú và nhiều đối tượng hệ thống khác
+
+Điều này mở ra các tự động hóa mạnh mẽ như thông báo thành viên nhóm khi sự kiện lịch được tạo, hoặc xử lý email đến tự động.
+</Tip>
+
+## Bản ghi được tạo
+Khởi động workflow khi bản ghi mới được tạo trong đối tượng đã chọn (Người, Công ty, Cơ hội hoặc bất kỳ đối tượng tùy chỉnh nào).
+
+**Cấu hình**: Chọn loại đối tượng để giám sát bản ghi mới.
+
+<Note>
+- Trigger này phù hợp cho bản ghi được tạo bởi CSV, đồng bộ hộp thư và lịch, API.
+- **Không khuyến nghị cho bản ghi tạo thủ công**: với trigger này, workflow bắt đầu ngay khi bản ghi được tạo. Vì giao diện Twenty cung cấp tự động lưu liên tục (không có chế độ chỉnh sửa rồi xác nhận lưu), workflow sẽ được kích hoạt trước khi người dùng nhập tất cả các trường.
+Để kích hoạt workflow cho bản ghi tạo thủ công, khuyến nghị sử dụng trigger `Bản ghi được tạo hoặc cập nhật` thay thế.
+</Note>
+
+## Bản ghi được cập nhật
+Khởi động workflow khi có thay đổi trên bản ghi hiện có.
+
+**Cấu hình**:
+- Chọn loại đối tượng
+- Tùy chọn chỉ định trường nào cần giám sát thay đổi
+
+## Bản ghi được cập nhật hoặc tạo
+Khởi động workflow khi bản ghi được tạo hoặc cập nhật trong đối tượng đã chọn.
+
+**Tại sao điều này quan trọng**: Trigger này đặc biệt hữu ích vì bản ghi tạo qua các phương thức khác nhau hoạt động khác nhau:
+- **Nhập API/CSV**: Bản ghi được tạo với tất cả trường được điền ngay
+- **Tạo thủ công**: Bản ghi được tạo trước, sau đó trường được thêm trong các cập nhật tiếp theo
+
+**Cấu hình**:
+- Chọn loại đối tượng để giám sát
+- Tùy chọn chỉ định trường nào cần giám sát thay đổi
+- Workflow sẽ kích hoạt cả khi tạo ban đầu và bất kỳ cập nhật nào sau đó
+
+## Bản ghi bị xóa
+Khởi động workflow khi bản ghi bị xóa khỏi đối tượng.
+
+**Cấu hình**: Chọn loại đối tượng để giám sát xóa.
+
+## Trigger thủ công
+Khởi động workflow khi được kích hoạt bởi hành động người dùng. Trigger này có thể truy cập qua menu `Cmd+K` hoặc qua nút tùy chỉnh hiển thị trong thanh điều hướng trên cùng sau khi chọn bản ghi.
+<img src="/images/user-guide/workflows/add_to_newsletter_button.png" style={{width:'100%'}}/>
+
+
+**Cấu hình khả dụng**:
+Chọn cách workflow xử lý chọn bản ghi:
+
+- **Toàn cục**: Không cần bản ghi để kích hoạt workflow. Workflow được kích hoạt từ menu lệnh `Cmd + K` ở bất đâu (từ bất kỳ đối tượng nào) và không sử dụng bản ghi làm đầu vào.
+
+- **Đơn**: Bản ghi đã chọn sẽ được truyền vào workflow. Cấu hình cho đối tượng cụ thể. Có thể chọn nhiều bản ghi trước khi kích hoạt workflow. Workflow sẽ chạy từ đầu đến cuối nhiều lần bằng số bản ghi đã chọn.
+
+  <Note>
+  **Giới hạn mềm: 100 lần chạy/phút**. Vượt quá mức này, workflow ở trạng thái "Chưa bắt đầu" và được xử lý dần — bởi tác vụ nền hoặc khi workflow khác vào hàng đợi. Nghĩa là bạn có thể chọn hơn 100 bản ghi với trigger Đơn; thực thi chỉ chậm hơn.
+  </Note>
+
+- **Hàng loạt**: Bản ghi đã chọn sẽ được truyền vào workflow. Cấu hình cho đối tượng cụ thể. Có thể chọn nhiều bản ghi trước khi kích hoạt workflow. Workflow sẽ chạy một lần, cung cấp toàn bộ danh sách bản ghi làm đầu vào. Nghĩa là workflow cần chứa [hành động Iterator](/l/vi/user-guide/workflows/capabilities/workflow-actions#iterator).
+<Note>
+Đây là nâng cao hơn, phù hợp nhất cho người muốn tối ưu số lần chạy workflow.
+</Note>
+<img src="/images/user-guide/workflows/manual_trigger.png" style={{width:'100%'}}/>
+
+
+
+**Cấu hình bổ sung**:
+- Chọn đối tượng đích (cho khả dụng Đơn và Hàng loạt)
+- Chọn biểu tượng lệnh cho trigger workflow
+- Cấu hình vị trí thanh điều hướng (Ghim hoặc Không ghim)
+
+**Phương thức truy cập**:
+- Menu `Cmd+K` để tìm và khởi chạy workflow thủ công
+- Nút tùy chỉnh trong thanh điều hướng trên cùng (nếu được cấu hình)
+
+## Trigger theo thời gian: Theo lịch trình
+
+Khởi động workflow theo chu kỳ bạn xác định.
+
+**Cấu hình**:
+- Chọn đơn vị thời gian (phút, giờ, ngày)
+- Nhập giá trị hoặc sử dụng biểu thức cron tùy chỉnh cho lịch trình nâng cao
+
+<Note>
+**Múi giờ**: Workflow theo lịch trình chạy theo **UTC**. Khi đặt giờ cho lịch trình hàng ngày, chuyển đổi giờ địa phương sang UTC.
+</Note>
+
+## Trigger bên ngoài: Webhook
+
+Khởi động workflow khi nhận yêu cầu GET hoặc POST từ dịch vụ bên ngoài.
+
+<img src="/images/user-guide/workflows/webhook_trigger.png" style={{width:'100%'}}/>
+
+**Cấu hình**:
+- Workflow cung cấp URL webhook duy nhất — sao chép và thêm vào hệ thống bên ngoài làm endpoint để gọi.
+- Đối với yêu cầu POST, xác định cấu trúc body mong đợi để Twenty biết dữ liệu nào sẽ nhận. Thêm ở đây các trường bạn sẽ nhận cần thiết bên dưới trong workflow.
+- Cấu hình xác thực (sắp ra mắt).
+
+## Chọn trigger phù hợp
+
+| Trường hợp sử dụng | Trigger khuyến nghị |
+|----------|---------------------|
+| Lead mới cần xử lý | Bản ghi được tạo |
+| Thay đổi dữ liệu cần đồng bộ | Bản ghi được cập nhật |
+| Xử lý dữ liệu nhập/thủ công | Bản ghi được cập nhật hoặc tạo |
+| Dọn dẹp sau xóa | Bản ghi bị xóa |
+| Hành động do người dùng khởi tạo | Khởi chạy thủ công |
+| Báo cáo định kỳ | Theo lịch trình |
+| Tích hợp bên ngoài | Webhook hoặc Theo lịch trình |

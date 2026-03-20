@@ -1,0 +1,175 @@
+---
+title: Tạo quan hệ nhiều-nhiều
+description: Kết nối các bản ghi khi nhiều mục ở cả hai phía có thể liên kết với nhau bằng đối tượng trung gian.
+---
+
+Quan hệ nhiều-nhiều cho phép bạn kết nối nhiều bản ghi ở cả hai phía. Ví dụ: nhiều People có thể làm việc trên nhiều Projects, và mỗi Project có thể có nhiều People.
+
+<Warning>
+**Tính năng thử nghiệm**: Quan hệ trung gian hiện đang ở Lab. Kích hoạt chúng tại **Settings → Updates → Lab** trước khi làm theo hướng dẫn này.
+</Warning>
+
+<Note>
+Tính năng này cũng yêu cầu bật **Advanced mode** (nút chuyển ở phía dưới bên phải của Settings).
+</Note>
+
+## Khi nào sử dụng nhiều-nhiều
+
+Sử dụng nhiều-nhiều khi cả hai phía của mối quan hệ có thể có nhiều kết nối:
+
+| Mối quan hệ | Ví dụ |
+|-------------|---------|
+| People ↔ Projects | Một người làm việc trên nhiều dự án; một dự án có nhiều thành viên |
+| Companies ↔ Tags | Một công ty có thể có nhiều tag; một tag có thể áp dụng cho nhiều công ty |
+| Products ↔ Orders | Một sản phẩm có thể nằm trong nhiều đơn hàng; một đơn hàng chứa nhiều sản phẩm |
+
+## Cách hoạt động
+
+Twenty sử dụng mẫu **đối tượng trung gian** cho quan hệ nhiều-nhiều. Đối tượng trung gian nằm giữa hai đối tượng và giữ các kết nối:
+
+```
+People ←→ Project Assignments ←→ Projects
+```
+
+Đối tượng **Project Assignments** (trung gian) có:
+- Một quan hệ đến People (nhiều-một)
+- Một quan hệ đến Projects (nhiều-một)
+
+Khi bạn bật nút chuyển quan hệ trung gian, Twenty hiển thị trực tiếp các bản ghi được liên kết thay vì hiển thị các bản ghi trung gian.
+
+## Điều kiện tiên quyết
+
+1. **Kích hoạt quan hệ trung gian trong Lab**: Vào **Settings → Updates → Lab** và kích hoạt **Junction Relations**
+2. **Kích hoạt Advanced mode**: Bật **Advanced mode** ở phía dưới bên phải thanh bên Settings
+3. Lập kế hoạch mô hình dữ liệu:
+   - Bạn đang kết nối hai đối tượng nào?
+   - Đối tượng trung gian nên được gọi là gì?
+
+## Bước 1: Tạo đối tượng trung gian
+
+Đầu tiên, tạo đối tượng trung gian sẽ giữ các kết nối.
+
+1. Vào **Settings → Data Model**
+2. Nhấp **+ New object**
+3. Đặt tên mô tả (ví dụ: "Project Assignment", "Team Member", "Product Order")
+4. Nhấp **Save**
+
+<Tip>
+**Quy ước đặt tên**: Sử dụng tên mô tả mối quan hệ, như "Project Assignment" hoặc "Team Membership". Điều này giúp mô hình dữ liệu dễ hiểu hơn.
+</Tip>
+
+## Bước 2: Tạo quan hệ từ đối tượng trung gian
+
+Thêm trường quan hệ từ đối tượng trung gian đến cả hai đối tượng bạn muốn kết nối.
+
+### Quan hệ thứ nhất (Trung gian → Đối tượng A)
+
+1. Chọn đối tượng trung gian trong **Settings → Data Model**
+2. Nhấp **+ Add Field**
+3. Chọn **Relation** làm loại trường
+4. Chọn đối tượng đầu tiên (ví dụ: "People")
+5. Đặt loại quan hệ là **Many-to-One** (nhiều phân công có thể liên kết đến một người)
+6. Đặt tên trường:
+   - Trường trên trung gian: ví dụ "Person"
+   - Trường trên People: ví dụ "Project Assignments"
+7. Nhấp **Save**
+
+### Quan hệ thứ hai (Trung gian → Đối tượng B)
+
+1. Vẫn trên đối tượng trung gian, nhấp **+ Add Field**
+2. Chọn **Relation** làm loại trường
+3. Chọn đối tượng thứ hai (ví dụ: "Projects")
+4. Đặt loại quan hệ là **Many-to-One**
+5. Đặt tên trường:
+   - Trường trên trung gian: ví dụ "Project"
+   - Trường trên Projects: ví dụ "Team Members"
+6. Nhấp **Save**
+
+## Bước 3: Cấu hình hiển thị quan hệ trung gian
+
+Bây giờ cấu hình các đối tượng nguồn để hiển thị trực tiếp các bản ghi được liên kết, bỏ qua đối tượng trung gian.
+
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng đầu tiên (ví dụ: "People")
+3. Tìm trường quan hệ trỏ đến đối tượng trung gian (ví dụ: "Project Assignments")
+4. Nhấp để chỉnh sửa trường
+5. Bật **"This is a relation to a Junction Object"**
+6. Chọn **Target relation** (ví dụ: "Project" — trường trên trung gian trỏ đến phía bên kia)
+7. Nhấp **Save**
+
+
+{/* TODO: Add image
+<img src="/images/user-guide/fields/junction-relation-toggle.png" style={{width:'100%'}}/>
+*/}
+
+Lặp lại cho đối tượng còn lại:
+1. Chọn "Projects" trong Data Model
+2. Chỉnh sửa trường quan hệ "Team Members"
+3. Bật nút chuyển trung gian
+4. Chọn "Person" làm target relation
+5. Lưu
+
+## Kết quả
+
+Sau khi cấu hình:
+
+- Trên bản ghi **Person**, trường "Project Assignments" hiển thị trực tiếp **Projects** (không phải bản ghi phân công)
+- Trên bản ghi **Project**, trường "Team Members" hiển thị trực tiếp **People**
+
+Đối tượng trung gian vẫn tồn tại và lưu trữ các kết nối, nhưng giao diện hiển thị chế độ xem nhiều-nhiều gọn gàng hơn.
+
+## Ví dụ: People ↔ Projects
+
+Đây là hướng dẫn đầy đủ:
+
+### Tạo đối tượng trung gian
+- Tên: **Project Assignment**
+- Mô tả: "Links people to projects they work on"
+
+### Thêm quan hệ
+1. **Project Assignment → People**
+   - Loại: Many-to-One
+   - Trường trên Assignment: "Person"
+   - Trường trên People: "Project Assignments"
+
+2. **Project Assignment → Projects**
+   - Loại: Many-to-One
+   - Trường trên Assignment: "Project"
+   - Trường trên Projects: "Team Members"
+
+### Cấu hình hiển thị trung gian
+1. Trên đối tượng **People**:
+   - Chỉnh sửa trường "Project Assignments"
+   - Bật nút chuyển trung gian
+   - Target: "Project"
+
+2. Trên đối tượng **Projects**:
+   - Chỉnh sửa trường "Team Members"
+   - Bật nút chuyển trung gian
+   - Target: "Person"
+
+### Sử dụng
+- Mở bản ghi Person → Xem trực tiếp Projects
+- Mở bản ghi Project → Xem trực tiếp thành viên nhóm
+- Tạo kết nối mới từ cả hai phía
+
+## Thêm dữ liệu bổ sung cho kết nối
+
+Vì đối tượng trung gian là đối tượng thực, bạn có thể thêm trường tùy chỉnh để lưu thông tin về mối quan hệ:
+
+- **Role**: "Developer", "Designer", "Manager"
+- **Start Date**: Khi họ tham gia dự án
+- **Hours Allocated**: Số giờ hàng tuần cho dự án này
+
+Để truy cập dữ liệu này, điều hướng trực tiếp đến đối tượng trung gian hoặc truy vấn qua API.
+
+## Giới hạn
+
+- **Nhập/Xuất CSV**: Nhập quan hệ nhiều-nhiều trực tiếp không được hỗ trợ. Thay vào đó, nhập bản ghi vào đối tượng trung gian.
+- **Bộ lọc**: Lọc theo quan hệ nhiều-nhiều có thể có các tùy chọn hạn chế.
+
+## Liên quan
+
+- [Trường quan hệ](/l/vi/user-guide/data-model/capabilities/relation-fields) — giải thích các loại quan hệ
+- [Tạo đối tượng tùy chỉnh](/l/vi/user-guide/data-model/how-tos/create-custom-objects) — cách tạo đối tượng
+- [Tạo trường quan hệ](/l/vi/user-guide/data-model/how-tos/create-relation-fields) — thiết lập quan hệ cơ bản

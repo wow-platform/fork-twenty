@@ -1,0 +1,118 @@
+---
+title: Trường
+description: Hiểu vai trò của trường và cách quản lý chúng.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+
+## Về trường
+
+Trường giống như các cột trong bảng tính. Chúng lưu trữ các loại dữ liệu khác nhau như văn bản, số hoặc ngày. Trường có thể là tiêu chuẩn (tích hợp sẵn) hoặc tùy chỉnh (do bạn tạo).
+
+### Trường tiêu chuẩn
+
+Trường tiêu chuẩn được tích hợp sẵn trong Twenty để xử lý các nhu cầu kinh doanh phổ biến.
+
+Ví dụ, `First Name` và `Last Name` là các trường tiêu chuẩn trong đối tượng `People`. Chúng lưu trữ dữ liệu văn bản cho tên cá nhân.
+
+Bạn không thể xóa trường tiêu chuẩn, nhưng có thể vô hiệu hóa chúng nếu không cần.
+
+Bạn cũng có thể tùy chỉnh các tùy chọn của trường `SELECT` tiêu chuẩn, ví dụ các tùy chọn cho `Stage` trên Opportunities.
+
+<img src="/images/user-guide/fields/standard-fields.png" style={{width:'100%'}}/>
+
+### Trường tùy chỉnh
+
+Trường tùy chỉnh có thể được thêm vào bất kỳ đối tượng nào. Bạn có thể lưu trữ văn bản, số, ngày, lựa chọn thả xuống và nhiều hơn nữa. Sử dụng trường tùy chỉnh để theo dõi thông tin cụ thể cho doanh nghiệp của bạn.
+
+Ví dụ, một trường tùy chỉnh cho SpaceX có thể là `Rocket Active Status`, cho biết rocket có đang hoạt động hay không.
+
+<img src="/images/user-guide/fields/custom-fields.png" style={{width:'100%'}}/>
+
+## Loại trường
+
+Twenty hỗ trợ nhiều loại trường:
+
+| Loại | Mô tả | Ví dụ |
+|------|-------------|---------|
+| Address | Địa chỉ có cấu trúc với đường, thành phố, bang, quốc gia, mã bưu chính | Địa chỉ văn phòng |
+| Array | Danh sách các giá trị văn bản | Tags |
+| Boolean | Hộp kiểm đúng/sai | Is Active |
+| Currency | Giá trị tiền tệ với mã tiền tệ | Deal Amount (USD) |
+| Date | Giá trị ngày | Close Date |
+| Date & Time | Ngày kèm giờ | Meeting Time |
+| Domain | Tên miền website (dùng cho Companies) | acme.com |
+| Email | Địa chỉ email (chính + bổ sung) | Contact Email |
+| JSON | Dữ liệu JSON có cấu trúc | Custom metadata |
+| Links | URL với nhãn (chính + phụ) | Website, LinkedIn |
+| Long Text | Văn bản nhiều dòng | Description, Notes |
+| Multi-Select | Nhiều lựa chọn từ danh sách định sẵn | Tags, Categories |
+| Number | Giá trị số (số nguyên hoặc thập phân) | Quantity, Score |
+| Phone | Số điện thoại với mã quốc gia | Work Phone |
+| Rating | Đánh giá sao (1-5) | Priority, Score |
+| Relation | Liên kết đến bản ghi trong đối tượng khác | Company → People |
+| Select | Một lựa chọn từ danh sách định sẵn | Stage, Status |
+| Text | Một dòng văn bản | Name, Title |
+
+## Tạo trường tùy chỉnh
+
+Để thêm trường tùy chỉnh vào bất kỳ đối tượng nào, hãy làm theo các bước sau:
+1. Vào `Settings` ở thanh bên trái.
+2. Vào `Data Model`, sau đó chọn đối tượng bạn muốn tùy chỉnh.
+3. Tiếp tục bằng cách nhấp `Add Field`.
+4. Chọn tên trường và loại phù hợp với yêu cầu. Cân nhắc thêm mô tả trường để hiểu rõ hơn.
+
+Trường mới tạo của bạn hiện có sẵn trong các trường của ứng dụng. Để hiển thị nó trên chế độ xem cụ thể, nhấp vào menu tùy chọn, sau đó chọn `Fields`.
+
+<VimeoEmbed videoId="927628219" title="Video minh họa" />
+
+**Cách nhanh:** Nhấp nút **+** ở phía trên bên phải của bất kỳ bảng đối tượng nào, sau đó chọn `Customize fields`. Điều này đưa bạn trực tiếp đến cài đặt Data Model.
+
+<img src="/images/user-guide/fields/quick-new-field.png" style={{width:'100%'}}/>
+
+## Vô hiệu hóa trường
+
+Bạn có thể vô hiệu hóa trường để ẩn nó khỏi ứng dụng mà không mất dữ liệu. Hãy coi nó như ẩn trường thay vì xóa.
+
+Cách thực hiện:
+
+1. Tìm trường bạn muốn vô hiệu hóa trong cài đặt đối tượng.
+
+2. Nhấp vào ba chấm `⋮` bên cạnh trường để mở menu.
+
+3. Chọn `Deactivate` từ menu thả xuống.
+
+<img src="/images/user-guide/fields/deactivate-field.png" style={{width:'100%'}}/>
+
+Điều gì xảy ra khi bạn vô hiệu hóa trường?
+
+1. **Trong ứng dụng:** Trường biến mất và bạn không thể thêm giá trị mới.
+
+2. **Mối quan hệ hiện có:** Nếu là trường quan hệ, các kết nối hiện có vẫn giữ nhưng bạn không thể tạo mới.
+
+3. **Truy cập API:** Bạn vẫn có thể truy cập trường và dữ liệu qua API.
+
+Bạn có thể kích hoạt lại trường tiêu chuẩn và tùy chỉnh hoặc có tùy chọn xóa vĩnh viễn.
+
+## Đặt trường là duy nhất
+
+Đặt trường là duy nhất để đảm bảo các bản ghi khác nhau không thể có cùng giá trị. Ví dụ, địa chỉ email là duy nhất cho mỗi người.
+
+Nếu bạn gặp lỗi khi đặt tính duy nhất, hãy kiểm tra giá trị trùng lặp trong dữ liệu (bao gồm cả bản ghi đã xóa).
+
+## Phương pháp tốt nhất cấu hình trường
+
+### Quy ước đặt tên và giới hạn
+- **Tên số ít và số nhiều phải khác nhau**: API GraphQL cần tên khác nhau cho các mutation
+- **Tên trường được bảo vệ**: một số tên được dành riêng cho hệ thống (ví dụ: `Type`, `Application`)
+
+### Trường tiền tệ và điện thoại
+- **Tiền tệ mặc định**: có thể cấu hình qua mô hình dữ liệu
+- **Mã quốc gia mặc định**: có thể cấu hình cho trường điện thoại qua mô hình dữ liệu
+
+### Trường Select
+- **Có thể chọn tùy chọn mặc định** cho mỗi trường Select
+
+### Trường văn bản bản ghi
+- **Mỗi đối tượng có một trường hiển thị chính**: Trường này xuất hiện ở cột ngoài cùng bên trái và đại diện cho bản ghi khi liên kết với đối tượng khác. Nó phải là trường văn bản. Ví dụ, People sử dụng `Name` làm trường chính, vì vậy khi bạn liên kết một người với công ty, bạn sẽ thấy tên của họ trong chế độ xem của công ty.

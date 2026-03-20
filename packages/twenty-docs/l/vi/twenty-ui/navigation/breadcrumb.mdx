@@ -1,0 +1,46 @@
+---
+title: Breadcrumb
+image: /images/user-guide/fields/field.png
+---
+<Frame>
+  <img src="/images/user-guide/fields/field.png" alt="Header" />
+</Frame>
+
+Hiển thị thanh điều hướng breadcrumb.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { BrowserRouter } from "react-router-dom";
+import { Breadcrumb } from "@/ui/navigation/bread-crumb/components/Breadcrumb";
+
+export const MyComponent = () => {
+  const breadcrumbLinks = [
+    { children: "Home", href: "/" },
+    { children: "Category", href: "/category" },
+    { children: "Subcategory", href: "/category/subcategory" },
+    { children: "Current Page" },
+  ];
+
+  return (
+    <BrowserRouter>
+      <Breadcrumb className links={breadcrumbLinks} />
+    </BrowserRouter>
+    )
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| className | string | Class tùy chọn để tùy chỉnh thêm kiểu dáng |
+| links | array | Một mảng các đối tượng, mỗi đối tượng đại diện cho một liên kết breadcrumb. Mỗi đối tượng có thuộc tính `children` (nội dung văn bản của liên kết) và thuộc tính `href` tùy chọn (URL để điều hướng đến khi nhấp vào liên kết) |
+
+
+
+</Tab>
+</Tabs>

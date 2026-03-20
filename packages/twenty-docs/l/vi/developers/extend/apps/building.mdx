@@ -1,0 +1,677 @@
+---
+title: Xây dựng ứng dụng
+description: Định nghĩa đối tượng, hàm logic, thành phần giao diện và nhiều hơn với Twenty SDK.
+---
+
+<Warning>
+Ứng dụng hiện đang trong giai đoạn thử nghiệm alpha. Tính năng đã hoạt động nhưng vẫn đang phát triển.
+</Warning>
+
+## Sử dụng tài nguyên SDK (type & cấu hình)
+
+twenty-sdk cung cấp các khối xây dựng có kiểu và hàm trợ giúp bạn sử dụng trong ứng dụng. Dưới đây là các thành phần chính bạn sẽ thường xuyên làm việc.
+
+### Hàm trợ giúp
+
+SDK cung cấp các hàm trợ giúp để định nghĩa entity của ứng dụng. Như mô tả trong [Phát hiện entity](/l/vi/developers/extend/apps/getting-started#entity-detection), bạn phải sử dụng `export default define<Entity>({...})` để entity được phát hiện:
+
+| Hàm | Mục đích |
+|----------|---------|
+| `defineApplication` | Cấu hình metadata ứng dụng (bắt buộc, một mỗi ứng dụng) |
+| `defineObject` | Định nghĩa đối tượng tùy chỉnh với các trường |
+| `defineLogicFunction` | Định nghĩa hàm logic với handler |
+| `definePreInstallLogicFunction` | Định nghĩa hàm logic pre-install (một mỗi ứng dụng) |
+| `definePostInstallLogicFunction` | Định nghĩa hàm logic post-install (một mỗi ứng dụng) |
+| `defineFrontComponent` | Định nghĩa thành phần giao diện cho UI tùy chỉnh |
+| `defineRole` | Cấu hình quyền role và truy cập đối tượng |
+| `defineField` | Mở rộng đối tượng hiện có với trường bổ sung |
+| `defineView` | Định nghĩa view đã lưu cho đối tượng |
+| `defineNavigationMenuItem` | Định nghĩa liên kết điều hướng sidebar |
+| `defineSkill` | Định nghĩa kỹ năng AI agent |
+
+Các hàm này xác thực cấu hình tại thời điểm build và cung cấp tự động hoàn thành IDE và an toàn kiểu.
+
+### Định nghĩa đối tượng
+
+Đối tượng tùy chỉnh mô tả cả schema và hành vi cho bản ghi trong workspace. Sử dụng `defineObject()` để định nghĩa đối tượng với xác thực tích hợp:
+
+```typescript
+// src/app/postCard.object.ts
+import { defineObject, FieldType } from 'twenty-sdk';
+
+enum PostCardStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+  DELIVERED = 'DELIVERED',
+  RETURNED = 'RETURNED',
+}
+
+export default defineObject({
+  universalIdentifier: '54b589ca-eeed-4950-a176-358418b85c05',
+  nameSingular: 'postCard',
+  namePlural: 'postCards',
+  labelSingular: 'Post Card',
+  labelPlural: 'Post Cards',
+  description: 'A post card object',
+  icon: 'IconMail',
+  fields: [
+    {
+      universalIdentifier: '58a0a314-d7ea-4865-9850-7fb84e72f30b',
+      name: 'content',
+      type: FieldType.TEXT,
+      label: 'Content',
+      description: "Postcard's content",
+      icon: 'IconAbc',
+    },
+    {
+      universalIdentifier: 'c6aa31f3-da76-4ac6-889f-475e226009ac',
+      name: 'recipientName',
+      type: FieldType.FULL_NAME,
+      label: 'Recipient name',
+      icon: 'IconUser',
+    },
+    {
+      universalIdentifier: '95045777-a0ad-49ec-98f9-22f9fc0c8266',
+      name: 'recipientAddress',
+      type: FieldType.ADDRESS,
+      label: 'Recipient address',
+      icon: 'IconHome',
+    },
+    {
+      universalIdentifier: '87b675b8-dd8c-4448-b4ca-20e5a2234a1e',
+      name: 'status',
+      type: FieldType.SELECT,
+      label: 'Status',
+      icon: 'IconSend',
+      defaultValue: `'${PostCardStatus.DRAFT}'`,
+      options: [
+        { value: PostCardStatus.DRAFT, label: 'Draft', position: 0, color: 'gray' },
+        { value: PostCardStatus.SENT, label: 'Sent', position: 1, color: 'orange' },
+        { value: PostCardStatus.DELIVERED, label: 'Delivered', position: 2, color: 'green' },
+        { value: PostCardStatus.RETURNED, label: 'Returned', position: 3, color: 'orange' },
+      ],
+    },
+    {
+      universalIdentifier: 'e06abe72-5b44-4e7f-93be-afc185a3c433',
+      name: 'deliveredAt',
+      type: FieldType.DATE_TIME,
+      label: 'Delivered at',
+      icon: 'IconCheck',
+      isNullable: true,
+      defaultValue: null,
+    },
+  ],
+});
+```
+
+Điểm chính:
+
+- Sử dụng `defineObject()` để có xác thực tích hợp và hỗ trợ IDE tốt hơn.
+- `universalIdentifier` phải duy nhất và ổn định giữa các lần triển khai.
+- Mỗi trường cần `name`, `type`, `label` và `universalIdentifier` ổn định riêng.
+- Mảng `fields` là tùy chọn -- bạn có thể định nghĩa đối tượng không có trường tùy chỉnh.
+- Bạn có thể tạo khung đối tượng mới bằng `yarn twenty entity:add`, hướng dẫn bạn qua việc đặt tên, trường và mối quan hệ.
+
+<Note>
+**Các trường cơ bản được tạo tự động.** Khi bạn định nghĩa đối tượng tùy chỉnh, Twenty tự động thêm các trường chuẩn
+  như `id`, `name`, `createdAt`, `updatedAt`, `createdBy`, `updatedBy` và `deletedAt`.
+  Bạn không cần định nghĩa chúng trong mảng `fields` -- chỉ thêm các trường tùy chỉnh của bạn.
+  Bạn có thể ghi đè trường mặc định bằng cách định nghĩa trường cùng tên trong mảng `fields`,
+  nhưng điều này không được khuyến nghị.
+</Note>
+
+
+### Cấu hình ứng dụng (application-config.ts)
+
+Mỗi ứng dụng có một file `application-config.ts` duy nhất mô tả:
+
+- **Ứng dụng là gì**: định danh, tên hiển thị và mô tả.
+- **Hàm chạy như thế nào**: role nào chúng sử dụng cho quyền.
+- **(Tùy chọn) biến**: cặp khóa-giá trị được cung cấp cho hàm như biến môi trường.
+- **(Tùy chọn) hàm pre-install**: hàm logic chạy trước khi ứng dụng được cài đặt.
+- **(Tùy chọn) hàm post-install**: hàm logic chạy sau khi ứng dụng được cài đặt.
+
+Sử dụng `defineApplication()` để định nghĩa cấu hình ứng dụng:
+
+```typescript
+// src/application-config.ts
+import { defineApplication } from 'twenty-sdk';
+import { DEFAULT_ROLE_UNIVERSAL_IDENTIFIER } from 'src/roles/default-role';
+
+export default defineApplication({
+  universalIdentifier: '4ec0391d-18d5-411c-b2f3-266ddc1c3ef7',
+  displayName: 'My Twenty App',
+  description: 'My first Twenty app',
+  icon: 'IconWorld',
+  applicationVariables: {
+    DEFAULT_RECIPIENT_NAME: {
+      universalIdentifier: '19e94e59-d4fe-4251-8981-b96d0a9f74de',
+      description: 'Default recipient name for postcards',
+      value: 'Jane Doe',
+      isSecret: false,
+    },
+  },
+  defaultRoleUniversalIdentifier: DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
+});
+```
+
+Ghi chú:
+- Các trường `universalIdentifier` là ID xác định bạn sở hữu; tạo một lần và giữ ổn định giữa các lần đồng bộ.
+- `applicationVariables` trở thành biến môi trường cho hàm (ví dụ, `DEFAULT_RECIPIENT_NAME` có sẵn như `process.env.DEFAULT_RECIPIENT_NAME`).
+- `defaultRoleUniversalIdentifier` phải khớp với file role (xem bên dưới).
+- Hàm pre-install và post-install được tự động phát hiện trong quá trình build manifest. Xem [Hàm pre-install](#pre-install-functions) và [Hàm post-install](#post-install-functions).
+
+#### Role và quyền
+
+Ứng dụng có thể định nghĩa role đóng gói quyền trên các đối tượng và hành động của workspace. Trường `defaultRoleUniversalIdentifier` trong `application-config.ts` chỉ định role mặc định được sử dụng bởi hàm logic của ứng dụng.
+
+- API key thời gian chạy được tiêm vào như `TWENTY_API_KEY` bắt nguồn từ role hàm mặc định này.
+- Typed client sẽ bị giới hạn bởi quyền được cấp cho role đó.
+- Thực hiện nguyên tắc đặc quyền tối thiểu: tạo role riêng chỉ với các quyền hàm của bạn cần, sau đó tham chiếu universal identifier của nó.
+
+##### Role hàm mặc định (*.role.ts)
+
+Khi bạn tạo khung ứng dụng mới, CLI cũng tạo file role mặc định. Sử dụng `defineRole()` để định nghĩa role với xác thực tích hợp:
+
+```typescript
+// src/roles/default-role.ts
+import { defineRole, PermissionFlag } from 'twenty-sdk';
+
+export const DEFAULT_ROLE_UNIVERSAL_IDENTIFIER =
+  'b648f87b-1d26-4961-b974-0908fd991061';
+
+export default defineRole({
+  universalIdentifier: DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
+  label: 'Default function role',
+  description: 'Default role for function Twenty client',
+  canReadAllObjectRecords: false,
+  canUpdateAllObjectRecords: false,
+  canSoftDeleteAllObjectRecords: false,
+  canDestroyAllObjectRecords: false,
+  canUpdateAllSettings: false,
+  canBeAssignedToAgents: false,
+  canBeAssignedToUsers: false,
+  canBeAssignedToApiKeys: false,
+  objectPermissions: [
+    {
+      objectUniversalIdentifier: '9f9882af-170c-4879-b013-f9628b77c050',
+      canReadObjectRecords: true,
+      canUpdateObjectRecords: true,
+      canSoftDeleteObjectRecords: false,
+      canDestroyObjectRecords: false,
+    },
+  ],
+  fieldPermissions: [
+    {
+      objectUniversalIdentifier: '9f9882af-170c-4879-b013-f9628b77c050',
+      fieldUniversalIdentifier: 'b2c37dc0-8ae7-470e-96cd-1476b47dfaff',
+      canReadFieldValue: false,
+      canUpdateFieldValue: false,
+    },
+  ],
+  permissionFlags: [PermissionFlag.APPLICATIONS],
+});
+```
+
+`universalIdentifier` của role này được tham chiếu trong `application-config.ts` là `defaultRoleUniversalIdentifier`. Nói cách khác:
+
+- **\*.role.ts** định nghĩa role hàm mặc định có thể làm gì.
+- **application-config.ts** trỏ đến role đó để hàm của bạn thừa kế quyền.
+
+Ghi chú:
+- Bắt đầu từ role scaffolded, sau đó dần dần giới hạn theo nguyên tắc đặc quyền tối thiểu.
+- Thay thế `objectPermissions` và `fieldPermissions` bằng các đối tượng/trường hàm của bạn cần.
+- `permissionFlags` kiểm soát truy cập đến các khả năng cấp nền tảng. Giữ chúng tối thiểu; chỉ thêm những gì bạn cần.
+- Xem ví dụ hoạt động trong ứng dụng Hello World: [`packages/twenty-apps/hello-world/src/roles/function-role.ts`](https://github.com/twentyhq/twenty/blob/main/packages/twenty-apps/hello-world/src/roles/function-role.ts).
+
+### Cấu hình hàm logic và điểm vào
+
+Mỗi file hàm sử dụng `defineLogicFunction()` để export cấu hình với handler và trigger tùy chọn.
+
+```typescript
+// src/app/createPostCard.logic-function.ts
+import { defineLogicFunction } from 'twenty-sdk';
+import type { DatabaseEventPayload, ObjectRecordCreateEvent, CronPayload, RoutePayload } from 'twenty-sdk';
+import { CoreApiClient, type Person } from 'twenty-sdk/generated';
+
+const handler = async (params: RoutePayload) => {
+  const client = new CoreApiClient();
+  const name = 'name' in params.queryStringParameters
+    ? params.queryStringParameters.name ?? process.env.DEFAULT_RECIPIENT_NAME ?? 'Hello world'
+    : 'Hello world';
+
+  const result = await client.mutation({
+    createPostCard: {
+      __args: { data: { name } },
+      id: true,
+      name: true,
+    },
+  });
+  return result;
+};
+
+export default defineLogicFunction({
+  universalIdentifier: 'e56d363b-0bdc-4d8a-a393-6f0d1c75bdcf',
+  name: 'create-new-post-card',
+  timeoutSeconds: 2,
+  handler,
+  triggers: [
+    // Trigger route HTTP công khai '/s/post-card/create'
+    {
+      universalIdentifier: 'c9f84c8d-b26d-40d1-95dd-4f834ae5a2c6',
+      type: 'route',
+      path: '/post-card/create',
+      httpMethod: 'GET',
+      isAuthRequired: false,
+    },
+    // Trigger cron (mẫu CRON)
+    // {
+    //   universalIdentifier: 'dd802808-0695-49e1-98c9-d5c9e2704ce2',
+    //   type: 'cron',
+    //   pattern: '0 0 1 1 *',
+    // },
+    // Trigger sự kiện database
+    // {
+    //   universalIdentifier: '203f1df3-4a82-4d06-a001-b8cf22a31156',
+    //   type: 'databaseEvent',
+    //   eventName: 'person.updated',
+    //   updatedFields: ['name'],
+    // },
+  ],
+});
+```
+
+Các loại trigger phổ biến:
+- **route**: Cung cấp hàm trên đường dẫn và phương thức HTTP **dưới endpoint `/s/`**:
+> ví dụ: `path: '/post-card/create',` -> gọi tại `<APP_URL>/s/post-card/create`
+- **cron**: Chạy hàm theo lịch sử dụng biểu thức CRON.
+- **databaseEvent**: Chạy khi có sự kiện vòng đời đối tượng workspace. Khi thao tác sự kiện là `updated`, các trường cụ thể để lắng nghe có thể được chỉ định trong mảng `updatedFields`. Nếu để trống hoặc không định nghĩa, bất kỳ cập nhật nào cũng kích hoạt hàm.
+> ví dụ: `person.updated`
+
+Ghi chú:
+- Mảng `triggers` là tùy chọn. Hàm không có trigger có thể dùng làm hàm tiện ích được gọi bởi hàm khác.
+- Bạn có thể kết hợp nhiều loại trigger trong một hàm.
+
+### Hàm pre-install
+
+Hàm pre-install là hàm logic chạy tự động trước khi ứng dụng được cài đặt trên workspace. Điều này hữu ích cho các tác vụ xác thực, kiểm tra điều kiện tiên quyết hoặc chuẩn bị trạng thái workspace trước khi quá trình cài đặt chính tiến hành.
+
+Khi bạn tạo khung ứng dụng mới với `create-twenty-app`, hàm pre-install được tạo sẵn tại `src/logic-functions/pre-install.ts`:
+
+```typescript
+// src/logic-functions/pre-install.ts
+import { definePreInstallLogicFunction, type InstallLogicFunctionPayload } from 'twenty-sdk';
+
+const handler = async (payload: InstallLogicFunctionPayload): Promise<void> => {
+  console.log('Pre install logic function executed successfully!', payload.previousVersion);
+};
+
+export default definePreInstallLogicFunction({
+  universalIdentifier: '<generated-uuid>',
+  name: 'pre-install',
+  description: 'Runs before installation to prepare the application.',
+  timeoutSeconds: 300,
+  handler,
+});
+```
+
+Bạn cũng có thể thực thi thủ công hàm pre-install bất kỳ lúc nào bằng CLI:
+
+```bash filename="Terminal"
+yarn twenty function:execute --preInstall
+```
+
+Điểm chính:
+- Hàm pre-install sử dụng `definePreInstallLogicFunction()` -- biến thể chuyên biệt bỏ qua cài đặt trigger (`cronTriggerSettings`, `databaseEventTriggerSettings`, `httpRouteTriggerSettings`, `isTool`).
+- Handler nhận `InstallLogicFunctionPayload` với `{ previousVersion: string }` -- phiên bản ứng dụng đã cài đặt trước đó (hoặc chuỗi rỗng cho cài đặt mới).
+- Chỉ cho phép một hàm pre-install mỗi ứng dụng. Quá trình build manifest sẽ báo lỗi nếu phát hiện nhiều hơn một.
+- `universalIdentifier` của hàm được tự động đặt làm `preInstallLogicFunctionUniversalIdentifier` trên manifest ứng dụng trong quá trình build -- bạn không cần tham chiếu nó trong `defineApplication()`.
+- Timeout mặc định là 300 giây (5 phút) để cho phép các tác vụ chuẩn bị dài hơn.
+- Hàm pre-install không cần trigger -- chúng được gọi bởi nền tảng trước khi cài đặt hoặc thủ công qua `function:execute --preInstall`.
+
+### Hàm post-install
+
+Hàm post-install là hàm logic chạy tự động sau khi ứng dụng được cài đặt trên workspace. Điều này hữu ích cho các tác vụ thiết lập một lần như gieo dữ liệu mặc định, tạo bản ghi ban đầu hoặc cấu hình cài đặt workspace.
+
+Khi bạn tạo khung ứng dụng mới với `create-twenty-app`, hàm post-install được tạo sẵn tại `src/logic-functions/post-install.ts`:
+
+```typescript
+// src/logic-functions/post-install.ts
+import { definePostInstallLogicFunction, type InstallLogicFunctionPayload } from 'twenty-sdk';
+
+const handler = async (payload: InstallLogicFunctionPayload): Promise<void> => {
+  console.log('Post install logic function executed successfully!', payload.previousVersion);
+};
+
+export default definePostInstallLogicFunction({
+  universalIdentifier: '<generated-uuid>',
+  name: 'post-install',
+  description: 'Runs after installation to set up the application.',
+  timeoutSeconds: 300,
+  handler,
+});
+```
+
+Bạn cũng có thể thực thi thủ công hàm post-install bất kỳ lúc nào bằng CLI:
+
+```bash filename="Terminal"
+yarn twenty function:execute --postInstall
+```
+
+Điểm chính:
+- Hàm post-install sử dụng `definePostInstallLogicFunction()` -- biến thể chuyên biệt bỏ qua cài đặt trigger (`cronTriggerSettings`, `databaseEventTriggerSettings`, `httpRouteTriggerSettings`, `isTool`).
+- Handler nhận `InstallLogicFunctionPayload` với `{ previousVersion: string }` -- phiên bản ứng dụng đã cài đặt trước đó (hoặc chuỗi rỗng cho cài đặt mới).
+- Chỉ cho phép một hàm post-install mỗi ứng dụng. Quá trình build manifest sẽ báo lỗi nếu phát hiện nhiều hơn một.
+- `universalIdentifier` của hàm được tự động đặt làm `postInstallLogicFunctionUniversalIdentifier` trên manifest ứng dụng trong quá trình build -- bạn không cần tham chiếu nó trong `defineApplication()`.
+- Timeout mặc định là 300 giây (5 phút) để cho phép các tác vụ thiết lập dài hơn như gieo dữ liệu.
+- Hàm post-install không cần trigger -- chúng được gọi bởi nền tảng trong quá trình cài đặt hoặc thủ công qua `function:execute --postInstall`.
+
+### Route trigger payload
+
+<Warning>
+**Thay đổi không tương thích ngược (v1.16, tháng 1 năm 2026):** Định dạng route trigger payload đã thay đổi. Trước v1.16, query parameter, path parameter và body được gửi trực tiếp là payload. Từ v1.16, chúng được lồng trong đối tượng `RoutePayload` có cấu trúc.
+
+**Trước v1.16:**
+```typescript
+const handler = async (params) => {
+  const { param1, param2 } = params; // Truy cập trực tiếp
+};
+```
+
+**Sau v1.16:**
+```typescript
+const handler = async (event: RoutePayload) => {
+  const { param1, param2 } = event.body; // Truy cập qua .body
+  const { queryParam } = event.queryStringParameters;
+  const { id } = event.pathParameters;
+};
+```
+
+**Để di chuyển hàm hiện có:** Cập nhật handler để destructure từ `event.body`, `event.queryStringParameters` hoặc `event.pathParameters` thay vì trực tiếp từ đối tượng params.
+</Warning>
+
+Khi route trigger gọi hàm logic, nó nhận đối tượng `RoutePayload` theo định dạng AWS HTTP API v2. Import type từ `twenty-sdk`:
+
+```typescript
+import { defineLogicFunction, type RoutePayload } from 'twenty-sdk';
+
+const handler = async (event: RoutePayload) => {
+  // Truy cập dữ liệu request
+  const { headers, queryStringParameters, pathParameters, body } = event;
+
+  // Phương thức HTTP và đường dẫn có sẵn trong requestContext
+  const { method, path } = event.requestContext.http;
+
+  return { message: 'Success' };
+};
+```
+
+Type `RoutePayload` có cấu trúc sau:
+
+| Thuộc tính | Type | Mô tả |
+|----------|------|-------------|
+| `headers` | `Record<string, string \| undefined>` | HTTP header (chỉ những header liệt kê trong `forwardedRequestHeaders`) |
+| `queryStringParameters` | `Record<string, string \| undefined>` | Query string parameter (nhiều giá trị nối bằng dấu phẩy) |
+| `pathParameters` | `Record<string, string \| undefined>` | Path parameter trích từ mẫu route (ví dụ: `/users/:id` -> `{ id: '123' }`) |
+| `body` | `object \| null` | Body request đã phân tích (JSON) |
+| `isBase64Encoded` | `boolean` | Body có được mã hóa base64 không |
+| `requestContext.http.method` | `string` | Phương thức HTTP (GET, POST, PUT, PATCH, DELETE) |
+| `requestContext.http.path` | `string` | Đường dẫn request gốc |
+
+### Chuyển tiếp HTTP header
+
+Mặc định, HTTP header từ request đến **không** được chuyển đến hàm logic vì lý do bảo mật. Để truy cập header cụ thể, liệt kê chúng rõ ràng trong mảng `forwardedRequestHeaders`:
+
+```typescript
+export default defineLogicFunction({
+  universalIdentifier: 'e56d363b-0bdc-4d8a-a393-6f0d1c75bdcf',
+  name: 'webhook-handler',
+  handler,
+  triggers: [
+    {
+      universalIdentifier: 'c9f84c8d-b26d-40d1-95dd-4f834ae5a2c6',
+      type: 'route',
+      path: '/webhook',
+      httpMethod: 'POST',
+      isAuthRequired: false,
+      forwardedRequestHeaders: ['x-webhook-signature', 'content-type'],
+    },
+  ],
+});
+```
+
+Trong handler, bạn có thể truy cập các header này:
+
+```typescript
+const handler = async (event: RoutePayload) => {
+  const signature = event.headers['x-webhook-signature'];
+  const contentType = event.headers['content-type'];
+
+  // Xác thực chữ ký webhook...
+  return { received: true };
+};
+```
+
+<Note>
+  Tên header được chuẩn hóa thành chữ thường. Truy cập chúng bằng khóa chữ thường (ví dụ, `event.headers['content-type']`).
+</Note>
+
+Bạn có thể tạo hàm mới bằng hai cách:
+
+- **Scaffolded**: Chạy `yarn twenty entity:add` và chọn tùy chọn thêm hàm logic mới. Điều này tạo file khởi đầu với handler và cấu hình.
+- **Thủ công**: Tạo file `*.logic-function.ts` mới và sử dụng `defineLogicFunction()`, theo cùng mẫu.
+
+### Đánh dấu hàm logic là tool
+
+Hàm logic có thể được cung cấp như **tool** cho AI agent và workflow. Khi hàm được đánh dấu là tool, nó trở nên khả khám phá bởi các tính năng AI của Twenty và có thể được chọn làm bước trong tự động hóa workflow.
+
+Để đánh dấu hàm logic là tool, đặt `isTool: true` và cung cấp `toolInputSchema` mô tả các tham số đầu vào dự kiến bằng [JSON Schema](https://json-schema.org/):
+
+```typescript
+// src/logic-functions/enrich-company.logic-function.ts
+import { defineLogicFunction } from 'twenty-sdk';
+import { CoreApiClient } from 'twenty-sdk/generated';
+
+const handler = async (params: { companyName: string; domain?: string }) => {
+  const client = new CoreApiClient();
+
+  const result = await client.mutation({
+    createTask: {
+      __args: {
+        data: {
+          title: `Enrich data for ${params.companyName}`,
+          body: `Domain: ${params.domain ?? 'unknown'}`,
+        },
+      },
+      id: true,
+    },
+  });
+
+  return { taskId: result.createTask.id };
+};
+
+export default defineLogicFunction({
+  universalIdentifier: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+  name: 'enrich-company',
+  description: 'Enrich a company record with external data',
+  timeoutSeconds: 10,
+  handler,
+  isTool: true,
+  toolInputSchema: {
+    type: 'object',
+    properties: {
+      companyName: {
+        type: 'string',
+        description: 'The name of the company to enrich',
+      },
+      domain: {
+        type: 'string',
+        description: 'The company website domain (optional)',
+      },
+    },
+    required: ['companyName'],
+  },
+});
+```
+
+Điểm chính:
+
+- **`isTool`** (`boolean`, mặc định: `false`): Khi đặt `true`, hàm được đăng ký là tool và trở nên có sẵn cho AI agent và tự động hóa workflow.
+- **`toolInputSchema`** (`object`, tùy chọn): Đối tượng JSON Schema mô tả các tham số hàm chấp nhận. AI agent sử dụng schema này để hiểu input tool mong đợi và xác thực các lời gọi. Nếu bỏ qua, schema mặc định là `{ type: 'object', properties: {} }` (không tham số).
+- Hàm với `isTool: false` (hoặc không đặt) **không** được cung cấp như tool. Chúng vẫn có thể thực thi trực tiếp hoặc gọi bởi hàm khác, nhưng không xuất hiện trong khám phá tool.
+- **Đặt tên tool**: Khi cung cấp là tool, tên hàm được tự động chuẩn hóa thành `logic_function_<tên>` (chữ thường, ký tự không phải số-chữ được thay bằng gạch dưới). Ví dụ, `enrich-company` trở thành `logic_function_enrich_company`.
+- Bạn có thể kết hợp `isTool` với trigger -- hàm có thể vừa là tool (gọi bởi AI agent) vừa được kích hoạt bởi sự kiện (cron, sự kiện database, route) cùng lúc.
+
+<Note>
+**Viết `description` tốt.** AI agent dựa vào trường `description` của hàm để quyết định khi nào sử dụng tool. Hãy cụ thể về những gì tool làm và khi nào nên gọi nó.
+</Note>
+
+### Thành phần giao diện
+
+Thành phần giao diện cho phép bạn xây dựng các React component tùy chỉnh hiển thị trong UI của Twenty. Sử dụng `defineFrontComponent()` để định nghĩa component với xác thực tích hợp:
+
+```typescript
+// src/front-components/my-widget.tsx
+import { defineFrontComponent } from 'twenty-sdk';
+
+const MyWidget = () => {
+  return (
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h1>My Custom Widget</h1>
+      <p>This is a custom front component for Twenty.</p>
+    </div>
+  );
+};
+
+export default defineFrontComponent({
+  universalIdentifier: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  name: 'my-widget',
+  description: 'A custom widget component',
+  component: MyWidget,
+});
+```
+
+Điểm chính:
+- Thành phần giao diện là React component hiển thị trong ngữ cảnh cô lập trong Twenty.
+- Trường `component` tham chiếu React component của bạn.
+- Component được build và đồng bộ tự động trong `yarn twenty app:dev`.
+
+Bạn có thể tạo thành phần giao diện mới bằng hai cách:
+
+- **Scaffolded**: Chạy `yarn twenty entity:add` và chọn tùy chọn thêm thành phần giao diện mới.
+- **Thủ công**: Tạo file `.tsx` mới và sử dụng `defineFrontComponent()`, theo cùng mẫu.
+
+### Kỹ năng
+
+Kỹ năng định nghĩa các hướng dẫn và khả năng có thể tái sử dụng mà AI agent có thể dùng trong workspace. Sử dụng `defineSkill()` để định nghĩa kỹ năng với xác thực tích hợp:
+
+```typescript
+// src/skills/example-skill.ts
+import { defineSkill } from 'twenty-sdk';
+
+export default defineSkill({
+  universalIdentifier: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  name: 'sales-outreach',
+  label: 'Sales Outreach',
+  description: 'Guides the AI agent through a structured sales outreach process',
+  icon: 'IconBrain',
+  content: `You are a sales outreach assistant. When reaching out to a prospect:
+1. Research the company and recent news
+2. Identify the prospect's role and likely pain points
+3. Draft a personalized message referencing specific details
+4. Keep the tone professional but conversational`,
+});
+```
+
+Điểm chính:
+- `name` là chuỗi định danh duy nhất cho kỹ năng (khuyến nghị kebab-case).
+- `label` là tên hiển thị dễ đọc cho người dùng trong UI.
+- `content` chứa hướng dẫn kỹ năng -- đây là văn bản AI agent sử dụng.
+- `icon` (tùy chọn) đặt biểu tượng hiển thị trong UI.
+- `description` (tùy chọn) cung cấp ngữ cảnh bổ sung về mục đích kỹ năng.
+
+Bạn có thể tạo kỹ năng mới bằng hai cách:
+
+- **Scaffolded**: Chạy `yarn twenty entity:add` và chọn tùy chọn thêm kỹ năng mới.
+- **Thủ công**: Tạo file mới và sử dụng `defineSkill()`, theo cùng mẫu.
+
+### Typed client được tạo tự động
+
+Hai typed client được tự động tạo bởi `yarn twenty app:dev` và lưu trong `node_modules/twenty-sdk/generated` dựa trên schema workspace:
+
+- **`CoreApiClient`** -- truy vấn endpoint `/graphql` cho dữ liệu workspace
+- **`MetadataApiClient`** -- truy vấn endpoint `/metadata` cho cấu hình workspace và tải file lên
+
+```typescript
+import { CoreApiClient, MetadataApiClient } from 'twenty-sdk/generated';
+
+const client = new CoreApiClient();
+const { me } = await client.query({ me: { id: true, displayName: true } });
+
+const metadataClient = new MetadataApiClient();
+const { currentWorkspace } = await metadataClient.query({ currentWorkspace: { id: true } });
+```
+
+Cả hai client đều được tạo lại tự động bởi `yarn twenty app:dev` mỗi khi đối tượng hoặc trường thay đổi.
+
+#### Thông tin xác thực lúc chạy trong hàm logic
+
+Khi hàm chạy trên Twenty, nền tảng tiêm thông tin xác thực làm biến môi trường trước khi code thực thi:
+
+- `TWENTY_API_URL`: URL gốc của Twenty API ứng dụng nhắm đến.
+- `TWENTY_API_KEY`: Key ngắn hạn giới hạn theo role hàm mặc định của ứng dụng.
+
+Ghi chú:
+- Bạn không cần truyền URL hoặc API key cho client đã tạo. Nó đọc `TWENTY_API_URL` và `TWENTY_API_KEY` từ process.env lúc chạy.
+- Quyền của API key được xác định bởi role tham chiếu trong `application-config.ts` qua `defaultRoleUniversalIdentifier`. Đây là role mặc định được sử dụng bởi hàm logic của ứng dụng.
+- Ứng dụng có thể định nghĩa role theo nguyên tắc đặc quyền tối thiểu. Chỉ cấp quyền hàm của bạn cần, sau đó trỏ `defaultRoleUniversalIdentifier` đến universal identifier của role đó.
+
+#### Tải file lên
+
+`MetadataApiClient` đã tạo bao gồm phương thức `uploadFile` để đính kèm file vào trường kiểu file trên đối tượng workspace. Vì client GraphQL chuẩn không hỗ trợ tải file nhiều phần tự nhiên, client cung cấp phương thức này thực hiện [GraphQL multipart request specification](https://github.com/jaydenseric/graphql-multipart-request-spec) bên trong.
+
+```typescript
+import { MetadataApiClient } from 'twenty-sdk/generated';
+import * as fs from 'fs';
+
+const metadataClient = new MetadataApiClient();
+
+const fileBuffer = fs.readFileSync('./invoice.pdf');
+
+const uploadedFile = await metadataClient.uploadFile(
+  fileBuffer,                                         // nội dung file dạng Buffer
+  'invoice.pdf',                                      // tên file
+  'application/pdf',                                  // MIME type (mặc định 'application/octet-stream')
+  '58a0a314-d7ea-4865-9850-7fb84e72f30b',            // field universal identifier
+);
+
+console.log(uploadedFile);
+// { id: '...', path: '...', size: 12345, createdAt: '...', url: 'https://...' }
+```
+
+Chữ ký phương thức:
+
+```typescript
+uploadFile(
+  fileBuffer: Buffer,
+  filename: string,
+  contentType: string,
+  fieldMetadataUniversalIdentifier: string,
+): Promise<{ id: string; path: string; size: number; createdAt: string; url: string }>
+```
+
+| Tham số | Type | Mô tả |
+|-----------|------|-------------|
+| `fileBuffer` | `Buffer` | Nội dung file gốc |
+| `filename` | `string` | Tên file (dùng để lưu trữ và hiển thị) |
+| `contentType` | `string` | MIME type của file (mặc định `application/octet-stream` nếu bỏ qua) |
+| `fieldMetadataUniversalIdentifier` | `string` | `universalIdentifier` của trường kiểu file trên đối tượng |
+
+Điểm chính:
+- Phương thức `uploadFile` có sẵn trên `MetadataApiClient` vì mutation upload được giải quyết bởi endpoint `/metadata`.
+- Nó sử dụng `universalIdentifier` của trường (không phải ID đặc thù workspace), nên code tải lên hoạt động trên bất kỳ workspace nào cài đặt ứng dụng -- nhất quán với cách ứng dụng tham chiếu trường ở mọi nơi khác.
+- `url` trả về là URL đã ký bạn có thể sử dụng để truy cập file đã tải lên.
+
+### Ví dụ Hello World
+
+Khám phá ví dụ tối thiểu, end-to-end minh họa đối tượng, hàm logic, thành phần giao diện và nhiều trigger [tại đây](https://github.com/twentyhq/twenty/tree/main/packages/twenty-apps/hello-world).

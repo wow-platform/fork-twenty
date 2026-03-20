@@ -1,0 +1,90 @@
+---
+title: Trường quan hệ
+description: Kết nối các bản ghi giữa các đối tượng khác nhau bằng trường quan hệ.
+---
+
+## Loại quan hệ
+
+### Một-nhiều
+Một bản ghi trong Đối tượng A có thể liên kết với nhiều bản ghi trong Đối tượng B.
+
+**Ví dụ:** Một Company có thể có nhiều People (nhân viên).
+
+### Nhiều-một
+Nhiều bản ghi trong Đối tượng A có thể liên kết với một bản ghi trong Đối tượng B.
+
+**Ví dụ:** Nhiều People có thể thuộc về một Company.
+
+### Quan hệ đến nhiều loại đối tượng
+
+Một số đối tượng có thể liên kết đến nhiều loại đối tượng ở một phía của quan hệ.
+
+**Ví dụ:** Một Note có thể được đính kèm vào một Person VÀ một Company VÀ một Opportunity cùng lúc. Note ở phía "nhiều", kết nối đến nhiều phía "một".
+
+<img src="/images/user-guide/fields/many-to-one-morph.png" style={{width:'100%'}}/>
+
+Tương tự, một Project (ở phía "một") có thể nhận liên kết từ nhiều People, nhiều Companies và nhiều Notes.
+
+<img src="/images/user-guide/fields/one-to-many-morph.png" style={{width:'100%'}}/>
+
+<Warning>
+**Giới hạn nhập/xuất**: Các quan hệ trỏ đến nhiều loại đối tượng chưa được hỗ trợ cho nhập/xuất CSV. Điều này nằm trong lộ trình phát triển.
+</Warning>
+
+### Nhiều-nhiều
+
+Nhiều bản ghi trong Đối tượng A có thể liên kết với nhiều bản ghi trong Đối tượng B.
+
+**Ví dụ:** Nhiều People có thể liên kết với nhiều Projects và ngược lại.
+
+Quan hệ nhiều-nhiều sử dụng mẫu **đối tượng trung gian**: một đối tượng trung gian kết nối cả hai phía. Với tính năng quan hệ trung gian, Twenty hiển thị trực tiếp các bản ghi được liên kết cuối cùng, ẩn đối tượng trung gian khỏi giao diện.
+
+<img src="/images/user-guide/fields/junction-relation-diagram.png" style={{width:'100%'}}/>
+
+<Warning>
+**Tính năng thử nghiệm**: Quan hệ trung gian phải được kích hoạt tại **Settings → Updates → Lab** trước khi sử dụng.
+</Warning>
+
+Xem [Cách tạo quan hệ nhiều-nhiều](/l/vi/user-guide/data-model/how-tos/create-many-to-many-relations) để có hướng dẫn từng bước đầy đủ.
+
+## Tạo trường quan hệ
+
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng bạn muốn thêm quan hệ
+3. Nhấp **+ Add Field**
+4. Chọn **Relation** làm loại trường
+5. Chọn đối tượng đích để liên kết
+6. Cấu hình cài đặt quan hệ:
+   - **Tên trường trên đối tượng nguồn**: Tên trường quan hệ trên đối tượng bạn đang chỉnh sửa
+   - **Tên trường trên đối tượng đích**: Tên trường quan hệ sẽ xuất hiện trên đối tượng đích
+   - Loại quan hệ (một-nhiều, nhiều-một)
+7. Nhấp **Save**
+
+## Quan hệ tiêu chuẩn
+
+Twenty đi kèm với các quan hệ tích hợp sẵn giữa các đối tượng tiêu chuẩn:
+
+| Từ đối tượng | Đến đối tượng | Loại quan hệ |
+|-------------|-----------|---------------|
+| People | Companies | Nhiều-một |
+| Opportunities | Companies | Nhiều-một |
+| Opportunities | People  | Nhiều-một |
+
+## Phương pháp tốt nhất
+
+### Lập kế hoạch quan hệ
+- **Vẽ sơ đồ mô hình dữ liệu**: Lập kế hoạch quan hệ trước khi tạo
+- **Cân nhắc hướng**: Nghĩ xem đối tượng nào "sở hữu" mối quan hệ
+- **Tránh phụ thuộc vòng**: Giữ mô hình dữ liệu gọn gàng
+
+### Đặt tên quan hệ
+- **Sử dụng tên rõ ràng**: Làm cho rõ ràng quan hệ đại diện cho gì
+- **Nhất quán**: Sử dụng mẫu đặt tên tương tự giữa các quan hệ
+- **Cân nhắc cả hai phía**: Đặt tên cả hai phía của quan hệ phù hợp
+
+### Hiệu suất
+- **Không tạo quá nhiều quan hệ**: Quá nhiều quan hệ có thể làm chậm không gian làm việc
+
+## Giới hạn
+- **Xóa quan hệ** loại bỏ liên kết nhưng không xóa bản ghi liên quan
+- **Quan hệ vòng** nên được tránh để đảm bảo tính toàn vẹn dữ liệu

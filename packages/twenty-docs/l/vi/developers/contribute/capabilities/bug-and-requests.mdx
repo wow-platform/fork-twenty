@@ -1,0 +1,75 @@
+---
+title: Lỗi, Yêu cầu & Pull Request
+info: Báo cáo vấn đề, yêu cầu tính năng và đóng góp code
+---
+
+
+## Báo cáo lỗi
+
+Để báo cáo lỗi, vui lòng [tạo issue trên GitHub](https://github.com/twentyhq/twenty/issues/new).
+
+Bạn cũng có thể yêu cầu giúp đỡ trên [Discord](https://discord.gg/cx5n4Jzs57).
+
+## Yêu cầu tính năng
+
+Nếu bạn không chắc đó là lỗi và cảm thấy nó gần với yêu cầu tính năng hơn, bạn nên [mở discussion thay thế](https://github.com/twentyhq/twenty/discussions/new).
+
+## Gửi Pull Request
+
+Đóng góp code cho Twenty bắt đầu với pull request (PR).
+
+### Trước khi bắt đầu
+
+1. Kiểm tra [issue hiện có](https://github.com/twentyhq/twenty/issues) cho công việc liên quan
+2. Với tính năng mới, mở issue trước để thảo luận
+3. Xem [Quy tắc ứng xử](https://github.com/twentyhq/twenty/blob/main/CODE_OF_CONDUCT.md)
+
+### Fork và Clone
+
+1. Fork repository trên GitHub
+2. Clone fork của bạn:
+```bash
+git clone https://github.com/YOUR_USERNAME/twenty.git
+cd twenty
+```
+
+3. Thêm remote upstream:
+```bash
+git remote add upstream https://github.com/twentyhq/twenty.git
+```
+
+### Tạo nhánh
+
+```bash
+git checkout -b feature/tên-tính-năng-của-bạn
+```
+
+Sử dụng tên nhánh mô tả:
+- `feature/add-export-button`
+- `fix/login-redirect-issue`
+- `docs/update-api-guide`
+
+### Thực hiện thay đổi
+
+1. Viết code sạch, có tài liệu tốt
+2. Tuân thủ phong cách code hiện có
+3. Thêm test cho chức năng mới
+4. Cập nhật tài liệu nếu cần
+
+### Gửi PR
+
+1. Đẩy nhánh của bạn:
+```bash
+git push origin feature/tên-tính-năng-của-bạn
+```
+
+2. Mở PR trên GitHub
+3. Điền mẫu PR
+4. Liên kết các issue liên quan
+
+### Danh sách kiểm tra PR
+
+- [ ] Code tuân thủ hướng dẫn phong cách dự án
+- [ ] Test chạy thành công cục bộ
+- [ ] Tài liệu được cập nhật
+- [ ] Mô tả PR giải thích các thay đổi

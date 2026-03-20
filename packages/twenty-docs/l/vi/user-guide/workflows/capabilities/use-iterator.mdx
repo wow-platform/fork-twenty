@@ -1,0 +1,173 @@
+---
+title: Sử dụng Iterator
+description: Lặp qua mảng bản ghi để thực hiện hành động trên mỗi phần tử.
+image: /images/user-guide/workflows/workflow.png
+---
+
+Iterator cho phép bạn lặp qua mảng bản ghi và thực hiện hành động trên mỗi bản ghi. Đây là tính năng cần thiết cho workflow cần xử lý nhiều bản ghi được trả về bởi Tìm kiếm bản ghi hoặc nhận qua webhook.
+
+
+## Khi nào sử dụng Iterator
+
+| Kịch bản | Ví dụ |
+|----------|---------|
+| **Xử lý kết quả tìm kiếm** | Gửi email cho mỗi người được tìm thấy |
+| **Xử lý mảng webhook** | Tạo bản ghi cho mỗi mục trong đơn hàng |
+| **Cập nhật hàng loạt** | Cập nhật nhiều bản ghi với giá trị tính toán |
+| **Thông báo** | Thông báo nhiều người về một sự kiện |
+
+## Hiểu về Iterator
+
+Iterator mong đợi **mảng** làm đầu vào. Sau đó nó:
+1. Lấy phần tử đầu tiên từ mảng
+2. Chạy tất cả hành động bên trong iterator với phần tử đó
+3. Chuyển sang phần tử tiếp theo
+4. Lặp lại cho đến khi tất cả phần tử được xử lý
+
+## Thiết lập cơ bản
+
+### Ví dụ: Gửi email cho mọi người trong kết quả tìm kiếm
+
+**Mục tiêu**: Tìm tất cả liên hệ trong một công ty cụ thể và gửi email cá nhân hóa cho mỗi người.
+
+### Bước 1: Tìm kiếm bản ghi
+
+1. Thêm hành động **Tìm kiếm bản ghi**
+2. Đối tượng: **Người**
+3. Bộ lọc: Công ty bằng "Acme Inc"
+4. Kết quả trả về mảng người
+
+### Bước 2: Kiểm tra kết quả tồn tại
+
+1. Thêm hành động **Bộ lọc**
+2. Điều kiện: `{{searchRecords.length}}` lớn hơn 0
+3. Điều này ngăn lỗi Iterator khi kết quả rỗng
+
+### Bước 3: Thêm Iterator
+
+1. Thêm hành động **Iterator**
+2. Đầu vào mảng: Chọn `{{searchRecords}}`
+3. Điều này tạo vòng lặp
+
+### Bước 4: Thêm hành động bên trong Iterator
+
+Hành động đặt sau Iterator chạy cho mỗi phần tử:
+
+1. Thêm hành động **Gửi email** (bên trong iterator)
+2. Đến: `{{iterator.currentItem.email}}`
+3. Chủ đề: Xin chào `{{iterator.currentItem.firstName}}`!
+4. Nội dung: Tin nhắn cá nhân hóa sử dụng trường phần tử hiện tại
+
+### Kết quả
+
+Nếu Tìm kiếm bản ghi trả về 5 người, Iterator:
+- Gửi email cho người 1
+- Gửi email cho người 2
+- ... tiếp tục cho cả 5
+
+## Truy cập dữ liệu phần tử hiện tại
+
+Bên trong Iterator, sử dụng `{{iterator.currentItem}}` để truy cập bản ghi hiện tại:
+
+| Biến | Mô tả |
+|----------|-------------|
+| `{{iterator.currentItem}}` | Toàn bộ đối tượng bản ghi hiện tại |
+| `{{iterator.currentItem.id}}` | ID bản ghi |
+| `{{iterator.currentItem.email}}` | Trường email |
+| `{{iterator.currentItem.company.name}}` | Tên công ty liên quan |
+| `{{iterator.index}}` | Vị trí hiện tại trong mảng (bắt đầu từ 0) |
+
+## Mẫu phổ biến
+
+### Cập nhật nhiều bản ghi
+
+**Mục tiêu**: Đánh dấu tất cả tác vụ quá hạn là "Trễ"
+
+```
+1. Tìm kiếm bản ghi (Tác vụ, Ngày hết hạn < Hôm nay, Trạng thái ≠ Hoàn thành)
+2. Bộ lọc (length > 0)
+3. Iterator (searchRecords)
+   └── Cập nhật bản ghi
+       - Đối tượng: Tác vụ
+       - Bản ghi: {{iterator.currentItem.id}}
+       - Trạng thái: Trễ
+```
+
+### Tạo bản ghi từ mảng
+
+**Mục tiêu**: Webhook nhận đơn hàng với nhiều mục, tạo bản ghi cho mỗi mục
+
+```
+1. Webhook Trigger (nhận mảng items)
+2. Bộ lọc (items.length > 0)
+3. Iterator (trigger.body.items)
+   └── Tạo bản ghi
+       - Đối tượng: Mục đơn hàng
+       - Tên: {{iterator.currentItem.name}}
+       - Số lượng: {{iterator.currentItem.qty}}
+       - Đơn hàng liên quan: {{trigger.body.orderId}}
+```
+
+### Xử lý có điều kiện bên trong vòng lặp
+
+**Mục tiêu**: Chỉ gửi email cho liên hệ có email hợp lệ
+
+```
+1. Tìm kiếm bản ghi (Người)
+2. Iterator (searchRecords)
+   └── Bộ lọc (currentItem.email không rỗng)
+       └── Gửi email
+           - Đến: {{iterator.currentItem.email}}
+```
+
+## Khắc phục sự cố
+
+### "Iterator mong đợi một mảng"
+
+**Nguyên nhân**: Bạn đã truyền một bản ghi đơn thay vì mảng.
+
+**Sửa**: Đảm bảo bạn đang truyền kết quả của Tìm kiếm bản ghi hoặc trường mảng, không phải bản ghi đơn.
+
+```
+✅ Đúng: {{searchRecords}}
+❌ Sai: {{searchRecords[0]}}
+```
+
+### Iterator không chạy
+
+**Nguyên nhân**: Mảng rỗng.
+
+**Sửa**: Thêm Bộ lọc trước Iterator để kiểm tra độ dài mảng:
+```
+Bộ lọc: {{searchRecords.length}} > 0
+```
+
+### Hành động chạy quá nhiều lần
+
+**Nguyên nhân**: Tìm kiếm bản ghi trả về nhiều bản ghi hơn mong đợi.
+
+**Sửa**:
+- Thêm bộ lọc cụ thể hơn cho Tìm kiếm bản ghi
+- Đặt giới hạn cho Tìm kiếm bản ghi (tối đa 200)
+- Thêm Bộ lọc bên trong Iterator cho điều kiện bổ sung
+
+## Lưu ý về hiệu suất
+
+- **Sử dụng credit**: Mỗi lần lặp tiêu thụ credit cho các hành động
+- **Thời gian**: Mảng lớn mất nhiều thời gian xử lý hơn
+- **Giới hạn**: Xem xét xử lý theo lô cho các thao tác rất lớn
+- **Giới hạn tốc độ**: Gọi API bên ngoài có thể đạt giới hạn tốc độ với nhiều lần lặp
+
+## Thực hành tốt nhất
+
+1. **Luôn kiểm tra độ dài mảng** trước Iterator để tránh lỗi
+2. **Thêm bộ lọc bên trong vòng lặp** khi không phải tất cả phần tử cần xử lý
+3. **Đổi tên bước Iterator** để mô tả nội dung đang lặp
+4. **Kiểm tra với mảng nhỏ** trước khi xử lý tập dữ liệu lớn
+5. **Giám sát lần chạy workflow** để đảm bảo các lần lặp hoàn thành như mong đợi
+
+## Liên quan
+
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Cách sử dụng nhánh](/l/vi/user-guide/workflows/capabilities/use-branches-in-workflows)
+- [FAQ Workflow](/l/vi/user-guide/workflows/how-tos/need-more-help/workflows-faq)

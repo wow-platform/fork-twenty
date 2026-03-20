@@ -1,0 +1,195 @@
+---
+title: Cập nhật bản ghi hiện có qua nhập
+description: Hướng dẫn từng bước đầy đủ để cập nhật hàng loạt bản ghi bằng nhập CSV.
+---
+
+## Tổng quan
+
+Cần cập nhật nhiều bản ghi cùng lúc? Thay vì chỉnh sửa từng cái, sử dụng nhập CSV để cập nhật hàng loạt bản ghi hiện có.
+
+**Trường hợp sử dụng:**
+- Cập nhật chức danh cho nhiều người
+- Thay đổi thông tin công ty hàng loạt
+- Thêm dữ liệu vào trường tùy chỉnh mới
+- Sửa lỗi dữ liệu trên nhiều bản ghi
+
+## Cách hoạt động
+
+Khi bạn nhập tệp chứa **định danh duy nhất** khớp bản ghi hiện có, Twenty cập nhật bản ghi đó thay vì tạo trùng lặp.
+
+| Nếu định danh duy nhất... | Twenty sẽ... |
+|-------------------------|----------------|
+| Khớp bản ghi hiện có | **Cập nhật** bản ghi hiện có |
+| Không khớp bản ghi nào | **Tạo** bản ghi mới |
+| Thiếu trong tệp | **Tạo** bản ghi mới (với ID tự động) |
+
+
+<Warning>
+**Trường Multi-Select bị ghi đè, không gộp.**
+
+Nếu bản ghi có `Option A` và `Option B` được chọn, và bạn nhập `["Option C"]`, bản ghi sẽ chỉ có `Option C` sau khi nhập. Nhập thay thế tất cả lựa chọn trước — không thêm vào.
+
+Để giữ giá trị hiện có, bao gồm tất cả trong nhập: `["Option A","Option B","Option C"]`
+</Warning>
+
+
+## Bước 1: Xuất dữ liệu hiện tại
+
+Đầu tiên, xuất bản ghi bạn muốn cập nhật:
+
+1. Điều hướng đến đối tượng (People, Companies, v.v.)
+2. **Thêm cột bạn cần** — nhấp **Options → Fields** để hiện trường bạn muốn cập nhật
+3. **Lọc nếu cần** — thu hẹp chỉ bản ghi bạn muốn cập nhật
+4. Nhấp **⋮** → **Export view**
+5. Lưu tệp CSV
+
+<Note>**Tại sao xuất trước?** Tệp xuất có định dạng đúng, bao gồm định danh duy nhất, và ánh xạ tự động khi nhập.</Note>
+
+### Nội dung được xuất
+
+- Tất cả cột hiển thị trong chế độ xem hiện tại
+- Định danh duy nhất của bản ghi (`id`, `email`, `domain`)
+- Giá trị trường hiện tại bạn có thể sửa đổi
+
+## Bước 2: Chỉnh sửa tệp CSV
+
+Mở tệp đã xuất trong ứng dụng bảng tính (Excel, Google Sheets, v.v.):
+
+1. **Giữ cột định danh duy nhất** — không xóa `id`, `email` hoặc `domain`
+2. **Cập nhật giá trị** trong cột bạn muốn thay đổi
+3. **Xóa cột không cần cập nhật** (tùy chọn, nhưng gọn hơn)
+4. **Không thay đổi giá trị định danh duy nhất** — nếu không Twenty sẽ tạo bản ghi mới
+
+### Ví dụ: Cập nhật chức danh
+
+**Tệp đã xuất:**
+```csv
+id,email,firstName,lastName,jobTitle
+550e8400-e29b-41d4-a716-446655440001,john@acme.com,John,Smith,Sales Rep
+550e8400-e29b-41d4-a716-446655440002,jane@acme.com,Jane,Doe,Sales Rep
+550e8400-e29b-41d4-a716-446655440003,bob@acme.com,Bob,Johnson,Sales Rep
+```
+
+**Sau khi chỉnh sửa:**
+```csv
+id,email,firstName,lastName,jobTitle
+550e8400-e29b-41d4-a716-446655440001,john@acme.com,John,Smith,Account Executive
+550e8400-e29b-41d4-a716-446655440002,jane@acme.com,Jane,Doe,Senior Account Executive
+550e8400-e29b-41d4-a716-446655440003,bob@acme.com,Bob,Johnson,Account Executive
+```
+
+<Warning>
+**Không thay đổi giá trị định danh duy nhất.**
+
+Nếu bạn thay đổi `john@acme.com` thành `john.smith@acme.com`, Twenty sẽ tạo bản ghi mới thay vì cập nhật bản ghi hiện có.
+</Warning>
+
+## Bước 3: Nhập tệp đã cập nhật
+
+1. Điều hướng đến đối tượng
+2. Nhấp **⋮** → **Import records**
+3. Tải tệp CSV đã chỉnh sửa lên
+4. **Đảm bảo định danh duy nhất được ánh xạ** — xác minh `email`, `domain` hoặc `id` được ánh xạ đúng
+5. Xem lại ánh xạ trường
+6. Kiểm tra lỗi
+7. Nhấp **Confirm**
+
+Twenty khớp bản ghi bằng định danh duy nhất và cập nhật với giá trị mới.
+
+## Chọn định danh duy nhất phù hợp
+
+| Đối tượng | Khuyến nghị | Thay thế | Ghi chú |
+|--------|-------------|-------------|-------|
+| **People** | `email` | `id` | Email dễ đọc |
+| **Companies** | `domain` | `id` | Domain dễ đọc |
+| **Đối tượng tùy chỉnh** | Bất kỳ trường duy nhất | `id` | Sử dụng trường duy nhất tùy chỉnh |
+
+<Note>**Chỉ sử dụng MỘT định danh duy nhất.** Không ánh xạ cả `email` VÀ `id`. Điều này có thể gây nhầm lẫn và lỗi.</Note>
+
+### Sử dụng trường duy nhất tùy chỉnh
+
+Nếu bạn có trường tùy chỉnh đánh dấu duy nhất (như ID bên ngoài từ hệ thống khác):
+1. Bao gồm trường đó trong xuất và nhập
+2. Ánh xạ khi nhập
+3. Twenty sẽ khớp theo trường đó
+
+## Bước 4: Xác minh cập nhật
+
+Sau khi nhập:
+1. Mở vài bản ghi đã cập nhật
+2. Xác minh thay đổi đã được áp dụng
+3. Kiểm tra không có bản ghi trùng lặp được tạo
+
+## Còn trường không trong tệp thì sao?
+
+**Trường không bao gồm trong tệp nhập vẫn giữ nguyên.**
+
+| Tệp bao gồm... | Kết quả |
+|-----------------------|--------|
+| `email`, `jobTitle` | Chỉ `jobTitle` được cập nhật; trường khác giữ nguyên |
+| `email`, `jobTitle`, `phone` | `jobTitle` và `phone` được cập nhật |
+
+Điều này có nghĩa bạn chỉ cần bao gồm trường bạn muốn thay đổi (cộng định danh duy nhất).
+
+
+## Kết hợp cập nhật và bản ghi mới
+
+Bạn có thể cập nhật bản ghi hiện có VÀ tạo mới trong cùng nhập:
+
+```csv
+email,firstName,lastName,jobTitle
+john@acme.com,John,Smith,Senior Manager    ← Cập nhật hiện có (email khớp)
+newperson@acme.com,New,Person,Analyst      ← Tạo mới (email không khớp)
+```
+
+## Lỗi phổ biến cần tránh
+
+| Lỗi | Vấn đề | Kết quả | Giải pháp |
+|---------|---------|--------|----------|
+| **Thay đổi định danh duy nhất** | Đổi `john@acme.com` thành `john.smith@acme.com` | Tạo bản ghi mới thay vì cập nhật | Giữ nguyên định danh duy nhất |
+| **Nhiều trường duy nhất** | Ánh xạ cả `email` VÀ `id` | Xung đột khớp tiềm ẩn | Chỉ ánh xạ MỘT định danh duy nhất |
+| **Không có định danh duy nhất** | Tệp chỉ có `firstName`, `lastName`, `jobTitle` | Tất cả hàng tạo bản ghi mới | Luôn bao gồm `email`, `domain` hoặc `id` |
+| **Không khớp chữ hoa/thường** | Tệp có `John@acme.com` nhưng Twenty có `john@acme.com` | Tạo bản ghi mới | Xuất từ Twenty để lấy giá trị chính xác |
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Nếu một số bản ghi chưa tồn tại thì sao?">
+    Bản ghi có định danh duy nhất không khớp bản ghi hiện có sẽ được tạo mới. Điều này cho phép bạn cập nhật và tạo trong cùng nhập.
+  </Accordion>
+
+  <Accordion title="Tôi có thể xóa/làm trống giá trị trường không?">
+    Có, để ô trống trong CSV. Nhập sẽ xóa giá trị trường đó trên bản ghi hiện có.
+  </Accordion>
+
+  <Accordion title="Điều gì xảy ra với trường tôi không bao gồm trong nhập?">
+    Trường không trong tệp nhập vẫn giữ nguyên trên bản ghi hiện có. Chỉ trường bạn bao gồm được cập nhật.
+  </Accordion>
+
+  <Accordion title="Tôi có thể cập nhật trường quan hệ (như Company) không?">
+    Có! Bao gồm định danh duy nhất của quan hệ (ví dụ: `companyDomain`) và ánh xạ với trường quan hệ. Quan hệ sẽ được cập nhật.
+  </Accordion>
+
+  <Accordion title="Làm thế nào để biết bản ghi nào sẽ được cập nhật vs. tạo mới?">
+    Trong bước xem lại nhập, Twenty hiển thị bao nhiêu bản ghi sẽ được cập nhật vs. tạo mới dựa trên khớp định danh duy nhất.
+  </Accordion>
+
+  <Accordion title="Tôi có thể hoàn tác cập nhật hàng loạt không?">
+    Không có hoàn tác tự động. Chúng tôi khuyến nghị xuất dữ liệu làm bản sao lưu trước khi cập nhật hàng loạt.
+  </Accordion>
+</AccordionGroup>
+
+## Phương pháp tốt nhất
+
+1. **Xuất trước** — luôn bắt đầu từ xuất để đảm bảo định dạng đúng
+2. **Sao lưu trước khi cập nhật** — xuất dữ liệu trước khi thay đổi hàng loạt
+3. **Kiểm tra với vài bản ghi** — thử cập nhật 5-10 bản ghi trước khi làm lô lớn
+4. **Sử dụng định danh dễ đọc** — `email` và `domain` dễ xác minh hơn `id`
+5. **Chỉ bao gồm cột cần thiết** — ít cột hơn nghĩa ít cơ hội lỗi hơn
+
+## Xử lý sự cố
+
+Gặp vấn đề? Kiểm tra:
+- [Cách sửa lỗi nhập](/l/vi/user-guide/data-migration/how-tos/fix-import-errors)
+- [Ràng buộc tính duy nhất](/l/vi/user-guide/data-migration/capabilities/uniqueness-constraints)
+- [Tham khảo ánh xạ trường](/l/vi/user-guide/data-migration/capabilities/field-mapping)

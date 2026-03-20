@@ -1,0 +1,187 @@
+---
+title: Ứng dụng Twenty
+description: Xây dựng và quản lý tùy chỉnh Twenty bằng code.
+---
+
+<Warning>
+Ứng dụng hiện đang trong giai đoạn thử nghiệm alpha. Tính năng đã hoạt động nhưng vẫn đang phát triển.
+</Warning>
+
+## Ứng dụng là gì?
+
+Ứng dụng cho phép bạn xây dựng và quản lý tùy chỉnh Twenty **bằng code**. Thay vì cấu hình mọi thứ qua giao diện, bạn định nghĩa mô hình dữ liệu và hàm logic trong code -- giúp xây dựng, bảo trì và triển khai nhanh hơn cho nhiều workspace.
+
+**Những gì bạn có thể làm hôm nay:**
+- Định nghĩa đối tượng và trường tùy chỉnh bằng code (mô hình dữ liệu được quản lý)
+- Xây dựng hàm logic với trigger tùy chỉnh
+- Định nghĩa kỹ năng và agent cho AI
+- Triển khai cùng một ứng dụng trên nhiều workspace
+
+## Điều kiện tiên quyết
+
+- Node.js 24+ và Yarn 4
+- Docker (cho máy chủ phát triển Twenty cục bộ)
+
+## Bắt đầu
+
+Tạo ứng dụng mới bằng công cụ scaffolder chính thức. Nó có thể tự động khởi động máy chủ Twenty cục bộ cho bạn:
+
+```bash filename="Terminal"
+# Tạo khung ứng dụng -- CLI sẽ đề nghị khởi động máy chủ Twenty cục bộ
+npx create-twenty-app@latest my-twenty-app
+cd my-twenty-app
+
+# Bắt đầu chế độ phát triển: tự động đồng bộ thay đổi cục bộ với workspace
+yarn twenty dev
+```
+
+### Quản lý máy chủ cục bộ
+
+SDK bao gồm các lệnh quản lý máy chủ phát triển Twenty cục bộ (Docker image tất-cả-trong-một với PostgreSQL, Redis, server và worker):
+
+```bash filename="Terminal"
+# Khởi động máy chủ cục bộ (tải image nếu cần)
+yarn twenty server start
+
+# Kiểm tra trạng thái máy chủ
+yarn twenty server status
+
+# Xem log máy chủ
+yarn twenty server logs
+
+# Dừng máy chủ
+yarn twenty server stop
+
+# Xóa tất cả dữ liệu và khởi động lại
+yarn twenty server reset
+```
+
+Máy chủ cục bộ được gieo sẵn với workspace và người dùng (`tim@apple.dev` / `tim@apple.dev`), nên bạn có thể bắt đầu phát triển ngay mà không cần thiết lập thủ công.
+
+### Xác thực
+
+Kết nối ứng dụng với máy chủ cục bộ bằng OAuth:
+
+```bash filename="Terminal"
+# Xác thực qua OAuth (mở trình duyệt)
+yarn twenty remote add --local
+```
+
+Scaffolder hỗ trợ hai chế độ để kiểm soát các file ví dụ được bao gồm:
+
+```bash filename="Terminal"
+# Mặc định (đầy đủ): tất cả ví dụ (object, field, logic function, front component, view, navigation menu item, skill, agent)
+npx create-twenty-app@latest my-app
+
+# Tối giản: chỉ các file cốt lõi (application-config.ts và default-role.ts)
+npx create-twenty-app@latest my-app --minimal
+```
+
+Từ đây bạn có thể:
+
+```bash filename="Terminal"
+# Thêm entity mới vào ứng dụng (có hướng dẫn)
+yarn twenty entity:add
+
+# Xem log của các hàm trong ứng dụng
+yarn twenty function:logs
+
+# Thực thi hàm theo tên
+yarn twenty function:execute -n my-function -p '{"name": "test"}'
+
+# Thực thi hàm pre-install
+yarn twenty function:execute --preInstall
+
+# Thực thi hàm post-install
+yarn twenty function:execute --postInstall
+
+# Build ứng dụng để phân phối
+yarn twenty app:build
+
+# Phát hành ứng dụng lên npm hoặc máy chủ Twenty
+yarn twenty app:publish
+
+# Gỡ cài đặt ứng dụng khỏi workspace hiện tại
+yarn twenty app:uninstall
+
+# Hiển thị trợ giúp các lệnh
+yarn twenty help
+```
+
+Xem thêm: trang tham khảo CLI cho [create-twenty-app](https://www.npmjs.com/package/create-twenty-app) và [twenty-sdk CLI](https://www.npmjs.com/package/twenty-sdk).
+
+Vui lòng tham khảo trang [Xây dựng ứng dụng](/l/vi/developers/extend/apps/building) và [Bắt đầu](/l/vi/developers/extend/apps/getting-started) để biết chi tiết đầy đủ về cấu trúc dự án, phát hiện entity, xác thực, định nghĩa đối tượng, hàm logic, thành phần giao diện, kỹ năng, agent, typed client và nhiều hơn.
+
+## Xây dựng ứng dụng
+
+Sau khi phát triển ứng dụng với `app:dev`, sử dụng `app:build` để biên dịch thành package có thể phân phối.
+
+```bash filename="Terminal"
+# Build ứng dụng (output vào .twenty/output/)
+yarn twenty app:build
+
+# Build và tạo tarball (.tgz) để phân phối
+yarn twenty app:build --tarball
+```
+
+## Phát hành ứng dụng
+
+Sử dụng `app:publish` để phân phối ứng dụng -- lên npm registry hoặc trực tiếp lên máy chủ Twenty.
+
+### Phát hành lên npm (mặc định)
+
+```bash filename="Terminal"
+# Phát hành lên npm (cần npm login)
+yarn twenty app:publish
+
+# Phát hành với dist-tag (ví dụ: beta, next)
+yarn twenty app:publish --tag beta
+```
+
+### Phát hành lên máy chủ Twenty
+
+```bash filename="Terminal"
+# Phát hành trực tiếp lên máy chủ Twenty
+yarn twenty app:publish --server https://app.twenty.com
+```
+
+## Đăng ký ứng dụng
+
+Trước khi ứng dụng có thể cài đặt trong workspace, nó phải được **đăng ký**. Đăng ký là bản ghi metadata mô tả nguồn gốc ứng dụng và cách xác thực nó. Điều này được xử lý tự động bởi CLI trong hầu hết trường hợp.
+
+### Loại nguồn
+
+| Loại nguồn | Cách giải quyết file | Trường hợp sử dụng điển hình |
+|-------------|----------------------|------------------|
+| `LOCAL` | File được đồng bộ theo thời gian thực bởi CLI watcher -- bỏ qua cài đặt | Phát triển với `app:dev` |
+| `NPM` | Lấy từ npm registry qua trường `sourcePackage` | Ứng dụng đã phát hành trên npm |
+| `TARBALL` | Trích xuất từ file `.tgz` đã tải lên lưu trên máy chủ | Ứng dụng riêng tư phát hành với `--server` |
+
+## Thiết lập thủ công (không dùng scaffolder)
+
+Mặc dù chúng tôi khuyến nghị sử dụng `create-twenty-app` để có trải nghiệm bắt đầu tốt nhất, bạn cũng có thể thiết lập dự án thủ công. Không cài đặt CLI toàn cục. Thay vào đó, thêm `twenty-sdk` làm dependency cục bộ và thêm một script duy nhất trong package.json:
+
+```bash filename="Terminal"
+yarn add -D twenty-sdk
+```
+
+Sau đó thêm script `twenty`:
+
+```json filename="package.json"
+{
+  "scripts": {
+    "twenty": "twenty"
+  }
+}
+```
+
+Bây giờ bạn có thể chạy tất cả lệnh qua `yarn twenty <lệnh>`, ví dụ `yarn twenty app:dev`, `yarn twenty help`, v.v.
+
+## Xử lý sự cố
+
+- Lỗi xác thực: chạy `yarn twenty auth:login` và đảm bảo API key có quyền cần thiết.
+- Không thể kết nối máy chủ: kiểm tra URL API và máy chủ Twenty có thể truy cập được.
+- Type hoặc client thiếu/lỗi thời: khởi động lại `yarn twenty app:dev` -- nó tự động tạo typed client.
+- Chế độ phát triển không đồng bộ: đảm bảo `yarn twenty app:dev` đang chạy và các thay đổi không bị môi trường bỏ qua.
+
+Kênh hỗ trợ Discord: https://discord.com/channels/1130383047699738754/1130386664812982322

@@ -1,0 +1,41 @@
+---
+title: Toggle
+image: /images/user-guide/table-views/table.png
+---
+<Frame>
+  <img src="/images/user-guide/table-views/table.png" alt="Header" />
+</Frame>
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { Toggle } from "twenty-ui/input";
+
+export const MyComponent = () => {
+  return (
+    <Toggle
+    value = {true}
+    onChange = {()=>console.log('On Change event')}
+    color="green"
+    toggleSize = "medium"
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả | Mặc định |
+|-------|------|-------|----------|
+| value | boolean | Trạng thái hiện tại của toggle | `false` |
+| onChange | function | Hàm callback được kích hoạt khi trạng thái toggle thay đổi |  |
+| color | string | Màu của toggle khi được bật | màu blue |
+| toggleSize | string | Kích thước của toggle, ảnh hưởng đến cả chiều cao và chiều rộng. Có hai tùy chọn: `small` và `medium` | medium |
+
+
+
+</Tab>
+</Tabs>

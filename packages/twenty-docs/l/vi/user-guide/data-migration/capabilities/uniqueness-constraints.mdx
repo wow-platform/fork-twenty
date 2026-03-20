@@ -1,0 +1,67 @@
+---
+title: Ràng buộc tính duy nhất
+description: Cách Twenty thực thi tính duy nhất dữ liệu trong quá trình nhập.
+---
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+## Tổng quan
+
+Twenty thực thi tính duy nhất trên một số trường nhất định để ngăn bản ghi trùng lặp và đảm bảo tính toàn vẹn dữ liệu. Hiểu các ràng buộc này là cần thiết cho việc nhập thành công.
+
+## Trường duy nhất mặc định
+
+| Đối tượng | Trường duy nhất |
+|--------|---------------|
+| **People** | `id`, `email` |
+| **Companies** | `id`, `domain` |
+| **Đối tượng tùy chỉnh** | Chỉ `id` (theo mặc định) |
+
+<Note>Trường `id` là định danh nội bộ của Twenty, được tạo tự động cho mỗi bản ghi. Nó sử dụng định dạng UUID (ví dụ: `c776ee49-f608-4a77-8cc8-6fe96ae1e43f`).</Note>
+
+## Trường duy nhất tùy chỉnh
+
+Bạn có thể định nghĩa trường duy nhất bổ sung tại **Settings → Data Model**:
+
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng
+3. Nhấp vào trường
+4. Bật **Unique** trong cài đặt trường
+
+### Trường hợp sử dụng trường duy nhất tùy chỉnh
+- **ID bên ngoài**: Lưu trữ ID từ hệ thống khác (Salesforce ID, HubSpot ID)
+- **Định danh kinh doanh**: Mã nhân viên, mã khách hàng
+- **Thông tin liên hệ thay thế**: Hồ sơ LinkedIn, số điện thoại
+
+<Note>Tên trường `id` được dành riêng cho ID nội bộ của Twenty. Sử dụng tên khác như `externalId` hoặc `legacyId` cho định danh bên ngoài.</Note>
+
+## Hành vi nhập
+
+### Tạo bản ghi mới
+Nếu giá trị trường duy nhất không tồn tại, bản ghi mới được tạo.
+
+### Cập nhật bản ghi hiện có
+Nếu giá trị trường duy nhất khớp với bản ghi hiện có, bản ghi đó được **cập nhật** với dữ liệu mới.
+<Warning>Để **cập nhật bản ghi hiện có**, khuyến nghị **chỉ khớp một trường duy nhất**.</Warning>
+
+### Bản ghi xóa mềm
+
+<Warning>
+**Bản ghi đã xóa được tính vào tính duy nhất.**
+
+Bản ghi xóa mềm (có thể thấy tại Command Menu → See deleted records) được bao gồm trong kiểm tra tính duy nhất. Nếu bạn nhập bản ghi có cùng giá trị duy nhất với bản ghi đã xóa, bản ghi đã xóa sẽ được **khôi phục** với dữ liệu mới.
+</Warning>
+
+## Phát hiện trùng lặp trong quá trình nhập
+
+Trong giai đoạn xác thực:
+- Trùng lặp trong tệp được đánh dấu màu vàng
+- Bạn có thể chỉnh sửa hoặc xóa hàng trùng lặp từ giao diện trước khi bắt đầu nhập
+
+<VimeoEmbed videoId="1145246326" title="Video minh họa" />
+
+## Phương pháp tốt nhất
+
+1. **Xóa trùng lặp** khỏi tệp trước khi nhập
+2. **Kiểm tra bản ghi hiện có** trong Twenty trước khi nhập
+3. **Sử dụng ID bên ngoài** khi di chuyển từ hệ thống khác
+4. **Bao gồm trường duy nhất** nếu bạn muốn cập nhật bản ghi hiện có

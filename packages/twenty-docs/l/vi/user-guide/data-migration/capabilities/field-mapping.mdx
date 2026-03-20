@@ -1,0 +1,162 @@
+---
+title: Ánh xạ trường
+description: Cách ánh xạ trường hoạt động trong quá trình nhập dữ liệu.
+---
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+## Cách ánh xạ trường hoạt động
+
+Khi bạn tải tệp lên, Twenty phân tích các cột và cố gắng khớp chúng với các trường hiện có.
+
+### Ánh xạ tự động
+Twenty cố gắng khớp cột dựa trên:
+- Tên tiêu đề cột (khớp chính xác hoặc tương tự)
+- Phát hiện kiểu dữ liệu (ngày, số, email)
+- Các mẫu trường phổ biến
+
+<Note>**Mẹo nhanh:** Xuất vài hàng từ đối tượng bạn muốn nhập. Tệp xuất sẽ có tên cột chính xác mà Twenty mong đợi, giúp ánh xạ tự động mượt mà khi nhập.</Note>
+
+### Tùy chọn ánh xạ thủ công
+Cho mỗi cột, bạn có thể:
+- **Ánh xạ với trường**: Chọn trường Twenty phù hợp từ danh sách thả xuống
+- **Không ánh xạ**: Bỏ qua cột hoàn toàn (dữ liệu sẽ không được nhập)
+
+<Note>**Trường phải tồn tại trước khi nhập.** Quá trình nhập tạo bản ghi, không tạo trường. Tạo trường tùy chỉnh tại **Settings → Data Model** trước khi nhập.</Note>
+
+## Tương thích loại trường
+
+Tất cả loại trường có sẵn trong Data Model đều được hỗ trợ nhập.
+
+Bạn cũng có thể nhập giá trị `id` để gán ID cụ thể cho bản ghi mới hoặc cập nhật bản ghi hiện có.
+
+<img src="/images/user-guide/fields/all-field-types.png" style={{width:'100%'}}/>
+
+## Yêu cầu định dạng dữ liệu
+
+<Note>**Một số trường có cú pháp đặc biệt.** Chúng tôi khuyến nghị tải tệp mẫu trước khi chuẩn bị nhập để xem cú pháp mong đợi cho mỗi loại trường.</Note>
+
+### Trường địa chỉ
+Địa chỉ là trường lồng nhau với nhiều cột. Một số có thể để trống.
+- **Address / Address 1**: Dòng địa chỉ 1
+- **Address / Address 2**: Dòng địa chỉ 2
+- **Address / City**: Tên thành phố
+- **Address / State**: Bang hoặc tỉnh
+- **Address / Country**: Tên quốc gia
+- **Address / Post Code**: Mã bưu chính
+
+### Trường mảng
+Sử dụng định dạng sau:
+```
+["value1","value2"]
+```
+
+### Trường Boolean
+Sử dụng `TRUE` hoặc `FALSE` (viết hoa) - không phải `true` hoặc `false`
+
+### Trường tiền tệ
+Tiền tệ là trường lồng nhau với hai cột **đều phải được điền**:
+- **Amount / Amount**: Giá trị số (ví dụ: `1234.56`)
+- **Amount / Currency**: Mã tiền tệ (ví dụ: `USD`, `EUR`)
+
+### Trường ngày
+Định dạng được hỗ trợ:
+- `YYYY-MM-DD` (khuyến nghị)
+- `MM/DD/YYYY`
+- `DD/MM/YYYY`
+- Định dạng ISO 8601
+
+### Trường tên miền
+- Khuyến nghị sử dụng định dạng `https://domain.com` để tránh tạo trùng lặp, vì đây là định dạng được sử dụng cho Companies được tạo từ đồng bộ hộp thư và lịch
+- Có thể điền `Domain Label` và `Domain URL`: phương pháp tốt nhất là điền `domain.com` vào label và `https://domain.com` vào url
+- Tên miền phải duy nhất trong đối tượng Companies
+- **Tên miền phải duy nhất trong tệp nhập**
+
+### Trường email
+- Phải có định dạng email hợp lệ
+- Email phải duy nhất trong đối tượng People
+- **Email phải duy nhất trong tệp nhập**
+- Cho email bổ sung: sử dụng **Emails / Primary Email** cho email chính, và **Emails / Additional Emails** với định dạng:
+```
+["jane@twenty.com","jane.doe@twenty.com"]
+```
+
+### Trường Id
+Chỉ định `id` khi nhập là tùy chọn. Twenty tự động tạo nếu không cung cấp.
+
+Trường hợp sử dụng ánh xạ cột `id`:
+- **Đặt ID cụ thể**: Chọn UUID cho bản ghi mới tạo
+- **Cập nhật bản ghi hiện có**: Khớp với bản ghi hiện có để cập nhật thay vì tạo trùng lặp. Trong trường hợp này, khuyến nghị không ánh xạ các trường duy nhất khác: chỉ ánh xạ một trường duy nhất đảm bảo nhập mượt mà hơn.
+
+<Note>Nếu bạn cung cấp `id`, nó phải ở định dạng UUID (ví dụ: `c776ee49-f608-4a77-8cc8-6fe96ae1e43f`).</Note>
+
+
+### Trường JSON
+Sử dụng định dạng JSON hợp lệ:
+```
+{"key":"value","key2":"value2"}
+```
+
+### Trường liên kết
+Tương tự trường Domain:
+- Điền cả cột label và URL: **Links / Link URL** và **Links / Link Label**
+- Sử dụng định dạng URL đầy đủ: `https://example.com`
+- Cho liên kết phụ, sử dụng cột **Links / Secondary Links** với định dạng:
+```
+[{"url":"https://twenty.com","label":"Twenty"}]
+```
+
+### Trường Multi-Select
+Sử dụng **tên API** (không phải nhãn hiển thị) với định dạng sau:
+```
+["VALUE1","VALUE2"]
+```
+Xem [tại đây](#finding-api-names-for-select-fields) để tìm tên API.
+
+<Note>Tùy chọn select mới sẽ không được tạo tự động khi nhập. Chúng phải được thêm tại **Settings → Data Model** trước khi nhập.</Note>
+
+<Warning>
+**Nhập ghi đè, không thêm vào.**
+
+Nếu bản ghi đã có `VALUE2` và `VALUE3` được chọn, và bạn nhập `["VALUE1"]`, bản ghi sẽ chỉ có `VALUE1` sau khi nhập. Các lựa chọn trước đó bị thay thế, không được gộp.
+</Warning>
+
+
+### Trường số
+- Chỉ số
+- Thập phân dùng dấu chấm: `1234.56`
+- Không dùng dấu phân cách hàng nghìn
+
+### Trường điện thoại
+Điện thoại là trường lồng nhau với nhiều cột **phải được điền**
+- **Phones / Primary Phone Number**: Số điện thoại (ví dụ: `4159095555`)
+- **Phones / Primary Phone Country Code**: Mã quốc gia (ví dụ: `US`)
+- **Phones / Primary Phone Calling Code**: Mã gọi (ví dụ: `+1`)
+
+### Trường đánh giá
+Sử dụng định dạng tên API: `RATING_1`, `RATING_2`, `RATING_3`, `RATING_4`, `RATING_5`
+
+### Trường quan hệ
+Vui lòng xem bài viết chuyên dụng: [Nhập quan hệ giữa các đối tượng](/l/vi/user-guide/data-migration/capabilities/import-relations)
+
+### Trường Select
+Sử dụng **tên API** của tùy chọn (không phải nhãn hiển thị):
+```
+VALUE1
+```
+Xem [tại đây](#finding-api-names-for-select-fields) để tìm tên API.
+<Note>Tùy chọn select mới sẽ không được tạo tự động khi nhập. Chúng phải được thêm tại **Settings → Data Model** trước khi nhập.</Note>
+### Trường văn bản
+- Không cần định dạng đặc biệt
+- Khoảng trắng đầu/cuối được cắt bỏ
+
+## Tìm tên API
+
+Cho trường Select, Multi-Select và Array với tùy chọn định sẵn, bạn phải sử dụng **tên API**, không phải nhãn hiển thị.
+
+### Cách tìm tên API
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng và trường
+3. Bật **Advanced mode** (nút chuyển ở phía dưới bên phải trang cài đặt)
+4. Xem tên API cho mỗi tùy chọn
+
+<VimeoEmbed videoId="1144910809" title="Video minh họa" />

@@ -1,0 +1,226 @@
+---
+title: Tạo PDF từ Twenty
+description: Tạo workflow để tạo và đính kèm PDF (như báo giá) vào bản ghi.
+---
+
+Tự động tạo hoặc lấy PDF và đính kèm vào bản ghi trong Twenty. Thường được sử dụng để tạo báo giá, hóa đơn hoặc báo cáo liên kết với Công ty, Cơ hội hoặc đối tượng khác.
+
+## Tổng quan
+
+Workflow này sử dụng **Trigger thủ công** để người dùng có thể tạo PDF theo yêu cầu cho bất kỳ bản ghi đã chọn. **Logic Function** xử lý:
+1. Tải PDF từ URL (từ dịch vụ tạo PDF)
+2. Tải tệp lên Twenty
+3. Tạo Tệp đính kèm liên kết với bản ghi
+
+## Điều kiện tiên quyết
+
+Trước khi thiết lập workflow:
+
+1. **Tạo API Key**: Vào **Cài đặt → API** và tạo API key mới. Bạn sẽ cần token này cho logic function.
+2. **Thiết lập dịch vụ tạo PDF** (tùy chọn): Nếu bạn muốn tạo PDF động (ví dụ: báo giá), sử dụng dịch vụ như Carbone, PDFMonkey hoặc DocuSeal để tạo PDF và lấy URL tải về.
+
+## Thiết lập từng bước
+
+### Bước 1: Cấu hình Trigger
+
+1. Vào **Workflow** và tạo workflow mới
+2. Chọn **Trigger thủ công**
+3. Chọn đối tượng bạn muốn đính kèm PDF (ví dụ: **Công ty** hoặc **Cơ hội**)
+
+<Tip>
+Với Trigger thủ công, người dùng có thể chạy workflow bằng nút xuất hiện ở góc trên bên phải khi bản ghi được chọn, để tạo và đính kèm PDF.
+</Tip>
+
+### Bước 2: Thêm Logic Function
+
+1. Thêm hành động **Mã nguồn** (logic function)
+2. Tạo function mới với mã bên dưới
+3. Cấu hình tham số đầu vào
+
+#### Tham số đầu vào
+
+| Tham số | Giá trị |
+|-----------|-------|
+| `companyId` | `{{trigger.object.id}}` |
+
+<Note>
+Nếu đính kèm vào đối tượng khác (Người, Cơ hội, v.v.), đổi tên tham số phù hợp (ví dụ: `personId`, `opportunityId`) và cập nhật logic function.
+</Note>
+
+#### Mã Logic Function
+
+```typescript
+export const main = async (
+  params: { companyId: string },
+) => {
+  const { companyId } = params;
+
+  // Thay bằng endpoint GraphQL Twenty của bạn
+  // Cloud: https://api.twenty.com/graphql
+  // Self-hosted: https://your-domain.com/graphql
+  const graphqlEndpoint = 'https://api.twenty.com/graphql';
+
+  // Thay bằng API key từ Cài đặt → API
+  const authToken = 'YOUR_API_KEY';
+
+  // Thay bằng URL PDF của bạn
+  // Có thể từ dịch vụ tạo PDF hoặc URL tĩnh
+  const pdfUrl = 'https://your-pdf-service.com/generated-quote.pdf';
+  const filename = 'quote.pdf';
+
+  // Bước 1: Tải tệp PDF
+  const pdfResponse = await fetch(pdfUrl);
+
+  if (!pdfResponse.ok) {
+    throw new Error(`Failed to download PDF: ${pdfResponse.status}`);
+  }
+
+  const pdfBlob = await pdfResponse.blob();
+  const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+  // Bước 2: Tải tệp lên qua GraphQL multipart upload
+  const uploadMutation = `
+    mutation UploadFile($file: Upload!, $fileFolder: FileFolder) {
+      uploadFile(file: $file, fileFolder: $fileFolder) {
+        path
+      }
+    }
+  `;
+
+  const uploadForm = new FormData();
+  uploadForm.append('operations', JSON.stringify({
+    query: uploadMutation,
+    variables: { file: null, fileFolder: 'Attachment' },
+  }));
+  uploadForm.append('map', JSON.stringify({ '0': ['variables.file'] }));
+  uploadForm.append('0', pdfFile);
+
+  const uploadResponse = await fetch(graphqlEndpoint, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${authToken}` },
+    body: uploadForm,
+  });
+
+  const uploadResult = await uploadResponse.json();
+
+  if (uploadResult.errors?.length) {
+    throw new Error(`Upload failed: ${uploadResult.errors[0].message}`);
+  }
+
+  const filePath = uploadResult.data?.uploadFile?.path;
+
+  if (!filePath) {
+    throw new Error('No file path returned from upload');
+  }
+
+  // Bước 3: Tạo tệp đính kèm liên kết với công ty
+  const attachmentMutation = `
+    mutation CreateAttachment($data: AttachmentCreateInput!) {
+      createAttachment(data: $data) {
+        id
+        name
+      }
+    }
+  `;
+
+  const attachmentResponse = await fetch(graphqlEndpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: attachmentMutation,
+      variables: {
+        data: {
+          name: filename,
+          fullPath: filePath,
+          companyId,
+        },
+      },
+    }),
+  });
+
+  const attachmentResult = await attachmentResponse.json();
+
+  if (attachmentResult.errors?.length) {
+    throw new Error(`Attachment creation failed: ${attachmentResult.errors[0].message}`);
+  }
+
+  return attachmentResult.data?.createAttachment;
+};
+```
+
+### Bước 3: Tùy chỉnh cho trường hợp sử dụng
+
+#### Đính kèm vào đối tượng khác
+
+Thay `companyId` bằng trường phù hợp:
+
+| Đối tượng | Tên trường |
+|--------|------------|
+| Công ty | `companyId` |
+| Người | `personId` |
+| Cơ hội | `opportunityId` |
+| Đối tượng tùy chỉnh | `yourCustomObjectId` |
+
+Cập nhật cả tham số function và đối tượng `variables.data` trong mutation tệp đính kèm.
+
+#### Sử dụng URL PDF động
+
+Nếu sử dụng dịch vụ tạo PDF, bạn có thể:
+1. Trước tiên thực hiện hành động HTTP Request để tạo PDF
+2. Truyền URL PDF trả về cho logic function dưới dạng tham số
+
+```typescript
+export const main = async (
+  params: { companyId: string; pdfUrl: string; filename: string },
+) => {
+  const { companyId, pdfUrl, filename } = params;
+  // ... phần còn lại của function
+};
+```
+
+### Bước 4: Kiểm tra và kích hoạt
+
+1. Lưu workflow
+2. Điều hướng đến bản ghi Công ty
+3. Nhấp menu **⋮** và chọn workflow
+4. Kiểm tra phần **Tệp đính kèm** trên bản ghi để xác minh PDF đã đính kèm
+5. Kích hoạt workflow
+
+## Kết hợp với dịch vụ tạo PDF
+
+Để tạo báo giá hoặc hóa đơn động:
+
+### Ví dụ: Tạo báo giá → Đính kèm PDF
+
+| Bước | Hành động | Mục đích |
+|------|--------|---------|
+| 1 | Trigger thủ công (Công ty) | Người dùng khởi tạo trên bản ghi |
+| 2 | Tìm kiếm bản ghi | Lấy chi tiết Cơ hội hoặc mục hàng |
+| 3 | HTTP Request | Gọi API tạo PDF với dữ liệu bản ghi |
+| 4 | Serverless Function | Tải về và đính kèm PDF đã tạo |
+
+### Dịch vụ tạo PDF phổ biến
+
+- **Carbone** - Tạo tài liệu dựa trên mẫu
+- **PDFMonkey** - Tạo PDF động từ mẫu
+- **DocuSeal** - Nền tảng tự động hóa tài liệu
+- **Documint** - Tạo tài liệu API-first
+
+Mỗi dịch vụ cung cấp API trả về URL PDF, sau đó bạn có thể truyền cho logic function.
+
+## Khắc phục sự cố
+
+| Vấn đề | Giải pháp |
+|-------|----------|
+| "Failed to download PDF" | Kiểm tra URL PDF có truy cập được và trả về PDF hợp lệ |
+| "Upload failed" | Xác minh API key hợp lệ và có quyền ghi |
+| "Attachment creation failed" | Đảm bảo tên trường ID đối tượng khớp với đối tượng đích |
+
+## Liên quan
+
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Logic Functions](/l/vi/user-guide/workflows/capabilities/workflow-actions#code)
+- [Tạo báo giá hoặc hóa đơn từ Twenty](/l/vi/user-guide/workflows/how-tos/connect-to-other-tools/generate-quote-or-invoice-from-twenty)

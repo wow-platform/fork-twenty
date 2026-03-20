@@ -1,0 +1,126 @@
+---
+title: Kiến trúc thư mục
+info: Cái nhìn chi tiết về kiến trúc thư mục server
+---
+
+
+Cấu trúc thư mục backend như sau:
+
+```
+server
+  └───ability
+  └───constants
+  └───core
+  └───database
+  └───decorators
+  └───filters
+  └───guards
+  └───health
+  └───integrations
+  └───metadata
+  └───workspace
+  └───utils
+```
+
+## Ability
+
+Định nghĩa quyền và bao gồm handler cho mỗi entity.
+
+## Decorator
+
+Định nghĩa custom decorator trong NestJS cho chức năng bổ sung.
+
+Xem [custom decorators](https://docs.nestjs.com/custom-decorators) để biết chi tiết.
+
+## Filter
+
+Bao gồm exception filter để xử lý ngoại lệ có thể xảy ra trong các endpoint GraphQL.
+
+## Guard
+
+Xem [guards](https://docs.nestjs.com/guards) để biết chi tiết.
+
+## Health
+
+Bao gồm REST API công khai (healthz) trả về JSON để xác nhận database có hoạt động đúng không.
+
+## Metadata
+
+Định nghĩa đối tượng tùy chỉnh và cung cấp GraphQL API (graphql/metadata).
+
+## Workspace
+
+Tạo và phục vụ schema GraphQL tùy chỉnh dựa trên metadata.
+
+### Cấu trúc thư mục Workspace
+
+```
+workspace
+
+  └───workspace-schema-builder
+    └───factories
+    └───graphql-types
+    └───database
+    └───interfaces
+    └───object-definitions
+    └───services
+    └───storage
+    └───utils
+  └───workspace-resolver-builder
+    └───factories
+    └───interfaces
+  └───workspace-query-builder
+    └───factories
+    └───interfaces
+  └───workspace-query-runner
+    └───interfaces
+    └───utils
+  └───workspace-datasource
+  └───workspace-manager
+  └───workspace-migration-runner
+  └───utils
+  └───workspace.module.ts
+  └───workspace.factory.spec.ts
+  └───workspace.factory.ts
+```
+
+
+Thư mục gốc workspace bao gồm `workspace.factory.ts`, file chứa hàm `createGraphQLSchema`. Hàm này tạo schema đặc thù workspace bằng cách sử dụng metadata để tùy chỉnh schema cho từng workspace riêng lẻ. Bằng cách tách riêng việc xây dựng schema và resolver, chúng tôi sử dụng hàm `makeExecutableSchema` kết hợp các thành phần riêng lẻ này.
+
+Chiến lược này không chỉ về tổ chức, mà còn giúp tối ưu hóa, như cache các định nghĩa kiểu đã tạo để tăng hiệu năng và khả năng mở rộng.
+
+### Workspace Schema builder
+
+Tạo schema GraphQL, và bao gồm:
+
+#### Factory:
+
+Các constructor chuyên biệt để tạo các cấu trúc liên quan GraphQL.
+- type.factory dịch metadata trường thành kiểu GraphQL sử dụng `TypeMapperService`.
+- type-definition.factory tạo đối tượng input hoặc output GraphQL bắt nguồn từ `objectMetadata`.
+
+#### Kiểu GraphQL
+
+Bao gồm enumeration, input, object và scalar, và phục vụ như khối xây dựng cho việc xây dựng schema.
+
+#### Interface và định nghĩa đối tượng
+
+Chứa bản thiết kế cho entity GraphQL, và bao gồm cả kiểu định nghĩa trước và tùy chỉnh như `MONEY` hoặc `URL`.
+
+#### Service
+
+Chứa service chịu trách nhiệm liên kết FieldMetadataType với scalar GraphQL hoặc bộ điều chỉnh truy vấn phù hợp.
+
+#### Storage
+
+Bao gồm lớp `TypeDefinitionsStorage` chứa các định nghĩa kiểu có thể tái sử dụng, ngăn trùng lặp kiểu GraphQL.
+
+### Workspace Resolver Builder
+
+Tạo các hàm resolver để truy vấn và thay đổi schema GraphQL.
+
+Mỗi factory trong thư mục này chịu trách nhiệm tạo một loại resolver riêng biệt, như `FindManyResolverFactory`, được thiết kế để áp dụng linh hoạt trên các bảng khác nhau.
+
+### Workspace Query Runner
+
+Chạy các truy vấn đã tạo trên database và phân tích kết quả.

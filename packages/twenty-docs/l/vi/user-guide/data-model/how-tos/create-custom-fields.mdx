@@ -1,0 +1,71 @@
+---
+title: Tạo trường tùy chỉnh
+description: Hướng dẫn từng bước để thêm trường tùy chỉnh vào bất kỳ đối tượng nào.
+---
+
+Trường tùy chỉnh cho phép bạn thu thập thông tin cụ thể cho doanh nghiệp. Thêm chúng vào bất kỳ đối tượng nào — tiêu chuẩn hoặc tùy chỉnh.
+
+## Các bước
+
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng bạn muốn thêm trường
+3. Nhấp **+ Add Field**
+4. Chọn **loại trường** (xem [Trường](/l/vi/user-guide/data-model/capabilities/fields) để biết tất cả các loại)
+5. Nhập **tên trường** và mô tả tùy chọn
+6. Cấu hình cài đặt cụ thể của trường (xem bên dưới)
+7. Nhấp **Save**
+
+**Cách nhanh:** Nhấp **+** ở cuối tiêu đề cột trong bất kỳ chế độ xem bảng nào → **Customize fields**.
+
+## Hiển thị trường trong chế độ xem
+
+Trường mới không tự động hiển thị. Để hiển thị:
+1. Mở chế độ xem bảng của đối tượng
+2. Nhấp **Options → Fields**
+3. Nhấp **biểu tượng mắt** bên cạnh trường để hiện nó
+4. Kéo để sắp xếp lại
+
+## Tùy chọn cấu hình
+
+### Cho Select / Multi-Select
+
+1. Nhấp **+ Add option** để tạo lựa chọn
+2. Đặt **tùy chọn mặc định** nếu muốn
+3. Kéo để sắp xếp lại tùy chọn
+
+<Note>
+**Sử dụng tên API cho nhập dữ liệu.** Bật **Advanced mode** trong Settings để xem tên API. Xem [Ánh xạ trường](/l/vi/user-guide/data-migration/capabilities/field-mapping).
+</Note>
+
+### Cho trường tiền tệ
+
+Đặt **tiền tệ mặc định** (USD, EUR, v.v.) cho bản ghi mới.
+
+### Cho trường điện thoại
+
+Đặt **mã quốc gia mặc định** để điền sẵn cho số điện thoại mới.
+
+### Đặt trường là duy nhất
+
+Bật **Unique** để ngăn giá trị trùng lặp giữa các bản ghi.
+
+<Note>
+Nếu giá trị trùng lặp tồn tại (bao gồm trong bản ghi đã xóa), bạn sẽ gặp lỗi. Hãy dọn dẹp trùng lặp trước.
+</Note>
+
+### Đặt giá trị mặc định
+
+Cho trường Select, bạn có thể chọn tùy chọn nào được chọn sẵn cho bản ghi mới. Cho trường Checkbox, đặt liệu nó được đánh dấu hay không theo mặc định.
+
+## Vô hiệu hóa trường
+
+1. Vào **Settings → Data Model**
+2. Tìm trường
+3. Nhấp **⋮ → Deactivate**
+
+Dữ liệu được bảo toàn. Bạn có thể kích hoạt lại hoặc xóa vĩnh viễn sau.
+
+## Liên quan
+
+- [Trường](/l/vi/user-guide/data-model/capabilities/fields) — giải thích tất cả loại trường
+- [FAQ mô hình dữ liệu](/l/vi/user-guide/data-model/how-tos/data-model-faq) — câu hỏi thường gặp

@@ -1,0 +1,71 @@
+---
+title: Tạo chế độ xem Kanban cho dự án
+description: Theo dõi dự án qua các giai đoạn bằng bảng trực quan.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+Sử dụng chế độ xem Kanban để trực quan hóa dự án (hoặc bất kỳ đối tượng nào có giai đoạn) dưới dạng thẻ di chuyển qua các cột.
+<VimeoEmbed videoId="927888627" title="Video demonstration" />
+
+## Điều kiện tiên quyết
+
+Đối tượng cần có **trường Lựa chọn** để sử dụng làm cột (ví dụ: Trạng thái, Giai đoạn, Pha).
+
+Nếu bạn chưa có:
+1. Đi tới **Cài đặt → Mô hình dữ liệu**
+2. Chọn đối tượng
+3. Thêm trường Lựa chọn với các tùy chọn giai đoạn
+
+## Các bước
+
+1. Điều hướng đến đối tượng (ví dụ: Dự án, Nhiệm vụ)
+2. Nhấp vào menu thả xuống chế độ xem → **+ Thêm chế độ xem**
+3. Đặt tên cho chế độ xem (ví dụ: "Bảng dự án")
+4. Nhấp **Tạo**
+5. Nhấp **Tùy chọn** và chọn **Kanban** làm bố cục
+6. Chế độ xem tự động sử dụng trường Lựa chọn cho các cột
+7. Nhấp **Lưu**
+
+## Cấu hình bảng
+
+### Hiển thị trường chính trên thẻ
+1. Nhấp **Tùy chọn → Trường**
+2. Tìm trường trong phần "Trường ẩn"
+3. Nhấp **biểu tượng mắt** để hiển thị trên thẻ
+4. Kéo để sắp xếp lại
+<img src="/images/user-guide/kanban-views/filter.png" style={{width:'100%'}}/>
+### Bật chế độ xem thu gọn
+Để có tổng quan cấp cao:
+1. Nhấp **Tùy chọn**
+2. Bật **Chế độ xem thu gọn**
+
+Thẻ chỉ hiển thị tên bản ghi.
+<img src="/images/user-guide/kanban-views/compact-view.png" style={{width:'100%'}}/>
+
+### Thêm tổng hợp
+Hiển thị số đếm hoặc tổng ở đầu mỗi cột:
+1. Nhấp vào số bên cạnh tên cột
+2. Chọn phép tổng hợp (Đếm, Tổng, v.v.)
+3. Chọn trường nếu cần
+
+## Di chuyển thẻ
+
+Kéo và thả thẻ giữa các cột để cập nhật trạng thái.
+
+<VimeoEmbed videoId="927888627" title="Video demonstration" />
+
+## Ví dụ: Bảng nhiệm vụ
+
+| Cột (Trạng thái) | Thẻ |
+|-----------------|-------|
+| **Cần làm** | Nhiệm vụ mới |
+| **Đang thực hiện** | Công việc đang tiến hành |
+| **Đánh giá** | Đang chờ phê duyệt |
+| **Hoàn thành** | Đã hoàn tất |
+
+## Liên quan
+
+- [Chế độ xem Kanban](/l/vi/user-guide/views-pipelines/capabilities/kanban-views) — tổng hợp, chế độ xem thu gọn, giai đoạn
+- [Cách thiết lập pipeline bán hàng](/l/vi/user-guide/views-pipelines/how-tos/set-up-a-sales-pipeline) — Kanban cho Cơ hội
+

@@ -1,0 +1,139 @@
+---
+title: MCP Server
+description: Kết nối trợ lý AI với không gian làm việc Twenty bằng Model Context Protocol.
+---
+
+<Warning>
+MCP hiện đang ở giai đoạn **alpha** và chỉ khả dụng trên một số không gian làm việc. Có thể chưa được kích hoạt cho không gian làm việc của bạn.
+</Warning>
+
+Twenty cung cấp server [MCP](https://modelcontextprotocol.io/) để các trợ lý AI — Claude Desktop, Claude Code, Cursor, ChatGPT, và những ứng dụng khác — có thể đọc và ghi dữ liệu CRM qua ngôn ngữ tự nhiên.
+
+Sử dụng **URL không gian làm việc** (URL bạn dùng để truy cập Twenty) làm MCP endpoint. Trên Twenty Cloud, URL không gian làm việc có thể là `https://{mycompany}.twenty.com` hoặc tên miền tùy chỉnh. Server khả dụng tại:
+
+| Môi trường | MCP Endpoint |
+|-------------|-------------|
+| **Cloud** | `https://{your-workspace-url}/mcp` (ví dụ: `https://mycompany.twenty.com/mcp`) |
+| **Self-Hosted** | `https://{your-domain}/mcp` |
+
+## Phương thức xác thực
+
+Bạn có hai cách để xác thực MCP client: **OAuth** (khuyến nghị) hoặc **API Key**.
+
+### Tùy chọn A — OAuth (Khuyến nghị)
+
+Với OAuth, MCP client mở cửa sổ trình duyệt để bạn đăng nhập. Không có secret nào được lưu trong tệp cấu hình, và token tự động làm mới.
+
+<Note>
+OAuth yêu cầu MCP client hỗ trợ [đặc tả MCP Authorization](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization). Claude Desktop, Claude Code, Cursor, và ChatGPT đều hỗ trợ.
+</Note>
+
+Thêm đoạn sau vào cấu hình MCP client, thay `{your-workspace-url}` bằng host không gian làm việc (ví dụ: `mycompany.twenty.com`):
+
+```json
+{
+  "mcpServers": {
+    "twenty": {
+      "type": "streamable-http",
+      "url": "https://{your-workspace-url}/mcp"
+    }
+  }
+}
+```
+
+Vậy là xong — không cần API key. Khi client kết nối lần đầu, nó sẽ:
+
+1. Khám phá metadata OAuth của Twenty qua `/.well-known/oauth-protected-resource` và `/.well-known/oauth-authorization-server`
+2. Tự đăng ký làm OAuth client qua đăng ký client động (RFC 7591)
+3. Mở trình duyệt để ủy quyền truy cập
+4. Nhận token và kết nối đến MCP server
+
+Các kết nối sau sử dụng lại token đã lưu và tự động làm mới.
+
+### Tùy chọn B — API Key
+
+Nếu MCP client không hỗ trợ OAuth, hoặc bạn ưa thích thông tin xác thực tĩnh, truyền API key trong header `Authorization`:
+
+```json
+{
+  "mcpServers": {
+    "twenty": {
+      "type": "streamable-http",
+      "url": "https://{your-workspace-url}/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+<Warning>
+API key cho phép truy cập dữ liệu không gian làm việc. Giữ nó ngoài quản lý phiên bản và tệp dotfiles chia sẻ.
+</Warning>
+
+Để tạo API key, vào **Cài đặt > API & Webhook > + Tạo key**. Xem [API](/l/vi/developers/extend/api#create-an-api-key) để biết chi tiết.
+
+## Bắt đầu nhanh
+
+### 1. Sao chép cấu hình
+
+Vào **Cài đặt > AI > Thêm > MCP Server** trong Twenty. Chọn phương thức xác thực (OAuth hoặc API Key), sao chép đoạn JSON (sẽ sử dụng sẵn URL không gian làm việc), và dán vào tệp cấu hình MCP client.
+
+| Client | Vị trí tệp cấu hình |
+|--------|---------------------|
+| **Claude Desktop** | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) hoặc `%APPDATA%\Claude\claude_desktop_config.json` (Windows) |
+| **Claude Code** | `~/.claude.json` (người dùng) hoặc `.mcp.json` (dự án) |
+| **Cursor** | `.cursor/mcp.json` trong dự án, hoặc `~/.cursor/mcp.json` toàn cục |
+| **ChatGPT** | Bật Chế độ nhà phát triển trong **Cài đặt > Ứng dụng & Kết nối > Cài đặt nâng cao**, sau đó sử dụng **Tạo** trong **Cài đặt > Ứng dụng & Kết nối** để thêm MCP server |
+
+### 2. Kết nối
+
+Khởi động lại MCP client (hoặc tải lại cấu hình). Nếu sử dụng OAuth bạn sẽ được chuyển hướng đến Twenty để ủy quyền truy cập. Nếu sử dụng API key, kết nối ngay lập tức.
+
+### 3. Bắt đầu sử dụng
+
+Yêu cầu trợ lý AI tương tác với CRM:
+
+- *"Hiển thị 5 công ty được tạo gần đây nhất"*
+- *"Tạo người mới tên Jane Doe tại Acme Corp"*
+- *"Tìm tất cả cơ hội đang mở trị giá hơn $10k"*
+
+## Công cụ khả dụng
+
+Sau khi kết nối, MCP server cung cấp các công cụ phản chiếu Twenty API. Quy trình khuyến nghị:
+
+1. **`get_tool_catalog`** — khám phá tất cả công cụ khả dụng
+2. **`learn_tools`** — lấy schema đầu vào cho công cụ cụ thể
+3. **`execute_tool`** — chạy công cụ
+
+Bạn không cần nhớ tên công cụ. Hỏi trợ lý AI những gì nó có thể làm và nó sẽ gọi `get_tool_catalog` tự động.
+
+## Quyền
+
+Kết nối MCP kế thừa quyền của người dùng đã xác thực (OAuth) hoặc vai trò được gán cho API key. Để giới hạn những gì MCP server có thể làm:
+
+- **OAuth**: Vai trò không gian làm việc của người dùng áp dụng.
+- **API Key**: Gán vai trò cho API key trong **Cài đặt > Vai trò**. Xem [Quyền](/l/vi/user-guide/permissions-access/capabilities/permissions).
+
+## Cấu hình Self-Hosted
+
+Đối với instance self-hosted, thay `{your-workspace-url}` bằng URL server. Đảm bảo `SERVER_URL` trong môi trường khớp với URL công khai của instance Twenty — giá trị này được sử dụng để tạo metadata khám phá OAuth.
+
+```bash
+SERVER_URL=https://twenty.yourcompany.com
+```
+
+MCP endpoint, OAuth endpoint và metadata khám phá đều dựa trên giá trị này.
+
+## Khắc phục sự cố
+
+**Lỗi "Unauthorized" hoặc 401**
+- OAuth: ủy quyền lại bằng cách xóa token đã lưu trong MCP client và kết nối lại.
+- API Key: xác minh key hợp lệ và chưa hết hạn. Tạo lại nếu cần.
+
+**Luồng OAuth không mở trình duyệt**
+- Đảm bảo MCP client hỗ trợ MCP Authorization. Chuyển sang phương thức API Key nếu không hỗ trợ.
+
+**Hết thời gian kết nối**
+- Xác nhận URL MCP endpoint có thể truy cập từ máy. Đối với instance self-hosted, kiểm tra server đang chạy và `SERVER_URL` được đặt đúng.

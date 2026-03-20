@@ -1,0 +1,84 @@
+---
+title: Di chuyển dữ liệu
+description: Nhập và xuất dữ liệu CRM qua tệp CSV hoặc API.
+image: /images/user-guide/import-export-data/cloud.png
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+<Frame>
+  <img src="/images/user-guide/import-export-data/cloud.png" alt="Di chuyển dữ liệu" />
+</Frame>
+
+## Phương thức nhập
+
+Twenty hỗ trợ hai phương thức chính để nhập dữ liệu:
+
+| Phương thức | Phù hợp cho | Giới hạn khối lượng |
+|--------|----------|--------------|
+| **Nhập CSV** | Di chuyển tiêu chuẩn, cập nhật thường xuyên | 10.000 bản ghi mỗi tệp |
+| **Nhập API** | Di chuyển quy mô lớn, tự động hóa | Không giới hạn |
+
+<Note>Với tập dữ liệu rất lớn (hàng trăm nghìn bản ghi), hãy sử dụng API. [Đối tác triển khai](/l/vi/user-guide/getting-started/capabilities/implementation-services) của chúng tôi có thể giúp chạy các script này nếu cần.</Note>
+
+## Cơ bản nhập CSV
+
+Bạn có thể nhập dữ liệu cho bất kỳ đối tượng nào bằng tệp CSV, XLSX hoặc XLS. Mỗi tệp chỉ nên chứa **một loại đối tượng** (ví dụ: chỉ bản ghi People).
+
+<Note>**Trường phải tồn tại trước khi nhập.** Tải lên CSV tạo bản ghi nhưng không tạo trường. Nếu bạn cần trường tùy chỉnh, hãy tạo chúng trước tại **Settings → Data Model**.</Note>
+
+### Các bước
+1. Điều hướng đến đối tượng bạn muốn nhập dữ liệu
+2. Nhấp biểu tượng **⋮** ở phía trên bên phải (đây là Command Menu) và nhấp **Import records**
+3. Tải tệp mẫu để đảm bảo dữ liệu ở định dạng mong đợi
+4. Tải lên tệp CSV đã định dạng
+5. Ánh xạ các cột với trường Twenty
+6. Xem lại lỗi (đánh dấu màu vàng) và sửa chúng, chỉnh sửa trực tiếp trong giao diện
+7. Xác nhận nhập
+
+### Nhập quan hệ giữa các đối tượng
+Bạn có thể nhập quan hệ giữa các đối tượng bằng chức năng nhập CSV. Bạn cần tham chiếu đối tượng liên quan bằng trường duy nhất từ đối tượng này: `id`, `email` cho People và Workspace Members, `domain` cho companies, bất kỳ trường nào khác được đặt là duy nhất trong mô hình dữ liệu cho đối tượng khác.
+
+<Note>**Bản ghi đã xóa được tính vào tính duy nhất.** Bản ghi xóa mềm (có thể thấy tại Command Menu → See deleted records) được bao gồm trong kiểm tra tính duy nhất. Nếu bạn nhập bản ghi có cùng giá trị duy nhất với bản ghi đã xóa, bản ghi đã xóa sẽ được khôi phục.</Note>
+
+<Warning>
+**Thứ tự nhập quan trọng!**
+
+Khi nhập các đối tượng liên quan, tải lên tệp theo thứ tự này:
+1. **Companies** trước (phía "một" của quan hệ)
+2. **People** sau (liên kết với companies qua companyId)
+3. **Opportunities** thứ ba (liên kết với companies/people)
+4. **Đối tượng tùy chỉnh** có quan hệ cuối cùng
+
+Tại sao? Phía "một" của quan hệ một-nhiều phải tồn tại trước khi bạn có thể tham chiếu đến nó. Ví dụ, bản ghi Company phải tồn tại trước khi bạn nhập Person với ID của company đó.
+</Warning>
+
+Vui lòng tham khảo [bài viết này](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv) để có hướng dẫn từng bước.
+
+## Xuất dữ liệu
+
+Xuất dữ liệu không gian làm việc để sao lưu, báo cáo hoặc di chuyển.
+
+### Các bước
+1. Điều hướng đến đối tượng bạn muốn xuất
+2. Cấu hình chế độ xem với các cột bạn cần
+3. Nhấp **⋮** → **Export view**
+4. Lưu tệp CSV
+
+<Note>**Chỉ xuất các cột hiển thị.** Tệp CSV chỉ chứa các cột hiển thị trong chế độ xem hiện tại. Thêm hoặc ẩn cột trước khi xuất để kiểm soát dữ liệu nào được bao gồm.</Note>
+
+<Note>**Giới hạn xuất**: Tối đa 20.000 bản ghi mỗi lần xuất.</Note>
+
+## Quyền
+
+Nhập và xuất dữ liệu yêu cầu quyền cụ thể:
+- **Nhập**: Yêu cầu quyền "Import CSV"
+- **Xuất**: Yêu cầu quyền "Export CSV"
+
+Liên hệ quản trị viên không gian làm việc nếu bạn không có các quyền này.
+
+## Bước tiếp theo
+
+- [Chuẩn bị tệp CSV](/l/vi/user-guide/data-migration/how-tos/prepare-your-csv-files)
+- [Nhập quan hệ giữa các đối tượng](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv)
+- [Nhập qua API cho tập dữ liệu lớn](/l/vi/user-guide/data-migration/how-tos/import-data-via-api)

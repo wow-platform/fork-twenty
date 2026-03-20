@@ -1,0 +1,94 @@
+---
+title: Chế độ xem bảng Kanban
+description: Tìm hiểu cách sử dụng chế độ xem Kanban để trực quan hóa và quản lý quy trình làm việc.
+image: /images/user-guide/kanban-views/kanban.png
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+## Giới thiệu về chế độ xem Kanban
+
+Chế độ xem Kanban trực quan hóa luồng quy trình, trong đó mỗi cột đại diện cho một giai đoạn riêng biệt và mỗi thẻ đại diện cho một bản ghi.
+
+## Di chuyển thẻ giữa các giai đoạn
+
+Bạn có thể di chuyển mỗi thẻ giữa các giai đoạn khi nó đi qua quy trình bằng cách kéo và thả. Để thực hiện, giữ nhấp vào thẻ và di chuyển nó sang giai đoạn tiếp theo.
+
+<VimeoEmbed videoId="927888627" title="Video demonstration" />
+
+## Thêm và xóa giai đoạn
+
+Bạn có thể tùy chỉnh quy trình theo nhu cầu bằng các giai đoạn, đại diện cho một giá trị trong trường Lựa chọn:
+
+### Thêm giai đoạn
+
+Để thêm giai đoạn, truy cập cài đặt trường Lựa chọn bằng cách điều hướng đến Cài đặt > Mô hình dữ liệu, chọn đối tượng của bạn, sau đó chọn trường mà bảng Kanban phụ thuộc vào.
+
+<VimeoEmbed videoId="927890428" title="Video demonstration" />
+
+### Xóa giai đoạn
+
+Để xóa giai đoạn, di chuột qua tên giai đoạn hoặc biểu tượng `⋮`, nhấp `Chỉnh sửa từ cài đặt` trong cài đặt trường Lựa chọn, sau đó nhấp **Xóa** bên cạnh giai đoạn liên quan.
+
+## Hiển thị trường
+
+Bạn có thể cấu hình bảng Kanban để hiển thị một số trường và ẩn các trường khác. Để ẩn trường, nhấp vào **Tùy chọn** ở góc trên bên phải, sau đó nhấp **Trường** để hiện danh sách tùy chọn. Tìm trường cần thiết trong phần Trường ẩn và nhấp vào nút mắt để hiển thị trường.
+
+Bạn cũng có thể sắp xếp lại thứ tự trường bằng cách giữ nhấp vào tên trường và kéo đến vị trí mong muốn.
+
+<img src="/images/user-guide/kanban-views/filter.png" style={{width:'100%'}}/>
+
+## Chế độ xem thu gọn
+
+Bạn có thể ẩn tất cả trường và có cái nhìn tổng quan về tất cả bản ghi. Để bật:
+1. Nhấp **Tùy chọn** ở góc trên bên phải
+2. Bật công tắc **Chế độ xem thu gọn**
+
+<img src="/images/user-guide/kanban-views/compact-view.png" style={{width:'100%'}}/>
+
+## Tổng hợp cột
+
+Mỗi cột trong chế độ xem Kanban có thể hiển thị giá trị tổng hợp ở đầu, giúp bạn hiểu dữ liệu nhanh chóng.
+
+### Các phép tổng hợp khả dụng
+
+| Phép tổng hợp | Mô tả |
+|-------------|-------------|
+| **Đếm** | Số lượng bản ghi trong cột |
+| **Tổng** | Tổng của trường số (ví dụ: giá trị giao dịch) |
+| **Trung bình** | Giá trị trung bình của trường số |
+| **Nhỏ nhất** | Giá trị thấp nhất |
+| **Lớn nhất** | Giá trị cao nhất |
+
+### Cấu hình tổng hợp
+
+1. Nhấp vào số hiển thị bên cạnh giá trị Giai đoạn, ở đầu cột
+2. Chọn loại tổng hợp
+3. Chọn trường để tổng hợp
+
+**Ví dụ:** Hiển thị tổng giá trị giao dịch theo giai đoạn bằng cách tổng hợp trường Số tiền với phép Tổng.
+
+## Khi nào sử dụng chế độ xem Kanban
+
+Chế độ xem Kanban lý tưởng cho:
+- **Pipeline bán hàng**: Theo dõi giao dịch qua các giai đoạn từ khách hàng tiềm năng đến chốt
+- **Quản lý dự án**: Giám sát nhiệm vụ qua các trạng thái quy trình
+- **Tuyển dụng**: Theo dõi ứng viên qua các giai đoạn tuyển dụng
+- **Bất kỳ quy trình theo giai đoạn nào**: Trực quan hóa bất kỳ quy trình nào có các giai đoạn xác định
+
+## Thực hành tốt nhất
+
+### Tổ chức giai đoạn
+- **Giới hạn giai đoạn**: 5-7 giai đoạn là lý tưởng cho khả năng hiển thị
+- **Đặt tên rõ ràng**: Sử dụng tên giai đoạn mô tả
+- **Thứ tự hợp lý**: Sắp xếp giai đoạn theo thứ tự quy trình
+
+### Tối ưu hiển thị thẻ
+- **Hiển thị trường chính**: Chỉ hiển thị thông tin quan trọng nhất
+- **Sử dụng chế độ xem thu gọn**: Cho tổng quan cấp cao
+- **Mã màu**: Sử dụng màu giai đoạn để nhận diện trạng thái nhanh
+
+### Duy trì chất lượng dữ liệu
+- **Cập nhật thường xuyên**: Giữ thẻ di chuyển qua các giai đoạn
+- **Lưu trữ đã hoàn thành**: Di chuyển các mục đã đóng ra khỏi chế độ xem đang hoạt động
+- **Xem xét thẻ trì trệ**: Theo dõi các thẻ bị mắc kẹt trong giai đoạn

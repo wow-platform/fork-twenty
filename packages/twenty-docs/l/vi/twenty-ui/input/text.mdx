@@ -1,0 +1,162 @@
+---
+title: Text
+image: /images/user-guide/notes/notes_header.png
+---
+<Frame>
+  <img src="/images/user-guide/notes/notes_header.png" alt="Header" />
+</Frame>
+
+## Text Input
+
+Cho phép người dùng nhập và chỉnh sửa văn bản.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { TextInput } from "@/ui/input/components/TextInput";
+
+export const MyComponent = () => {
+  const handleChange = (text) => {
+    console.log("Input changed:", text);
+  };
+
+  const handleKeyDown = (event) => {
+    console.log("Key pressed:", event.key);
+  };
+
+  return (
+    <TextInput
+      className
+      label="Username"
+      onChange={handleChange}
+      fullWidth={false}
+      disableHotkeys={false}
+      error="Invalid username"
+      onKeyDown={handleKeyDown}
+      RightIcon={null}
+    />
+  );
+};
+
+```
+
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+| label | string | Nhãn cho ô nhập liệu |
+| onChange | function | Hàm được gọi khi giá trị nhập liệu thay đổi |
+| fullWidth | boolean | Chỉ ra rằng ô nhập liệu có nên chiếm 100% chiều rộng hay không |
+| disableHotkeys | boolean | Chỉ ra rằng các phím tắt có được bật cho ô nhập liệu hay không |
+| error | string | Thông báo lỗi cần hiển thị. Khi được cung cấp, nó cũng thêm biểu tượng lỗi ở bên phải ô nhập liệu |
+| onKeyDown | function | Được gọi khi một phím được nhấn xuống trong khi ô nhập liệu đang được focus. Nhận `React.KeyboardEvent` làm tham số |
+| RightIcon | IconComponent | Component biểu tượng tùy chọn hiển thị ở bên phải ô nhập liệu |
+
+
+
+
+Component này cũng chấp nhận các props khác của phần tử HTML input.
+
+</Tab>
+
+</Tabs>
+
+
+## Autosize Text Input
+
+Component nhập văn bản tự động điều chỉnh chiều cao dựa trên nội dung.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { AutosizeTextInput } from "@/ui/input/components/AutosizeTextInput";
+
+export const MyComponent = () => {
+  return (
+    <AutosizeTextInput
+      onValidate={() => console.log("onValidate function fired")}
+      minRows={1}
+      placeholder="Write a comment"
+      onFocus={() => console.log("onFocus function fired")}
+      variant="icon"
+      buttonTitle
+      value="Task: "
+    />
+  );
+};
+```
+
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| onValidate | function | Hàm callback bạn muốn kích hoạt khi người dùng xác nhận đầu vào |
+| minRows | number | Số hàng tối thiểu cho vùng văn bản |
+| placeholder | string | Văn bản placeholder bạn muốn hiển thị khi vùng văn bản trống |
+| onFocus | function | Hàm callback bạn muốn kích hoạt khi vùng văn bản được focus |
+| variant | string | Biến thể của ô nhập liệu. Các tùy chọn bao gồm: `default`, `icon`, và `button` |
+| buttonTitle | string | Tiêu đề cho button (chỉ áp dụng cho biến thể button) |
+| value | string | Giá trị ban đầu cho vùng văn bản |
+
+
+
+
+</Tab>
+
+</Tabs>
+
+## Text Area
+
+Cho phép bạn tạo các ô nhập văn bản nhiều dòng.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { TextArea } from "@/ui/input/components/TextArea";
+
+export const MyComponent = () => {
+  return (
+    <TextArea
+    disabled={false}
+    minRows={4}
+    onChange={()=>console.log('On change function fired')}
+    placeholder="Enter text here"
+    value=""
+    />
+  );
+};
+```
+
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| disabled | boolean | Chỉ ra xem vùng văn bản có bị vô hiệu hóa hay không |
+| minRows | number | Số hàng hiển thị tối thiểu cho vùng văn bản |
+| onChange | function | Hàm callback được kích hoạt khi nội dung vùng văn bản thay đổi |
+| placeholder | string | Văn bản placeholder hiển thị khi vùng văn bản trống |
+| value | string | Giá trị hiện tại của vùng văn bản |
+
+
+
+
+</Tab>
+</Tabs>

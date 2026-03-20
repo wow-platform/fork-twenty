@@ -1,0 +1,147 @@
+---
+title: Hiển thị số tiền dự kiến trong pipeline
+description: Tính toán và hiển thị giá trị giao dịch có trọng số dựa trên xác suất giai đoạn.
+---
+
+Số tiền dự kiến là giá trị được tính: **Số tiền x Xác suất**. Điều này giúp bạn dự báo doanh thu bằng cách đánh trọng số giao dịch dựa trên khả năng chốt.
+
+<Tip>
+Đây là ví dụ về việc tạo [Trường công thức](/l/vi/user-guide/workflows/how-tos/crm-automations/formula-fields) sử dụng workflow.
+</Tip>
+
+Hướng dẫn này sẽ giúp bạn thiết lập các trường tùy chỉnh và workflow cần thiết để tính toán và hiển thị số tiền dự kiến trong pipeline.
+
+## Bước 1: Tạo trường tùy chỉnh
+
+Bạn cần hai trường tùy chỉnh trên đối tượng Cơ hội.
+
+### Tạo trường Xác suất
+
+1. Đi tới **Cài đặt → Mô hình dữ liệu → Cơ hội**
+2. Nhấp **+ Thêm trường**
+3. Cấu hình:
+   - **Tên**: Xác suất
+   - **Loại**: Số
+   - **Mô tả**: Xác suất dựa trên giai đoạn (0-100%)
+4. Nhấp **Lưu**
+
+### Tạo trường Số tiền dự kiến
+
+1. Nhấp **+ Thêm trường**
+2. Cấu hình:
+   - **Tên**: Số tiền dự kiến
+   - **Loại**: Tiền tệ
+   - **Mô tả**: Tính toán: Số tiền x Xác suất
+3. Nhấp **Lưu**
+
+### Tùy chọn: Đặt trường chỉ đọc cho người dùng
+
+Nếu bạn không muốn người dùng chỉnh sửa thủ công các trường tính toán này:
+
+1. Đi tới **Cài đặt → Vai trò**
+2. Chọn vai trò cần cấu hình
+3. Tìm đối tượng Cơ hội
+4. Đặt trường **Xác suất** và **Số tiền dự kiến** thành chỉ đọc
+
+Điều này đảm bảo chỉ workflow mới có thể cập nhật các giá trị này.
+
+## Bước 2: Tạo Workflow #1 — Cập nhật xác suất khi thay đổi giai đoạn
+
+Workflow này tự động đặt Xác suất khi cơ hội chuyển sang giai đoạn mới.
+
+### Tạo workflow
+
+1. Đi tới **Workflow**
+2. Nhấp **+ Workflow mới**
+3. Đặt tên "Cập nhật xác suất khi thay đổi giai đoạn"
+
+### Cấu hình trigger
+
+1. Thêm trigger **Bản ghi được tạo hoặc cập nhật**
+2. Chọn **Cơ hội** làm đối tượng
+3. Lọc theo: Trường **Giai đoạn** được cập nhật
+
+### Thêm nhánh cho mỗi giai đoạn
+
+Tạo nhánh cho mỗi giai đoạn với xác suất tương ứng:
+
+| Giai đoạn | Xác suất |
+|-------|-------------|
+| Mới | 10% |
+| Đủ điều kiện | 25% |
+| Cuộc họp | 40% |
+| Đề xuất | 60% |
+| Đàm phán | 80% |
+| Chốt thành công | 100% |
+| Chốt thất bại | 0% |
+
+<Note>
+Để tạo nhánh mới, nhấp chuột phải vào canvas workflow và nhấp **Hành động mới**. Sau đó, liên kết hành động này với nút trước bằng cách kéo mũi tên từ nút trước đến hành động mới này.
+</Note>
+
+Cho mỗi giai đoạn:
+1. Thêm nút **Bộ lọc**: Giai đoạn = [tên giai đoạn]
+2. Thêm hành động **Cập nhật bản ghi**:
+   - Bản ghi: Cơ hội kích hoạt
+   - Trường: Xác suất
+   - Giá trị: [xác suất cho giai đoạn đó]
+
+### Tính số tiền dự kiến
+
+Sau khi các nhánh hội tụ:
+1. Thêm nút **Bộ lọc**: Số tiền không trống
+2. Thêm hành động **Cập nhật bản ghi**:
+   - Bản ghi: Cơ hội kích hoạt
+   - Trường: Số tiền dự kiến
+   - Giá trị: Số tiền x Xác suất
+
+## Bước 3: Tạo Workflow #2 — Tính lại khi số tiền thay đổi
+
+Workflow này cập nhật Số tiền dự kiến khi Số tiền giao dịch thay đổi.
+
+### Tạo workflow
+
+1. Đi tới **Workflow**
+2. Nhấp **+ Workflow mới**
+3. Đặt tên "Tính lại số tiền dự kiến khi số tiền thay đổi"
+
+### Cấu hình trigger
+
+1. Thêm trigger **Bản ghi được tạo hoặc cập nhật**
+2. Chọn **Cơ hội** làm đối tượng
+3. Lọc theo: Trường **Số tiền** được cập nhật
+
+### Thêm logic
+
+1. Thêm nút **Bộ lọc**: Số tiền không trống
+2. Thêm hành động **Cập nhật bản ghi**:
+   - Bản ghi: Cơ hội kích hoạt
+   - Trường: Số tiền dự kiến
+   - Giá trị: Số tiền x Xác suất
+
+## Bước 4: Hiển thị trong pipeline
+
+Bây giờ hiển thị tổng Số tiền dự kiến trong chế độ xem Kanban:
+
+1. Mở chế độ xem Kanban **Pipeline bán hàng**
+2. Nhấp vào **số** bên cạnh bất kỳ tên Giai đoạn nào ở đầu cột
+3. Chọn **Tổng**
+4. Chọn **Số tiền dự kiến**
+
+Mỗi cột bây giờ hiển thị tổng giá trị pipeline có trọng số cho giai đoạn đó.
+
+## Tóm tắt
+
+| Thành phần | Mục đích |
+|-----------|---------|
+| **Trường Xác suất** | Lưu xác suất chiến thắng dựa trên giai đoạn |
+| **Trường Số tiền dự kiến** | Lưu Số tiền x Xác suất |
+| **Workflow #1** | Cập nhật Xác suất khi Giai đoạn thay đổi, sau đó tính lại Số tiền dự kiến |
+| **Workflow #2** | Tính lại Số tiền dự kiến khi Số tiền thay đổi |
+| **Tổng hợp** | Hiển thị Tổng Số tiền dự kiến theo giai đoạn |
+
+## Liên quan
+
+- [Trường công thức](/l/vi/user-guide/workflows/how-tos/crm-automations/formula-fields) — tạo trường tính toán sử dụng workflow
+- [Chế độ xem Kanban](/l/vi/user-guide/views-pipelines/capabilities/kanban-views) — tổng hợp cột
+- [Cách tạo trường tùy chỉnh](/l/vi/user-guide/data-model/how-tos/create-custom-fields) — cấu hình trường

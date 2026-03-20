@@ -1,0 +1,121 @@
+---
+title: Lịch & Email
+description: Kết nối tài khoản email và lịch của bạn với Twenty.
+image: /images/user-guide/emails/emails_header.png
+---
+
+<Frame>
+  <img src="/images/user-guide/emails/emails_header.png" alt="Lịch & Email" />
+</Frame>
+
+## Tùy chọn kết nối
+
+### Tài khoản Google (Gmail & Google Calendar)
+1. Vào **Cài đặt → Tài khoản**
+2. Nhấp **Thêm tài khoản**
+3. Chọn **Tiếp tục với Google**
+4. Cho phép Twenty truy cập Gmail và Google Calendar của bạn
+5. Cấu hình cài đặt đồng bộ email (hiển thị, tự động tạo) → nhấp **Tiếp theo**
+6. Cấu hình cài đặt đồng bộ lịch (hiển thị, tự động tạo) → nhấp **Thêm tài khoản**
+7. Email và sự kiện lịch của bạn sẽ bắt đầu đồng bộ tự động
+
+### Tài khoản Microsoft (Outlook & Microsoft Calendar)
+1. Vào **Cài đặt → Tài khoản**
+2. Nhấp **Thêm tài khoản**
+3. Chọn **Tiếp tục với Microsoft**
+4. Cho phép Twenty truy cập Outlook và Microsoft Calendar của bạn
+5. Cấu hình cài đặt đồng bộ email (hiển thị, tự động tạo) → nhấp **Tiếp theo**
+6. Cấu hình cài đặt đồng bộ lịch (hiển thị, tự động tạo) → nhấp **Thêm tài khoản**
+7. Email và sự kiện lịch của bạn sẽ bắt đầu đồng bộ tự động
+
+### Thiết lập SMTP/CalDAV (Nhà cung cấp khác)
+Đối với các nhà cung cấp email và lịch khác:
+1. Vào **Cài đặt → Tài khoản**
+2. Cấu hình cài đặt SMTP cho email
+3. Cấu hình cài đặt CalDAV cho lịch
+4. Kiểm tra kết nối
+
+### Nhiều hộp thư
+- **Không giới hạn tài khoản**: Kết nối nhiều tài khoản email cho mỗi người dùng
+- **Quản lý tài khoản**: Chuyển đổi giữa các hộp thư khác nhau
+- **Cài đặt đồng bộ**: Cấu hình cài đặt khác nhau cho mỗi hộp thư
+
+
+<Warning>
+Chỉ có thể kết nối hộp thư thực (ví dụ: support@domain.com có hộp thư đến riêng). Các bí danh email chuyển tiếp đến hộp thư khác không thể kết nối với Twenty.
+</Warning>
+
+
+## Cấu hình Email
+
+### Mức độ hiển thị tin nhắn
+Chọn các mức độ hiển thị khác nhau cho email của bạn:
+
+- **Chỉ metadata**: Chỉ chia sẻ thông tin cơ bản (người gửi, người nhận, ngày, giờ)
+- **Chủ đề và metadata**: Chia sẻ dòng chủ đề cùng với metadata
+- **Toàn bộ nội dung email**: Chia sẻ toàn bộ nội dung email bao gồm tệp đính kèm
+
+### Tự động tạo liên hệ
+- **Tắt**: Không tự động tạo liên hệ
+- **Cho tin nhắn gửi & nhận**: Tạo liên hệ cho tất cả tương tác email bên ngoài
+- **Chỉ cho tin nhắn đã gửi**: Chỉ tạo liên hệ cho email bạn gửi
+- **Lưu ý**: Email nội bộ (cùng tên miền) không bao giờ được đồng bộ để bảo vệ quyền riêng tư
+
+<Note>Khi được bật, liên hệ sẽ tự động được liên kết với bản ghi Công ty dựa trên tên miền email. Nếu công ty chưa tồn tại, Twenty sẽ tạo công ty cho bạn.</Note>
+
+### Kiểm soát email nào được đồng bộ với Chọn thư mục tin nhắn
+Kiểm soát thư mục email nào đồng bộ với Twenty:
+1. Vào **Cài đặt → Tài khoản** và chọn tài khoản email đã kết nối
+3. Chọn thư mục cần đồng bộ:
+   - **Hộp thư đến**: Email đến chính
+   - **Đã gửi**: Email đi bạn đã gửi
+   - **Thư mục tùy chỉnh**: Bất kỳ thư mục cụ thể nào bạn muốn bao gồm
+   - **Loại trừ thư mục**: Bỏ qua các thư mục như Spam, Thùng rác hoặc thư mục cá nhân
+
+Điều này cho phép bạn kiểm soát chính xác email nào xuất hiện trong CRM mà không cần đồng bộ tất cả.
+
+**Những gì được đồng bộ:**
+- **Email bên ngoài**: Tất cả email với liên hệ bên ngoài từ các thư mục đã chọn
+- **Email nội bộ**: Không đồng bộ (email cùng tên miền vẫn riêng tư)
+- **Tệp đính kèm**: Sẽ có trong nửa đầu năm 2026
+
+**Lưu ý**: Chúng tôi không cung cấp địa chỉ email CC để đồng bộ có chọn lọc. Thay vào đó, hãy sử dụng tính năng Thư mục tin nhắn ở trên để đạt được cùng mức độ kiểm soát email nào đồng bộ với Twenty.
+
+
+## Cấu hình Lịch
+
+### Mức độ hiển thị sự kiện
+Chọn nội dung sẽ hiển thị cho người dùng khác trong không gian làm việc:
+- **Mọi thứ**: Toàn bộ chi tiết sự kiện sẽ được chia sẻ với nhóm của bạn
+- **Metadata**: Chỉ ngày & người tham gia sẽ được chia sẻ với nhóm của bạn
+
+
+### Tự động tạo liên hệ cho cuộc họp
+- **Có**: Tự động tạo liên hệ cho người tham gia cuộc họp chưa có trong CRM
+- **Không**: Chỉ liên kết cuộc họp với liên hệ hiện có
+
+<Note>Khi được bật, liên hệ sẽ tự động được liên kết với bản ghi Công ty dựa trên tên miền email. Nếu công ty chưa tồn tại, Twenty sẽ tạo công ty cho bạn.</Note>
+
+### Kiểm soát sự kiện nào được đồng bộ
+- **Nhập cuộc họp**: Tự động nhập sự kiện lịch
+- **Liên kết liên hệ**: Liên kết cuộc họp với bản ghi Người và Công ty
+
+**Những gì được đồng bộ:**
+- **Cuộc họp**: Sự kiện lịch với người tham gia bên ngoài
+- **Liên kết liên hệ**: Sự kiện tự động liên kết với bản ghi CRM
+- **Sự kiện nhóm**: Hiển thị lịch được chia sẻ
+
+
+
+## Tần suất đồng bộ
+
+**Cập nhật mỗi 5 phút**: Cả dữ liệu email và lịch đều đồng bộ tự động mỗi 5 phút sau lần nhập ban đầu.
+
+<Note>
+**Thời gian đồng bộ ban đầu**: Đồng bộ lịch hoàn thành nhanh chóng (thường trong vài phút), trong khi đồng bộ email mất nhiều thời gian hơn cho hộp thư lớn. Twenty nhập email với tốc độ khoảng **400 tin nhắn mỗi phút** (bị giới hạn bởi tốc độ API Gmail), vì vậy hộp thư có 10.000 email mất khoảng 25 phút. Đừng lo lắng nếu bạn thấy liên hệ từ sự kiện lịch xuất hiện trước liên hệ email; đây là hành vi bình thường.
+</Note>
+
+## Bước tiếp theo
+
+- [Khả năng hộp thư](/l/vi/user-guide/calendar-emails/capabilities/mailbox)
+- [Khắc phục sự cố email bị thiếu](/l/vi/user-guide/calendar-emails/how-tos/i-dont-see-emails-on-records)

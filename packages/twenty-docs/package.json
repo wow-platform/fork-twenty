@@ -11,7 +11,7 @@
     "lint": "npx oxlint -c .oxlintrc.json ."
   },
   "dependencies": {
-    "mintlify": "latest"
+    "mintlify": "^4.2.444"
   },
   "devDependencies": {
     "twenty-shared": "workspace:*"

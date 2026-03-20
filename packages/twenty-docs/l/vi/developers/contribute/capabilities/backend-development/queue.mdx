@@ -1,0 +1,41 @@
+---
+title: Hàng đợi tin nhắn
+---
+
+
+Hàng đợi hỗ trợ các thao tác bất đồng bộ. Chúng có thể được sử dụng để thực hiện các tác vụ nền như gửi email chào mừng khi đăng ký.
+Mỗi trường hợp sử dụng sẽ có lớp hàng đợi riêng mở rộng từ `MessageQueueServiceBase`.
+
+Hiện tại, chúng tôi chỉ hỗ trợ [bull-mq](https://bullmq.io/) làm driver hàng đợi.
+
+## Các bước tạo và sử dụng hàng đợi mới
+
+1. Thêm tên hàng đợi cho hàng đợi mới trong enum `MESSAGE_QUEUES`.
+2. Cung cấp implementation factory của hàng đợi với tên hàng đợi làm dependency token.
+3. Inject hàng đợi đã tạo trong module/service cần thiết với tên hàng đợi làm dependency token.
+4. Thêm lớp worker với injection dựa trên token giống như producer.
+
+### Ví dụ sử dụng
+```ts
+class Resolver {
+  constructor(@Inject(MESSAGE_QUEUES.custom) private queue: MessageQueueService) {}
+
+  async onSomeAction() {
+    //logic nghiệp vụ
+    await this.queue.add(someData);
+  }
+}
+
+//async worker
+class CustomWorker {
+  constructor(@Inject(MESSAGE_QUEUES.custom) private queue: MessageQueueService) {
+    this.initWorker();
+  }
+
+  async initWorker() {
+    await this.queue.work(async ({ id, data }) => {
+      //logic worker
+    });
+  }
+}
+```

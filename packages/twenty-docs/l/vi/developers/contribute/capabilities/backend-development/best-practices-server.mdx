@@ -1,0 +1,23 @@
+---
+title: Các thực hành tốt nhất
+---
+
+
+Tài liệu này trình bày các thực hành tốt nhất bạn nên tuân theo khi làm việc trên backend.
+
+## Tuân theo phương pháp module
+
+Backend tuân theo phương pháp module, là nguyên tắc cơ bản khi làm việc với NestJS. Đảm bảo bạn chia code thành các module có thể tái sử dụng để duy trì codebase sạch và có tổ chức.
+Mỗi module nên đóng gói một tính năng hoặc chức năng cụ thể và có phạm vi được định nghĩa rõ ràng. Phương pháp module này cho phép tách biệt quan tâm rõ ràng và loại bỏ những phức tạp không cần thiết.
+
+## Cung cấp service để sử dụng trong module
+
+Luôn tạo service có trách nhiệm rõ ràng và duy nhất, tăng cường khả năng đọc và bảo trì code. Đặt tên service một cách mô tả và nhất quán.
+
+Bạn cũng nên cung cấp service mà bạn muốn sử dụng trong các module khác. Cung cấp service cho các module khác có thể thông qua hệ thống dependency injection mạnh mẽ của NestJS, và thúc đẩy liên kết lỏng lẻo giữa các component.
+
+## Tránh sử dụng kiểu `any`
+
+Khi bạn khai báo biến là `any`, trình kiểm tra kiểu của TypeScript không thực hiện kiểm tra kiểu, cho phép gán bất kỳ giá trị nào cho biến. TypeScript sử dụng suy luận kiểu để xác định kiểu của biến dựa trên giá trị. Khai báo `any` khiến TypeScript không thể suy luận kiểu nữa. Điều này làm khó bắt lỗi liên quan kiểu trong quá trình phát triển, dẫn đến lỗi runtime và làm code khó bảo trì, khó tin cậy và khó hiểu cho người khác.
+
+Đây là lý do mọi thứ nên có kiểu. Nên nếu bạn tạo đối tượng mới với họ và tên, bạn nên tạo interface hoặc type chứa họ và tên để định nghĩa hình dạng của đối tượng bạn đang thao tác.

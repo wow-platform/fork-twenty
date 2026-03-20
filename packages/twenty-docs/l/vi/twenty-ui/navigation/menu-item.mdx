@@ -1,0 +1,504 @@
+---
+title: Menu Item
+image: /images/user-guide/kanban-views/kanban.png
+---
+<Frame>
+  <img src="/images/user-guide/kanban-views/kanban.png" alt="Header" />
+</Frame>
+
+Một mục menu đa năng được thiết kế để sử dụng trong menu hoặc danh sách điều hướng.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from "@tabler/icons-react";
+import { IconAlertCircle } from "@tabler/icons-react";
+import { MenuItem } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const handleMenuItemClick = (event) => {
+    console.log("Menu item clicked!", event);
+  };
+
+  const handleButtonClick = (event) => {
+    console.log("Icon button clicked!", event);
+  };
+
+  return (
+    <MenuItem
+      LeftIcon={IconBell}
+      accent="default"
+      text="Menu item text"
+      iconButtons={[{ Icon: IconAlertCircle, onClick: handleButtonClick }]}
+      isTooltipOpen={true}
+      testId="menu-item-1"
+      onClick={handleMenuItemClick}
+      className
+    />
+  );
+};
+```
+
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| accent | string | Chỉ định màu nhấn của mục menu. Các tùy chọn bao gồm: `default`, `danger`, và `placeholder` |
+| text | string | Nội dung văn bản của mục menu |
+| iconButtons | array | Một mảng các đối tượng đại diện cho các icon button bổ sung liên kết với mục menu |
+| isTooltipOpen | boolean | Kiểm soát khả năng hiển thị của tooltip liên kết với mục menu |
+| testId | string | Thuộc tính data-testid cho mục đích kiểm thử |
+| onClick | function | Hàm callback được kích hoạt khi mục menu được nhấp |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+## Các biến thể
+
+Các biến thể khác nhau của component menu item bao gồm:
+
+### Command
+
+Mục menu kiểu command trong menu để chỉ ra phím tắt.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from "@tabler/icons-react";
+import { MenuItemCommand } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const handleCommandClick = () => {
+    console.log("Command clicked!");
+  };
+
+  return (
+    <MenuItemCommand
+      LeftIcon={IconBell}
+      text="First Option"
+      firstHotKey="⌘"
+      secondHotKey="1"
+      isSelected={true}
+      onClick={handleCommandClick}
+      className
+    />
+  );
+};
+```
+
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| firstHotKey | string | Phím tắt đầu tiên liên kết với command |
+| secondHotKey | string | Phím tắt thứ hai liên kết với command |
+| isSelected | boolean | Chỉ ra xem mục menu có đang được chọn hoặc được đánh dấu hay không |
+| onClick | function | Hàm callback được kích hoạt khi mục menu được nhấp |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+</Tab>
+</Tabs>
+
+### Draggable
+
+Component mục menu có thể kéo được thiết kế để sử dụng trong menu hoặc danh sách nơi các mục có thể được kéo, và các hành động bổ sung có thể được thực hiện thông qua các icon button.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from "@tabler/icons-react";
+import { IconAlertCircle } from "@tabler/icons-react";
+import { MenuItemDraggable } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const handleMenuItemClick = (event) => {
+    console.log("Menu item clicked!", event);
+  };
+
+  return (
+    <MenuItemDraggable
+      LeftIcon={IconBell}
+      accent="default"
+      iconButtons={[{ Icon: IconAlertCircle, onClick: handleButtonClick }]}
+      isTooltipOpen={false}
+      onClick={handleMenuItemClick}
+      text="Menu item draggable"
+      isDragDisabled={false}
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| accent | string | Màu nhấn của mục menu. Có thể là `default`, `placeholder`, và `danger` |
+| iconButtons | array | Một mảng các đối tượng đại diện cho các icon button bổ sung liên kết với mục menu |
+| isTooltipOpen | boolean | Kiểm soát khả năng hiển thị của tooltip liên kết với mục menu |
+| onClick | function | Hàm callback được kích hoạt khi liên kết được nhấp |
+| text | string | Nội dung văn bản của mục menu |
+| isDragDisabled | boolean | Chỉ ra xem chức năng kéo có bị vô hiệu hóa hay không |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+### Multi Select
+
+Cung cấp cách triển khai chức năng chọn nhiều với checkbox đi kèm.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from "@tabler/icons-react";
+import { MenuItemMultiSelect } from "twenty-ui/display";
+
+export const MyComponent = () => {
+
+  return (
+    <MenuItemMultiSelect
+      LeftIcon={IconBell}
+      text="First Option"
+      selected={false}
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| selected | boolean | Chỉ ra xem mục menu có đang được chọn (đánh dấu) hay không |
+| onSelectChange | function | Hàm callback được kích hoạt khi trạng thái checkbox thay đổi |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+### Multi Select Avatar
+
+Mục menu chọn nhiều với avatar, checkbox để chọn, và nội dung văn bản.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { MenuItemMultiSelectAvatar } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const imageUrl =
+    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAYABgAAD/4QCMRXhpZgAATU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABgAAAAAQAAAGAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABSgAwAEAAAAAQAAABQAAAAA/8AAEQgAFAAUAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMACwgICggHCwoJCg0MCw0RHBIRDw8RIhkaFBwpJCsqKCQnJy0yQDctMD0wJyc4TDk9Q0VISUgrNk9VTkZUQEdIRf/bAEMBDA0NEQ8RIRISIUUuJy5FRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRf/dAAQAAv/aAAwDAQACEQMRAD8Ava1q728otYY98joSCTgZrnbXWdTtrhrfVZXWLafmcAEkdgR/hVltQku9Q8+OIEBcGOT+ID0PY1ka1KH2u8ToqnPLbmIqG7u6LtbQ7RXBRec4Uck9eKXcPWsKDWVnhWSL5kYcFelSf2m3901POh8jP//QoyIAnTuKpXsY82NsksUyWPU5q/L9z8RVK++/F/uCsVsaEURwgA4HtT9x9TUcf3KfUGh//9k=";
+
+  return (
+    <MenuItemMultiSelectAvatar
+      avatar={<img src={imageUrl} alt="Avatar" />}
+      text="First Option"
+      selected={false}
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| avatar | `ReactNode` | Avatar hoặc biểu tượng hiển thị ở bên trái mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| selected | boolean | Chỉ ra xem mục menu có đang được chọn (đánh dấu) hay không |
+| onSelectChange | function | Hàm callback được kích hoạt khi trạng thái checkbox thay đổi |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+### Navigate
+
+Mục menu có biểu tượng bên trái tùy chọn, nội dung văn bản, và biểu tượng chevron bên phải.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from "@tabler/icons-react";
+import { MenuItemNavigate } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const handleNavigation = () => {
+    console.log("Navigate to another page");
+  };
+
+  return (
+    <MenuItemNavigate
+      LeftIcon={IconBell}
+      text="First Option"
+      onClick={handleNavigation}
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| onClick | function | Hàm callback được kích hoạt khi mục menu được nhấp |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+### Select
+
+Mục menu có thể chọn, có nội dung bên trái tùy chọn (biểu tượng và văn bản) và chỉ báo (biểu tượng check) cho trạng thái đã chọn.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from "@tabler/icons-react";
+import { MenuItemSelect } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const handleSelection = () => {
+    console.log("Menu item selected");
+  };
+
+  return (
+    <MenuItemSelect
+      LeftIcon={IconBell}
+      text="First Option"
+      selected={true}
+      disabled={false}
+      hovered={false}
+      onClick={handleSelection}
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| selected | boolean | Chỉ ra xem mục menu có đang được chọn (đánh dấu) hay không |
+| disabled | boolean | Chỉ ra xem mục menu có bị vô hiệu hóa hay không |
+| hovered | boolean | Chỉ ra xem mục menu có đang được di chuột qua hay không |
+| onClick | function | Hàm callback được kích hoạt khi mục menu được nhấp |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+### Select Avatar
+
+Mục menu có thể chọn với avatar, có nội dung bên trái tùy chọn (avatar và văn bản) và chỉ báo (biểu tượng check) cho trạng thái đã chọn.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { MenuItemSelectAvatar } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const imageUrl =
+    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAYABgAAD/4QCMRXhpZgAATU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABgAAAAAQAAAGAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABSgAwAEAAAAAQAAABQAAAAA/8AAEQgAFAAUAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMACwgICggHCwoJCg0MCw0RHBIRDw8RIhkaFBwpJCsqKCQnJy0yQDctMD0wJyc4TDk9Q0VISUgrNk9VTkZUQEdIRf/bAEMBDA0NEQ8RIRISIUUuJy5FRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRf/dAAQAAv/aAAwDAQACEQMRAD8Ava1q728otYY98joSCTgZrnbXWdTtrhrfVZXWLafmcAEkdgR/hVltQku9Q8+OIEBcGOT+ID0PY1ka1KH2u8ToqnPLbmIqG7u6LtbQ7RXBRec4Uck9eKXcPWsKDWVnhWSL5kYcFelSf2m3901POh8jP//QoyIAnTuKpXsY82NsksUyWPU5q/L9z8RVK++/F/uCsVsaEURwgA4HtT9x9TUcf3KfUGh//9k=";
+
+  const handleSelection = () => {
+    console.log("Menu item selected");
+  };
+
+  return (
+    <MenuItemSelectAvatar
+      avatar={<img src={imageUrl} alt="Avatar" />}
+      text="First Option"
+      selected={true}
+      disabled={false}
+      hovered={false}
+      testId="menu-item-test"
+      onClick={handleSelection}
+      className
+    />
+  );
+};
+
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| avatar | `ReactNode` | Avatar hoặc biểu tượng hiển thị ở bên trái mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| selected | boolean | Chỉ ra xem mục menu có đang được chọn (đánh dấu) hay không |
+| disabled | boolean | Chỉ ra xem mục menu có bị vô hiệu hóa hay không |
+| hovered | boolean | Chỉ ra xem mục menu có đang được di chuột qua hay không |
+| testId | string | Thuộc tính data-testid cho mục đích kiểm thử |
+| onClick | function | Hàm callback được kích hoạt khi mục menu được nhấp |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+### Select Color
+
+Mục menu có thể chọn với mẫu màu cho các trường hợp bạn muốn người dùng chọn một màu từ menu.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { MenuItemSelectColor } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  const handleSelection = () => {
+    console.log("Menu item selected");
+  };
+
+  return (
+    <MenuItemSelectColor
+      color="green"
+      selected={true}
+      disabled={false}
+      hovered={true}
+      variant="default"
+      onClick={handleSelection}
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| color | string | Màu chủ đề hiển thị dưới dạng mẫu trong mục menu. Các tùy chọn bao gồm: `green`, `turquoise`, `sky`, `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, và `gray` |
+| selected | boolean | Chỉ ra xem mục menu có đang được chọn (đánh dấu) hay không |
+| disabled | boolean | Chỉ ra xem mục menu có bị vô hiệu hóa hay không |
+| hovered | boolean | Chỉ ra xem mục menu có đang được di chuột qua hay không |
+| variant | string | Biến thể của mẫu màu. Có thể là `default` hoặc `pipeline` |
+| onClick | function | Hàm callback được kích hoạt khi mục menu được nhấp |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>
+
+### Toggle
+
+Mục menu với công tắc toggle đi kèm cho phép người dùng bật hoặc tắt một tính năng cụ thể.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconBell } from '@tabler/icons-react';
+
+import { MenuItemToggle } from 'twenty-ui/display';
+
+export const MyComponent = () => {
+
+  return (
+    <MenuItemToggle
+      LeftIcon={IconBell}
+      text="First Option"
+      toggled={true}
+      toggleSize="small"
+      className
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| LeftIcon | IconComponent | Biểu tượng bên trái tùy chọn hiển thị trước văn bản trong mục menu |
+| text | string | Nội dung văn bản của mục menu |
+| toggled | boolean | Chỉ ra xem công tắc toggle đang ở trạng thái "bật" hay "tắt" |
+| onToggleChange | function | Hàm callback được kích hoạt khi trạng thái công tắc toggle thay đổi |
+| toggleSize | string | Kích thước của công tắc toggle. Có thể là `small` hoặc `medium` |
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+
+
+
+
+</Tab>
+</Tabs>

@@ -1,0 +1,133 @@
+---
+title: Phát hiện cơ hội trì trệ
+description: Tự động thông báo quản lý khi cơ hội không được cập nhật.
+---
+
+Giữ pipeline lành mạnh bằng cách cảnh báo quản lý khi cơ hội trở nên trì trệ. Workflow này kiểm tra các cơ hội chưa được cập nhật trong số ngày xác định.
+
+## Vấn đề
+
+Cơ hội nằm yên không cập nhật dẫn đến:
+- Giao dịch bị nguội
+- Dự báo không đáng tin cậy
+- Mất doanh thu
+
+## Giải pháp
+
+Tạo workflow theo lịch trình tìm cơ hội trì trệ và gửi email cho quản lý.
+
+## Thiết lập từng bước
+
+### Bước 1: Tạo Workflow
+
+1. Vào **Cài đặt → Workflow**
+2. Nhấp **+ Workflow mới**
+3. Đặt tên "Cảnh báo cơ hội trì trệ"
+
+### Bước 2: Cấu hình Trigger
+
+1. Chọn **Theo lịch trình**
+2. Đặt chạy hàng ngày (ví dụ: mỗi ngày lúc 8 giờ sáng)
+
+### Bước 3: Tìm kiếm cơ hội trì trệ
+
+1. Thêm hành động **Tìm kiếm bản ghi**
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đối tượng** | Cơ hội |
+| **Bộ lọc** | Cập nhật lúc trước (hôm nay - 7 ngày) |
+| **Bộ lọc** | Giai đoạn không phải "Closed Won" VÀ không phải "Closed Lost" |
+| **Giới hạn** | 100 |
+
+### Bước 4: Kiểm tra nếu có kết quả
+
+1. Thêm hành động **Bộ lọc**
+2. Điều kiện: `{{searchRecords.length}}` lớn hơn 0
+3. Nếu không có cơ hội trì trệ, workflow dừng tại đây
+
+### Bước 5: Định dạng cảnh báo (Hành động Mã nguồn)
+
+Thêm hành động **Mã nguồn** để định dạng email:
+
+```javascript
+export const main = async (params) => {
+  const opportunities = params.opportunities;
+
+  // Nhóm cơ hội theo chủ sở hữu
+  const byOwner = {};
+  opportunities.forEach(opp => {
+    const ownerEmail = opp.owner?.email || 'unassigned';
+    if (!byOwner[ownerEmail]) {
+      byOwner[ownerEmail] = [];
+    }
+    byOwner[ownerEmail].push({
+      name: opp.name,
+      amount: opp.amount,
+      lastUpdated: opp.updatedAt,
+      stage: opp.stage
+    });
+  });
+
+  // Định dạng tóm tắt cho quản lý
+  let summary = "Báo cáo cơ hội trì trệ\n\n";
+  Object.entries(byOwner).forEach(([owner, opps]) => {
+    summary += `${owner}: ${opps.length} cơ hội trì trệ\n`;
+    opps.forEach(opp => {
+      summary += `  - ${opp.name} (${opp.stage})\n`;
+    });
+    summary += "\n";
+  });
+
+  return {
+    summary,
+    totalCount: opportunities.length
+  };
+};
+```
+
+### Bước 6: Gửi email cảnh báo
+
+Thêm hành động **Gửi email**:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đến** | sales-manager@yourcompany.com |
+| **Chủ đề** | `🚨 {{code.totalCount}} cơ hội trì trệ cần chú ý` |
+| **Nội dung** | `{{code.summary}}` |
+
+### Bước 7: Kiểm tra và kích hoạt
+
+1. Nhấp **Kiểm tra** để chạy workflow
+2. Kiểm tra email chứa đúng dữ liệu
+3. Kích hoạt khi sẵn sàng
+
+## Tùy chọn tùy chỉnh
+
+### Thay đổi ngưỡng trì trệ
+
+Sửa bộ lọc Tìm kiếm bản ghi để thay đổi từ 7 ngày sang khoảng thời gian ưa thích:
+- 3 ngày cho bán hàng tốc độ cao
+- 14 ngày cho giao dịch doanh nghiệp
+- 30 ngày cho chu kỳ bán hàng dài
+
+### Cảnh báo cho từng đại diện
+
+Thay vì một email quản lý, sử dụng **Iterator** để gửi email cá nhân hóa cho mỗi đại diện về giao dịch trì trệ của họ.
+
+### Thêm leo thang
+
+Tạo nhiều workflow với mức nghiêm trọng tăng dần:
+1. Ngày 7: Email cho đại diện
+2. Ngày 14: Email cho đại diện + quản lý
+3. Ngày 21: Tạo tác vụ cho quản lý can thiệp
+
+### Gửi vào Slack
+
+Sử dụng **HTTP Request** để đăng vào Slack webhook thay vì hoặc kèm theo email.
+
+## Liên quan
+
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Gửi email từ Workflow](/l/vi/user-guide/workflows/capabilities/send-emails-from-workflows)

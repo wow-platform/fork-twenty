@@ -1,0 +1,39 @@
+---
+title: Đối tượng tùy chỉnh
+---
+
+
+Đối tượng là cấu trúc cho phép bạn lưu dữ liệu (bản ghi, thuộc tính và giá trị) đặc thù cho tổ chức. Twenty cung cấp cả đối tượng chuẩn và tùy chỉnh.
+
+Đối tượng chuẩn là đối tượng có sẵn với tập thuộc tính có sẵn cho tất cả người dùng. Ví dụ đối tượng chuẩn trong Twenty bao gồm Company và Person. Đối tượng chuẩn có trường chuẩn cũng có sẵn cho tất cả người dùng Twenty, như Company.displayName.
+
+Đối tượng tùy chỉnh là đối tượng bạn có thể tạo để lưu thông tin duy nhất cho tổ chức. Chúng không được xây dựng sẵn; thành viên workspace có thể tạo và tùy chỉnh đối tượng tùy chỉnh để lưu thông tin mà đối tượng chuẩn không phù hợp.
+
+
+## Sơ đồ cấp cao
+
+<div style={{textAlign: 'center'}}>
+    <img src="/images/docs/server/custom-object-schema.png" alt="Sơ đồ cấp cao" />
+</div>
+
+<br/>
+
+## Cách hoạt động
+
+Đối tượng tùy chỉnh đến từ các bảng metadata xác định hình dạng, tên và kiểu của đối tượng. Tất cả thông tin này có mặt trong database schema metadata, bao gồm các bảng:
+
+- **DataSource**: Chi tiết nơi dữ liệu có mặt.
+- **Object**: Mô tả đối tượng và liên kết đến DataSource.
+- **Field**: Phân tích các trường của Object và kết nối đến Object.
+
+Để thêm đối tượng tùy chỉnh, workspaceMember sẽ truy vấn API /metadata. Điều này cập nhật metadata tương ứng và tính toán schema GraphQL dựa trên metadata, lưu trữ nó trong GQL cache để sử dụng sau.
+<div style={{textAlign: 'center'}}>
+    <img src="/images/docs/server/add-custom-objects.jpeg" alt="Truy vấn API /metadata để thêm đối tượng tùy chỉnh" />
+</div>
+
+<br/>
+
+Để lấy dữ liệu, quá trình liên quan đến việc thực hiện truy vấn qua endpoint /graphql và truyền qua Query Resolver.
+<div style={{textAlign: 'center'}}>
+    <img src="/images/docs/server/custom-object-schema.png" alt="Truy vấn endpoint /graphql để lấy dữ liệu" />
+</div>

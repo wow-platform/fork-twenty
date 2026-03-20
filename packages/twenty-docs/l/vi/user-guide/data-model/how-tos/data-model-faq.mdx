@@ -1,0 +1,154 @@
+---
+title: FAQ mô hình dữ liệu
+description: Các câu hỏi thường gặp về mô hình dữ liệu của Twenty.
+---
+
+## Quản lý đối tượng
+
+<AccordionGroup>
+<Accordion title="Tôi có thể xóa đối tượng tùy chỉnh không?">
+Có, đối tượng tùy chỉnh có thể được xóa. Bạn cũng có thể vô hiệu hóa chúng trước, điều này ẩn đối tượng và dữ liệu khỏi giao diện trong khi vẫn bảo toàn dữ liệu.
+</Accordion>
+
+<Accordion title="Tôi có thể xóa đối tượng tiêu chuẩn (People, Companies, v.v.) không?">
+Không, đối tượng tiêu chuẩn không thể xóa. Bạn chỉ có thể vô hiệu hóa chúng, điều này ẩn chúng khỏi giao diện nhưng bảo toàn dữ liệu.
+</Accordion>
+
+<Accordion title="Tôi có thể tạo bao nhiêu đối tượng tùy chỉnh?">
+Bạn có thể tạo bao nhiêu đối tượng và trường tùy chỉnh tùy ý — giá không thay đổi.
+</Accordion>
+
+<Accordion title="Tôi có thể đổi tên đối tượng tiêu chuẩn không?">
+Bạn có thể đổi nhãn hiển thị của đối tượng tiêu chuẩn (People, Companies, Opportunities), nhưng không đổi được tên API. Tên API được cố định để đảm bảo tính nhất quán trên tất cả các không gian làm việc Twenty.
+</Accordion>
+
+<Accordion title="Tôi có thể thay đổi biểu tượng của đối tượng không?">
+Có, bạn có thể thay đổi biểu tượng cho cả đối tượng tiêu chuẩn và tùy chỉnh trong **Settings → Data Model**.
+</Accordion>
+
+<Accordion title="Tôi có thể sắp xếp lại đối tượng trong thanh điều hướng bên trái không?">
+Chưa được. Thứ tự đối tượng trong thanh điều hướng hiện tại là cố định, nhưng tính năng này được lên kế hoạch cho phiên bản tương lai.
+</Accordion>
+
+<Accordion title="Tôi có thể ẩn đối tượng khỏi thanh điều hướng bên trái không?">
+Tất cả đối tượng đang hoạt động đều xuất hiện trong thanh điều hướng. Bạn có thể vô hiệu hóa đối tượng không cần tại **Settings → Data Model**.
+</Accordion>
+</AccordionGroup>
+
+## Khả năng trường
+
+<AccordionGroup>
+<Accordion title="Tôi có thể thay đổi loại trường sau khi tạo không?">
+Không, loại trường không thể thay đổi sau khi tạo. Nếu bạn cần loại khác, hãy tạo trường mới với loại đúng, di chuyển dữ liệu, sau đó vô hiệu hóa trường cũ.
+</Accordion>
+
+
+<Accordion title="Tại sao tôi cần tên số ít và số nhiều khác nhau?">
+API GraphQL sử dụng cả hai dạng cho các thao tác khác nhau:
+- `createPerson` (số ít) cho các hành động bản ghi đơn
+- `createPeople` (số nhiều) cho các thao tác hàng loạt
+
+Điều này tạo ra giới hạn khi dạng số ít và số nhiều giống nhau, nhưng cải thiện trải nghiệm nhà phát triển.
+</Accordion>
+
+<Accordion title="Tại sao một số tên trường bị bảo vệ?">
+Một số tên trường như `Type` hoặc `Application` được dành riêng cho hệ thống. Hãy chọn tên thay thế như `Category` hoặc `Classification`.
+</Accordion>
+
+<Accordion title="Điều gì xảy ra khi tôi vô hiệu hóa trường?">
+- Trường bị ẩn khỏi giao diện
+- Dữ liệu hiện có được bảo toàn
+- Bạn vẫn có thể truy cập trường qua API
+- Quan hệ hiện có vẫn giữ nhưng bạn không thể tạo mới
+- Bạn có thể kích hoạt lại trường sau
+</Accordion>
+
+<Accordion title="Tôi có thể đặt trường là bắt buộc không?">
+Hiện tại, bạn không thể đặt trường tùy chỉnh là bắt buộc. Tất cả trường chấp nhận giá trị trống. Bạn có thể sử dụng workflows để thực thi trường bắt buộc bằng cách gửi cảnh báo hoặc chặn hành động khi trường trống.
+</Accordion>
+
+<Accordion title="Sự khác biệt giữa duy nhất và bắt buộc là gì?">
+- **Duy nhất**: Không có hai bản ghi nào có thể có cùng giá trị trong trường này
+- **Bắt buộc**: Trường phải có giá trị (hiện chưa hỗ trợ cho trường tùy chỉnh)
+</Accordion>
+
+<Accordion title="Tôi có thể tạo trường công thức không?">
+Trường công thức sẽ có trong **Q1 2026**. Trong thời gian chờ đợi, bạn có thể sử dụng workflows để tính toán và cập nhật giá trị trường tự động.
+</Accordion>
+
+<Accordion title="Tôi có thể có trường lồng nhau trong đối tượng không?">
+Trường lồng nhau sẽ có trong **Q1 2026**. Hiện tại, bạn có thể sử dụng workflows để lấy giá trị trường từ đối tượng liên quan. Ví dụ, để hiển thị ngành của công ty trên bản ghi Person, tạo trường tùy chỉnh trên People và sử dụng workflow để đồng bộ giá trị.
+</Accordion>
+
+<Accordion title="Tôi có thể sắp xếp lại trường trong đối tượng không?">
+Sắp xếp lại trường sẽ khả dụng với bố cục tùy chỉnh trong **Q4 2025**. Hiện tại, trường xuất hiện theo thứ tự bảng chữ cái.
+</Accordion>
+</AccordionGroup>
+
+## Quan hệ
+
+<AccordionGroup>
+<Accordion title="Tôi có thể có quan hệ trỏ đến cùng đối tượng không?">
+Có! Quan hệ tự tham chiếu được hỗ trợ và khuyến nghị cho các trường hợp như cấu trúc phân cấp tài khoản. Ví dụ, tạo quan hệ từ Companies đến Companies để theo dõi tài khoản mẹ/con.
+</Accordion>
+
+<Accordion title="Tôi có thể tạo quan hệ nhiều-nhiều không?">
+Quan hệ nhiều-nhiều sẽ có trong **H1 2026**. Hiện tại, hãy tạo đối tượng trung gian với hai quan hệ một-nhiều như giải pháp tạm thời.
+
+Ví dụ, để liên kết People và Projects (nhiều-nhiều), tạo đối tượng "Project Assignments" với:
+- Quan hệ đến People (nhiều phân công → một người)
+- Quan hệ đến Projects (nhiều phân công → một dự án)
+</Accordion>
+
+<Accordion title="Quan hệ đến nhiều loại đối tượng (quan hệ Morph) là gì?">
+Những quan hệ này cho phép một đối tượng liên kết với nhiều loại đối tượng khác nhau qua một trường duy nhất. Ví dụ, Notes có thể đính kèm vào People VÀ Companies VÀ Opportunities cùng lúc.
+
+Mỗi Note liên kết đến một Person, một Company và một Opportunity đồng thời.
+
+Tìm hiểu thêm tại [Trường quan hệ](/l/vi/user-guide/data-model/capabilities/relation-fields).
+</Accordion>
+
+<Accordion title="Tôi có thể có nhiều quan hệ giữa cùng hai đối tượng không?">
+Có, bạn có thể tạo nhiều quan hệ giữa cùng hai đối tượng. Ví dụ, một Company có thể có cả quan hệ "Primary Contact" và "Billing Contact" đến People.
+</Accordion>
+
+<Accordion title="Điều gì xảy ra với quan hệ khi tôi xóa bản ghi?">
+Khi bạn xóa bản ghi, liên kết quan hệ bị xóa khỏi bản ghi liên quan. Bản thân các bản ghi liên quan không bị xóa.
+</Accordion>
+
+<Accordion title="Tôi có thể tạo quan hệ vòng không?">
+Mặc dù về mặt kỹ thuật có thể, quan hệ vòng (A → B → C → A) nên được tránh vì chúng có thể gây nhầm lẫn và các vấn đề hiệu suất tiềm ẩn.
+</Accordion>
+</AccordionGroup>
+
+## Truy cập và quyền
+
+<AccordionGroup>
+<Accordion title="Tôi có thể xem và chỉnh sửa mô hình dữ liệu ở đâu?">
+Vào **Settings → Data Model** để xem và chỉnh sửa tất cả đối tượng và trường.
+</Accordion>
+
+<Accordion title="Tại sao tôi không thấy Data Model trong Settings?">
+Liên hệ quản trị viên không gian làm việc. Quyền truy cập mô hình dữ liệu thường bị hạn chế chỉ cho quản trị viên.
+</Accordion>
+</AccordionGroup>
+
+## Quản lý dữ liệu
+
+<AccordionGroup>
+<Accordion title="Có giới hạn số lượng bản ghi không?">
+Không có giới hạn cứng về số lượng bản ghi. Tuy nhiên, tập dữ liệu rất lớn có thể ảnh hưởng đến hiệu suất ở một số chế độ xem. Sử dụng bộ lọc và chế độ xem để quản lý tập dữ liệu lớn hiệu quả.
+</Accordion>
+
+<Accordion title="Tôi có thể nhập dữ liệu vào đối tượng tùy chỉnh không?">
+Có, bạn có thể nhập dữ liệu CSV vào bất kỳ đối tượng nào, bao gồm đối tượng tùy chỉnh. Quá trình nhập hỗ trợ ánh xạ trường cho trường tùy chỉnh. Xem [Cách chuẩn bị tệp CSV](/l/vi/user-guide/data-migration/how-tos/prepare-your-csv-files).
+</Accordion>
+
+<Accordion title="Tôi có thể xuất cấu hình mô hình dữ liệu không?">
+Hiện tại, chưa có tính năng xuất tích hợp cho cấu hình mô hình dữ liệu. Liên hệ hỗ trợ nếu bạn cần di chuyển mô hình dữ liệu giữa các không gian làm việc.
+</Accordion>
+</AccordionGroup>
+
+## Cần thêm trợ giúp?
+
+Xem [Dịch vụ triển khai](/l/vi/user-guide/getting-started/capabilities/implementation-services) để được hỗ trợ thiết kế mô hình dữ liệu phức tạp.

@@ -1,0 +1,281 @@
+---
+title: Hướng dẫn phong cách
+---
+
+
+Tài liệu này bao gồm các quy tắc cần tuân theo khi viết code.
+
+Mục tiêu là có codebase nhất quán, dễ đọc và dễ bảo trì.
+
+Vì điều này, tốt hơn là chi tiết một chút hơn là quá ngắn gọn.
+
+Luôn nhớ rằng mọi người đọc code thường xuyên hơn là viết, đặc biệt trên dự án mã nguồn mở, nơi bất kỳ ai cũng có thể đóng góp.
+
+Có nhiều quy tắc không được định nghĩa ở đây nhưng được linter tự động kiểm tra.
+
+## React
+
+### Sử dụng functional component
+
+Luôn sử dụng TSX functional component.
+
+Không sử dụng `import` mặc định với `const`, vì khó đọc hơn và khó import với code completion.
+
+```tsx
+// ❌ Xấu, khó đọc, khó import với code completion
+const MyComponent = () => {
+  return <div>Hello World</div>;
+};
+
+export default MyComponent;
+
+// ✅ Tốt, dễ đọc, dễ import với code completion
+export function MyComponent() {
+  return <div>Hello World</div>;
+};
+```
+
+### Props
+
+Tạo type của props và đặt tên `(ComponentName)Props` nếu không cần export.
+
+Sử dụng destructuring props.
+
+```tsx
+// ❌ Xấu, không có type
+export const MyComponent = (props) => <div>Hello {props.name}</div>;
+
+// ✅ Tốt, có type
+type MyComponentProps = {
+  name: string;
+};
+
+export const MyComponent = ({ name }: MyComponentProps) => <div>Hello {name}</div>;
+```
+
+#### Tránh sử dụng `React.FC` hoặc `React.FunctionComponent` để định nghĩa type props
+
+```tsx
+/* ❌ - Xấu, định nghĩa type annotations với `FC`
+ *    - Với `React.FC`, component ngầm chấp nhận prop `children`
+ *      ngay cả khi không định nghĩa trong type props.
+ */
+const EmailField: React.FC<{
+  value: string;
+}> = ({ value }) => <TextInput value={value} disabled fullWidth />;
+```
+
+```tsx
+/* ✅ - Tốt, type riêng (OwnProps) được định nghĩa rõ ràng cho
+ *      props của component
+ *    - Phương pháp này không tự động bao gồm prop children.
+ */
+type EmailFieldProps = {
+  value: string;
+};
+
+const EmailField = ({ value }: EmailFieldProps) => (
+  <TextInput value={value} disabled fullWidth />
+);
+```
+
+#### Không Spread một biến Props trong JSX Element
+
+Tránh sử dụng spread một biến props trong JSX element, như `{...props}`. Thực hành này thường dẫn đến code khó đọc và khó bảo trì vì không rõ component nhận props nào.
+
+```tsx
+/* ❌ - Xấu, spread một biến prop vào component bên dưới
+ */
+const MyComponent = (props: OwnProps) => {
+  return <OtherComponent {...props} />;
+}
+```
+
+```tsx
+/* ✅ - Tốt, liệt kê rõ ràng tất cả props
+ *    - Tăng khả năng đọc và bảo trì
+ */
+const MyComponent = ({ prop1, prop2, prop3 }: MyComponentProps) => {
+  return <OtherComponent {...{ prop1, prop2, prop3 }} />;
+};
+```
+
+## JavaScript
+
+### Sử dụng toán tử nullish-coalescing `??`
+
+```tsx
+// ❌ Xấu, có thể trả về 'default' ngay cả khi value là 0 hoặc ''
+const value = process.env.MY_VALUE || 'default';
+
+// ✅ Tốt, chỉ trả về 'default' khi value là null hoặc undefined
+const value = process.env.MY_VALUE ?? 'default';
+```
+
+### Sử dụng optional chaining `?.`
+
+```tsx
+// ❌ Xấu
+onClick && onClick();
+
+// ✅ Tốt
+onClick?.();
+```
+
+## TypeScript
+
+### Sử dụng `type` thay vì `interface`
+
+Luôn sử dụng `type` thay vì `interface`, vì chúng gần như luôn trùng lặp và `type` linh hoạt hơn.
+
+```tsx
+// ❌ Xấu
+interface MyInterface {
+  name: string;
+}
+
+// ✅ Tốt
+type MyType = {
+  name: string;
+};
+```
+
+### Sử dụng string literal thay vì enum
+
+[String literal](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types) là cách ưu tiên để xử lý giá trị kiểu enum trong TypeScript. Chúng dễ mở rộng với Pick và Omit, và cung cấp trải nghiệm nhà phát triển tốt hơn, đặc biệt với code completion.
+
+Bạn có thể xem tại sao TypeScript khuyến nghị tránh enum [tại đây](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#enums).
+
+```tsx
+// ❌ Xấu, sử dụng enum
+enum Color {
+  Red = "red",
+  Green = "green",
+  Blue = "blue",
+}
+
+let color = Color.Red;
+```
+
+```tsx
+// ✅ Tốt, sử dụng string literal
+
+let color: "red" | "green" | "blue" = "red";
+```
+
+#### GraphQL và thư viện nội bộ
+
+Bạn nên sử dụng enum mà GraphQL codegen tạo ra.
+
+Cũng tốt hơn khi sử dụng enum khi dùng thư viện nội bộ, để thư viện không phải phơi bài string literal type không liên quan đến API nội bộ.
+
+Ví dụ:
+
+```TSX
+const {
+  setHotkeyScopeAndMemorizePreviousScope,
+  goBackToPreviousHotkeyScope,
+} = usePreviousHotkeyScope();
+
+setHotkeyScopeAndMemorizePreviousScope(
+  RelationPickerHotkeyScope.RelationPicker,
+);
+```
+
+## Tạo kiểu
+
+### Sử dụng StyledComponent
+
+Tạo kiểu cho component với [Linaria styled](https://github.com/callstack/linaria).
+
+```tsx
+// ❌ Xấu
+<div className="my-class">Hello World</div>
+```
+
+```tsx
+// ✅ Tốt
+const StyledTitle = styled.div`
+  color: red;
+`;
+```
+
+Thêm tiền tố "Styled" cho styled component để phân biệt với component "thực".
+
+```tsx
+// ❌ Xấu
+const Title = styled.div`
+  color: red;
+`;
+```
+
+```tsx
+// ✅ Tốt
+const StyledTitle = styled.div`
+  color: red;
+`;
+```
+
+### Theme
+
+Sử dụng theme cho phần lớn việc tạo kiểu component là phương pháp ưu tiên.
+
+#### Đơn vị đo
+
+Tránh sử dụng giá trị `px` hoặc `rem` trực tiếp trong styled component. Các giá trị cần thiết thường đã được định nghĩa trong theme, nên khuyến nghị sử dụng theme cho các mục đích này.
+
+#### Màu sắc
+
+Tránh thêm màu mới; thay vào đó sử dụng bảng màu có sẵn từ theme. Nếu có tình huống bảng màu không phù hợp, vui lòng để lại comment để team có thể sửa.
+
+```tsx
+// ❌ Xấu, chỉ định trực tiếp giá trị style không sử dụng theme
+const StyledButton = styled.button`
+  color: #333333;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-left: 4px;
+  border-radius: 50px;
+`;
+```
+
+```tsx
+// ✅ Tốt, sử dụng theme
+const StyledButton = styled.button`
+  color: ${({ theme }) => theme.font.color.primary};
+  font-size: ${({ theme }) => theme.font.size.md};
+  font-weight: ${({ theme }) => theme.font.weight.regular};
+  margin-left: ${({ theme }) => theme.spacing(1)};
+  border-radius:  ${({ theme }) => theme.border.rounded};
+`;
+```
+## Thực thi không Import Type
+
+Tránh type import. Để thực thi tiêu chuẩn này, quy tắc Oxlint kiểm tra và báo cáo mọi type import. Điều này giúp duy trì tính nhất quán và khả năng đọc trong code TypeScript.
+
+```tsx
+// ❌ Xấu
+import { type Meta, type StoryObj } from '@storybook/react';
+
+// ❌ Xấu
+import type { Meta, StoryObj } from '@storybook/react';
+
+// ✅ Tốt
+import { Meta, StoryObj } from '@storybook/react';
+```
+
+### Tại sao không Import Type
+
+- **Nhất quán**: Bằng cách tránh type import và sử dụng một phương pháp duy nhất cho cả type và value import, codebase giữ nhất quán trong phong cách import module.
+
+- **Khả năng đọc**: Import không có type cải thiện khả năng đọc code bằng cách làm rõ khi bạn import giá trị hoặc type.
+
+- **Khả năng bảo trì**: Nó tăng cường khả năng bảo trì codebase vì nhà phát triển có thể xác định và định vị import chỉ kiểu khi xem xét hoặc chỉnh sửa code.
+
+### Quy tắc Oxlint
+
+Quy tắc Oxlint `typescript/consistent-type-imports` thực thi tiêu chuẩn không import type. Quy tắc này sẽ tạo lỗi hoặc cảnh báo cho mọi vi phạm import type.
+
+Lưu ý quy tắc này đặc biệt xử lý các trường hợp hiếm khi import type vô ý xảy ra. TypeScript tự nó không khuyến khích thực hành này, như đề cập trong [ghi chú phát hành TypeScript 3.8](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html). Trong hầu hết tình huống, bạn không cần sử dụng import chỉ kiểu.
+
+Để đảm bảo code tuân thủ quy tắc này, đảm bảo chạy Oxlint như một phần của quy trình phát triển.

@@ -1,0 +1,80 @@
+---
+title: Xử lý mảng trong hành động Mã nguồn
+description: Tìm hiểu cách xử lý đúng đầu vào mảng trong hành động Mã nguồn workflow.
+---
+
+Khi làm việc với mảng trong hành động Mã nguồn, bạn có thể gặp hai thách thức phổ biến:
+1. **Mảng được truyền dạng chuỗi** — dữ liệu từ hệ thống bên ngoài hoặc bước trước đến dạng chuỗi thay vì mảng thực
+2. **Không thể chọn mục riêng lẻ** — bạn chỉ có thể chọn toàn bộ mảng, không phải trường cụ thể bên trong
+
+Cả hai đều có thể giải quyết bằng nút Mã nguồn.
+
+## Phân tích mảng từ chuỗi
+
+Mảng thường được truyền giữa các bước workflow dưới dạng chuỗi hoặc JSON thay vì mảng gốc. Điều này xảy ra khi:
+- Nhận dữ liệu từ API bên ngoài qua HTTP Request
+- Xử lý payload webhook
+- Truyền dữ liệu giữa các bước workflow
+
+**Giải pháp**: Thêm mẫu này ở đầu hành động Mã nguồn:
+
+```javascript
+export const main = async (params: {
+  users: any;
+}): Promise<object> => {
+  const { users } = params;
+
+  // Xử lý đầu vào có thể là chuỗi hoặc mảng
+  const usersFormatted = typeof users === "string" ? JSON.parse(users) : users;
+
+  // Bây giờ bạn có thể làm việc an toàn với usersFormatted dưới dạng mảng
+  return {
+    users: usersFormatted.map((user) => ({
+      ...user,
+      activityStatus: String(user.activityStatus).toUpperCase(),
+    })),
+  };
+};
+```
+
+Dòng chính `typeof users === "string" ? JSON.parse(users) : users` kiểm tra đầu vào có phải chuỗi không, phân tích nếu cần, hoặc sử dụng trực tiếp nếu đã là mảng.
+
+## Trích xuất trường riêng lẻ từ mảng
+
+Webhook có thể trả về mảng như `answers: [...]`, nhưng trong các bước workflow tiếp theo bạn chỉ có thể chọn **toàn bộ mảng** — không phải mục riêng lẻ bên trong.
+
+**Giải pháp**: Thêm nút Mã nguồn để trích xuất trường cụ thể và trả về dưới dạng đối tượng có cấu trúc:
+
+```javascript
+export const main = async (params: {
+  answers: any;
+}): Promise<object> => {
+  const { answers } = params;
+
+  // Xử lý đầu vào có thể là chuỗi hoặc mảng
+  const answersFormatted = typeof answers === "string"
+    ? JSON.parse(answers)
+    : answers;
+
+  // Trích xuất trường cụ thể từ mảng
+  const firstname = answersFormatted[0]?.text || "";
+  const name = answersFormatted[1]?.text || "";
+
+  return {
+    answer: {
+      firstname,
+      name
+    }
+  };
+};
+```
+
+Nút Mã nguồn trả về đối tượng có cấu trúc thay vì mảng. Trong các bước tiếp theo, bạn có thể chọn trường riêng lẻ như `answer.firstname` và `answer.name` từ bộ chọn biến.
+
+<Note>
+Chúng tôi đang tích cực phát triển để xử lý mảng dễ dàng hơn trong các bản cập nhật tương lai.
+</Note>
+
+<Tip>
+Nhấp biểu tượng vuông ở góc trên bên phải trình soạn thảo mã để hiển thị toàn màn hình — hữu ích vì chiều rộng trình soạn thảo mặc định bị hạn chế.
+</Tip>

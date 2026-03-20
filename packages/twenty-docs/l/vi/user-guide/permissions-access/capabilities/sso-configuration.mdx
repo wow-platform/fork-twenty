@@ -1,0 +1,105 @@
+---
+title: Cấu hình SSO
+description: Cấu hình Single Sign-On cho xác thực doanh nghiệp an toàn.
+---
+
+## Giới thiệu về SSO
+
+Single Sign-On (SSO) cho phép các thành viên nhóm đăng nhập vào Twenty bằng nhà cung cấp danh tính của tổ chức. Điều này cung cấp:
+- **Kiểm soát truy cập tập trung**: Quản lý truy cập từ một nơi
+- **Bảo mật nâng cao**: Tận dụng chính sách bảo mật hiện có
+- **Trải nghiệm người dùng tốt hơn**: Một bộ thông tin đăng nhập cho tất cả công cụ
+
+## Nhà cung cấp được hỗ trợ
+
+Twenty hỗ trợ SSO với:
+- **SAML 2.0**: Hoạt động với hầu hết nhà cung cấp danh tính doanh nghiệp
+- **Google Workspace**: Cho tổ chức sử dụng Google
+- **Microsoft Entra ID**: (trước đây là Azure AD) Cho môi trường Microsoft
+
+## Thiết lập SSO
+
+### Điều kiện tiên quyết
+- Gói Organization (workspace cloud và tự lưu trữ)
+- Quyền quản trị viên cho nhà cung cấp danh tính
+- Quyền quản trị viên cho workspace Twenty
+
+<Note>
+**Cho người dùng tự lưu trữ muốn thiết lập SSO**, liên hệ contact@twenty.com
+</Note>
+
+### Các bước cấu hình
+
+#### 1. Truy cập cài đặt SSO
+1. Đi tới **Cài đặt → Bảo mật**
+2. Tìm phần **Cấu hình SSO**
+3. Nhấp **Cấu hình SSO**
+
+#### 2. Chọn nhà cung cấp
+Chọn nhà cung cấp danh tính từ danh sách hoặc chọn "SAML tùy chỉnh" cho các nhà cung cấp khác.
+
+#### 3. Cấu hình nhà cung cấp danh tính
+Bạn cần cấu hình nhà cung cấp danh tính với:
+- **Entity ID**: Được cung cấp bởi Twenty
+- **ACS URL**: URL callback cho xác thực
+- **Chứng chỉ**: Để giao tiếp an toàn
+
+#### 4. Nhập thông tin nhà cung cấp vào Twenty
+- **SSO URL**: URL đăng nhập từ nhà cung cấp
+- **Entity ID**: Mã định danh của nhà cung cấp
+- **Chứng chỉ**: Chứng chỉ X.509 từ nhà cung cấp
+
+#### 5. Kiểm tra và kích hoạt
+1. Nhấp **Kiểm tra cấu hình** để xác minh thiết lập
+2. Kích hoạt SSO khi kiểm tra thành công
+3. Cấu hình tùy chọn cung cấp người dùng
+
+## Cung cấp người dùng
+
+### Cung cấp Just-in-Time (JIT)
+- Người dùng được tạo tự động khi đăng nhập lần đầu
+- Tự động gán vai trò mặc định
+- Không cần tạo người dùng thủ công
+
+### Cung cấp thủ công
+- Mời người dùng trước khi họ có thể đăng nhập
+- Gán trước vai trò cụ thể
+- Kiểm soát nhiều hơn ai có thể truy cập
+
+## Quản lý người dùng SSO
+
+### Gán vai trò
+Người dùng SSO có thể được gán vai trò như người dùng thông thường:
+1. Đi tới **Cài đặt → Thành viên**
+2. Tìm người dùng
+3. Thay đổi vai trò theo nhu cầu
+
+### Thu hồi quyền truy cập
+Để xóa quyền truy cập cho người dùng SSO:
+- Xóa họ khỏi nhà cung cấp danh tính, hoặc
+- Xóa họ khỏi workspace Twenty
+
+## Thực hành tốt nhất
+
+### Bảo mật
+- **Yêu cầu SSO**: Tắt đăng nhập bằng mật khẩu cho người dùng SSO
+- **Kiểm toán thường xuyên**: Xem xét quyền truy cập định kỳ
+- **Chính sách IdP mạnh**: Thực thi MFA tại nhà cung cấp danh tính
+
+### Quản lý người dùng
+- **Đặt tên rõ ràng**: Sử dụng tên nhất quán từ thư mục
+- **Ánh xạ nhóm**: Ánh xạ nhóm IdP sang vai trò Twenty (nếu có)
+- **Quy trình hủy kích hoạt**: Bao gồm Twenty trong quy trình hủy cung cấp
+
+## Khắc phục sự cố
+
+### Vấn đề phổ biến
+- **Lỗi chứng chỉ**: Đảm bảo chứng chỉ chưa hết hạn
+- **URL không khớp**: Xác minh ACS URL khớp chính xác
+- **Không tìm thấy người dùng**: Kiểm tra cài đặt cung cấp JIT
+
+### Nhận trợ giúp
+Nếu gặp vấn đề, liên hệ hỗ trợ với:
+- Thông báo lỗi nhận được
+- Nhà cung cấp danh tính đang sử dụng
+- Chi tiết cấu hình (không bao gồm dữ liệu nhạy cảm)

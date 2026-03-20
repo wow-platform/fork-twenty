@@ -1,0 +1,203 @@
+{
+  "tabs": {
+    "userGuide": {
+      "label": "Hướng dẫn sử dụng",
+      "groups": {
+        "discoverTwenty": {
+          "label": "Khám phá Twenty",
+          "groups": {
+            "gettingStartedCapabilities": {
+              "label": "Tính năng"
+            },
+            "gettingStartedHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "dataModel": {
+          "label": "Mô hình dữ liệu",
+          "groups": {
+            "dataModelCapabilities": {
+              "label": "Tính năng"
+            },
+            "dataModelHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "dataMigration": {
+          "label": "Di chuyển dữ liệu",
+          "groups": {
+            "dataMigrationCapabilities": {
+              "label": "Tính năng"
+            },
+            "dataMigrationHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "calendarEmails": {
+          "label": "Lịch & Email",
+          "groups": {
+            "calendarEmailsCapabilities": {
+              "label": "Tính năng"
+            },
+            "calendarEmailsHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "workflows": {
+          "label": "Quy trình tự động",
+          "groups": {
+            "workflowsCapabilities": {
+              "label": "Tính năng"
+            },
+            "workflowsHowTos": {
+              "label": "Hướng dẫn",
+              "groups": {
+                "crmAutomations": {
+                  "label": "Tự động hóa CRM"
+                },
+                "connectToOtherTools": {
+                  "label": "Kết nối công cụ khác"
+                },
+                "advancedConfigurations": {
+                  "label": "Cấu hình nâng cao"
+                },
+                "needMoreHelp": {
+                  "label": "Cần thêm hỗ trợ"
+                }
+              }
+            }
+          }
+        },
+        "ai": {
+          "label": "AI",
+          "groups": {
+            "aiCapabilities": {
+              "label": "Tính năng"
+            },
+            "aiHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "viewsPipelines": {
+          "label": "Chế độ xem & Pipeline",
+          "groups": {
+            "viewsPipelinesCapabilities": {
+              "label": "Tính năng"
+            },
+            "viewsPipelinesHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "dashboards": {
+          "label": "Bảng điều khiển",
+          "groups": {
+            "dashboardsCapabilities": {
+              "label": "Tính năng"
+            },
+            "dashboardsHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "permissionsAccess": {
+          "label": "Quyền & Truy cập",
+          "groups": {
+            "permissionsAccessCapabilities": {
+              "label": "Tính năng"
+            },
+            "permissionsAccessHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "billing": {
+          "label": "Thanh toán",
+          "groups": {
+            "billingCapabilities": {
+              "label": "Tính năng"
+            },
+            "billingHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        },
+        "settings": {
+          "label": "Cài đặt",
+          "groups": {
+            "settingsCapabilities": {
+              "label": "Tính năng"
+            },
+            "settingsHowTos": {
+              "label": "Hướng dẫn"
+            }
+          }
+        }
+      }
+    },
+    "developers": {
+      "label": "Nhà phát triển",
+      "groups": {
+        "developersGroup": {
+          "label": "Nhà phát triển"
+        },
+        "extend": {
+          "label": "Mở rộng",
+          "groups": {
+            "apps": {
+              "label": "Ứng dụng"
+            }
+          }
+        },
+        "selfHost": {
+          "label": "Tự triển khai",
+          "groups": {
+            "selfHostCapabilities": {
+              "label": "Tính năng"
+            }
+          }
+        },
+        "contribute": {
+          "label": "Đóng góp",
+          "groups": {
+            "contributeCapabilities": {
+              "label": "Tính năng",
+              "groups": {
+                "frontendDevelopment": {
+                  "label": "Phát triển Frontend",
+                  "groups": {
+                    "twentyUi": {
+                      "label": "Twenty UI",
+                      "groups": {
+                        "display": {
+                          "label": "Hiển thị"
+                        },
+                        "feedback": {
+                          "label": "Phản hồi"
+                        },
+                        "input": {
+                          "label": "Đầu vào"
+                        },
+                        "navigation": {
+                          "label": "Điều hướng"
+                        }
+                      }
+                    }
+                  }
+                },
+                "backendDevelopment": {
+                  "label": "Phát triển Backend"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

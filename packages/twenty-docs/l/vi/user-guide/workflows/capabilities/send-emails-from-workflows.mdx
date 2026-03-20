@@ -1,0 +1,164 @@
+---
+title: Gửi email từ Workflow
+description: Gửi email cá nhân hóa tự động bằng hành động workflow.
+image: /images/user-guide/workflows/workflow.png
+---
+
+Tự động gửi email khi các sự kiện cụ thể xảy ra trong CRM — chào đón liên hệ mới, theo dõi cơ hội hoặc thông báo cho thành viên nhóm.
+
+## Điều kiện tiên quyết
+
+Trước khi có thể gửi email từ workflow:
+1. Kết nối tài khoản email trong **Cài đặt → Tài khoản**
+2. Đảm bảo tài khoản có quyền gửi được bật
+
+## Workflow email cơ bản
+
+### Ví dụ: Email chào mừng cho liên hệ mới
+
+**Mục tiêu**: Gửi email chào mừng khi người mới được thêm vào CRM.
+
+**Thiết lập**:
+
+1. **Tạo workflow**: Vào **Cài đặt → Workflow** và nhấp **+ Workflow mới**
+
+2. **Thêm trigger**: Chọn **Bản ghi được tạo** → **Người**
+
+3. **Thêm hành động Gửi email**:
+   - Nhấp **+** để thêm hành động
+   - Chọn **Gửi email**
+   - Cấu hình email:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đến** | `{{trigger.object.email}}` |
+| **Chủ đề** | `Chào mừng đến {{Tên công ty của bạn}}` |
+| **Nội dung** | `Xin chào {{trigger.object.firstName}}, ...` |
+
+4. **Kiểm tra và kích hoạt**: Kiểm tra với bản ghi mẫu, sau đó kích hoạt
+
+## Sử dụng biến trong email
+
+Tham chiếu dữ liệu từ các bước trước bằng cú pháp `{{variable}}`:
+
+```text
+Xin chào {{trigger.object.firstName}},
+
+Cảm ơn bạn đã kết nối với chúng tôi!
+
+Công ty của bạn, {{trigger.object.company.name}}, hiện đã có trong hệ thống.
+
+Trân trọng,
+Đội ngũ
+```
+
+### Biến khả dụng từ Trigger
+
+| Loại Trigger | Biến phổ biến |
+|--------------|------------------|
+| **Bản ghi được tạo/cập nhật** | `{{trigger.object.fieldName}}` |
+| **Thủ công** | `{{trigger.selectedRecord.fieldName}}` |
+| **Webhook** | `{{trigger.body.fieldName}}` |
+
+## Nâng cao: Email có điều kiện
+
+### Ví dụ: Email khác nhau dựa trên nguồn Lead
+
+**Mục tiêu**: Gửi email chào mừng khác nhau dựa trên nơi lead đến từ.
+
+**Thiết lập**:
+
+1. **Trigger**: Bản ghi được tạo (Người)
+
+2. **Thêm hành động Bộ lọc**:
+   - Điều kiện: `{{trigger.object.source}}` bằng `"Website"`
+   - Nếu đúng → tiếp tục đến email chào mừng website
+
+3. **Nhánh cho nguồn khác**:
+   - Tạo nhánh song song cho các nguồn khác nhau
+   - Mỗi nhánh có hành động Gửi email riêng
+
+## Gửi email cho nhiều người nhận
+
+### Ví dụ: Thông báo nhóm khi giao dịch hoàn tất
+
+**Mục tiêu**: Gửi email cho đại diện bán hàng và quản lý khi cơ hội thắng.
+
+**Thiết lập**:
+
+1. **Trigger**: Bản ghi được cập nhật (Cơ hội, Giai đoạn = "Closed Won")
+
+2. **Tìm kiếm bản ghi**: Tìm quản lý của chủ sở hữu cơ hội
+
+3. **Gửi email #1**: Cho chủ sở hữu cơ hội
+   - Đến: `{{trigger.object.owner.email}}`
+   - Chủ đề: `Chúc mừng đã hoàn tất {{trigger.object.name}}!`
+
+4. **Gửi email #2**: Cho quản lý
+   - Đến: `{{searchRecords.manager.email}}`
+   - Chủ đề: `Giao dịch thắng: {{trigger.object.name}}`
+
+## Email theo dõi theo lịch
+
+### Ví dụ: Theo dõi 3 ngày sau cuộc họp
+
+**Mục tiêu**: Gửi email theo dõi 3 ngày sau khi cuộc họp được ghi nhận.
+
+**Thiết lập**:
+
+1. **Trigger**: Bản ghi được tạo (Hoạt động, Loại = "Cuộc họp")
+
+2. **Hành động trì hoãn**: Chờ 3 ngày
+
+3. **Gửi email**:
+   - Đến: Người tham dự cuộc họp
+   - Chủ đề: Theo dõi cuộc trò chuyện của chúng ta
+   - Nội dung: Tham chiếu chi tiết cuộc họp từ trigger
+
+## Tệp đính kèm email
+
+Bạn có thể đính kèm tệp vào email gửi từ workflow. Tệp đính kèm là tệp tĩnh mà bạn tải lên khi cấu hình workflow.
+
+### Cách thêm tệp đính kèm
+
+1. Trong hành động **Gửi email**, nhấp vào nút **Tệp đính kèm**
+2. Nhấp để tải lên tệp từ máy tính
+3. Tệp sẽ được đính kèm vào tất cả email gửi bởi hành động này
+
+### Trường hợp sử dụng phổ biến
+
+| Trường hợp | Tệp ví dụ |
+|----------|--------------|
+| **Email chào mừng** | Tài liệu giới thiệu công ty (PDF) |
+| **Chuỗi onboarding** | Hướng dẫn bắt đầu |
+| **Theo dõi bán hàng** | Danh mục sản phẩm hoặc bảng giá |
+| **Xác nhận sự kiện** | Chi tiết sự kiện hoặc chương trình |
+
+<Note>
+Tệp đính kèm là tĩnh — cùng một tệp được gửi cho tất cả người nhận. Đối với tài liệu động (như báo giá cá nhân hóa), hãy tạo và đính kèm tệp bằng [Logic Function](/l/vi/user-guide/workflows/how-tos/connect-to-other-tools/generate-pdf-from-twenty).
+</Note>
+
+## Thực hành tốt nhất
+
+### Nội dung email
+- Giữ dòng chủ đề ngắn gọn và liên quan
+- Cá nhân hóa với tên người nhận
+- Bao gồm lời kêu gọi hành động rõ ràng
+- Kiểm tra email trước khi kích hoạt
+
+### Khả năng gửi
+- Không gửi quá nhiều email quá nhanh
+- Sử dụng chữ ký email chuyên nghiệp
+- Tránh các từ kích hoạt spam
+- Đảm bảo tùy chọn hủy đăng ký cho email marketing
+
+### Khắc phục sự cố
+- Xác minh tài khoản email đã kết nối và hoạt động
+- Kiểm tra địa chỉ email người nhận hợp lệ
+- Xem lại lần chạy workflow để tìm thông báo lỗi
+- Kiểm tra trước với địa chỉ email của bạn
+
+## Liên quan
+
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)

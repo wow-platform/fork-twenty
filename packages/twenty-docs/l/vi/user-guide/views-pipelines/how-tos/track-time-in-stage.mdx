@@ -1,0 +1,226 @@
+---
+title: Theo dõi thời gian cơ hội ở mỗi giai đoạn
+description: Giám sát tốc độ giao dịch bằng cách theo dõi khi cơ hội vào mỗi giai đoạn.
+---
+
+<Tip>
+Đây là ví dụ về việc tạo [Trường công thức](/l/vi/user-guide/workflows/how-tos/crm-automations/formula-fields) sử dụng workflow — cụ thể là tính toán ngày tháng.
+</Tip>
+
+Theo dõi khi cơ hội vào mỗi giai đoạn giúp bạn xác định điểm nghẽn và đo lường tốc độ giao dịch.
+
+Hướng dẫn này sẽ giúp bạn thiết lập các trường tùy chỉnh và workflow để tự động ghi nhận khi cơ hội chuyển sang mỗi giai đoạn và tính số ngày ở giai đoạn trước.
+
+## Bước 1: Tạo trường tùy chỉnh
+
+Bạn cần hai loại trường cho mỗi giai đoạn:
+- **Trường Ngày & Giờ**: Ghi nhận khi cơ hội vào mỗi giai đoạn
+- **Trường Số**: Lưu số ngày cơ hội ở mỗi giai đoạn
+
+### Tạo trường "Lần cuối vào"
+
+1. Đi tới **Cài đặt → Mô hình dữ liệu → Cơ hội**
+2. Cho mỗi giai đoạn, nhấp **+ Thêm trường** và cấu hình:
+   - **Tên**: Lần cuối vào [Tên giai đoạn] (ví dụ: "Lần cuối vào Mới", "Lần cuối vào Đủ điều kiện")
+   - **Loại**: Ngày & Giờ
+   - **Mô tả**: Thời gian khi cơ hội vào giai đoạn này
+3. Nhấp **Lưu**
+
+Tạo các trường này:
+- Lần cuối vào Mới
+- Lần cuối vào Đủ điều kiện
+- Lần cuối vào Cuộc họp
+- Lần cuối vào Đề xuất
+- Lần cuối vào Đàm phán
+- Lần cuối vào Chốt thành công
+- Lần cuối vào Chốt thất bại
+
+### Tạo trường "Số ngày trong giai đoạn"
+
+1. Cho mỗi giai đoạn, nhấp **+ Thêm trường** và cấu hình:
+   - **Tên**: Số ngày trong [Tên giai đoạn] (ví dụ: "Số ngày trong Mới", "Số ngày trong Đủ điều kiện")
+   - **Loại**: Số
+   - **Mô tả**: Số ngày ở giai đoạn này
+2. Nhấp **Lưu**
+
+Tạo các trường này:
+- Số ngày trong Mới
+- Số ngày trong Đủ điều kiện
+- Số ngày trong Cuộc họp
+- Số ngày trong Đề xuất
+- Số ngày trong Đàm phán
+
+<Note>
+Bạn không cần trường "Số ngày trong" cho Chốt thành công và Chốt thất bại vì đó là giai đoạn cuối cùng.
+</Note>
+
+### Tùy chọn: Đặt trường chỉ đọc
+
+Nếu bạn không muốn người dùng chỉnh sửa thủ công các trường tính toán này:
+
+1. Đi tới **Cài đặt → Vai trò**
+2. Chọn vai trò cần cấu hình
+3. Tìm đối tượng Cơ hội
+4. Đặt trường "Lần cuối vào" và "Số ngày trong" thành chỉ đọc
+
+## Bước 2: Tạo workflow
+
+Workflow duy nhất này xử lý cả hai nhiệm vụ:
+- Ghi nhận thời gian khi vào giai đoạn mới
+- Tính số ngày ở giai đoạn trước
+
+### Tạo workflow
+
+1. Đi tới **Workflow**
+2. Nhấp **+ Workflow mới**
+3. Đặt tên "Theo dõi thời gian giai đoạn"
+
+### Cấu hình trigger
+
+1. Thêm trigger **Bản ghi được cập nhật**
+2. Chọn **Cơ hội** làm đối tượng
+3. Lọc theo: Trường **Giai đoạn** được cập nhật
+
+### Thêm nhánh cho mỗi giai đoạn
+
+<Note>
+Để tạo nhánh mới, nhấp chuột phải vào canvas workflow và nhấp **Hành động mới**. Sau đó, liên kết hành động này với nút trước bằng cách kéo mũi tên từ nút trước đến hành động mới này.
+</Note>
+
+---
+
+**Nhánh 1: Giai đoạn = Mới (giai đoạn đầu tiên)**
+
+Vì đây là giai đoạn đầu tiên, chúng ta chỉ ghi nhận thời gian vào — không có giai đoạn trước để tính.
+
+1. Thêm nút **Bộ lọc**: Giai đoạn = Mới
+2. Thêm hành động **Mã**:
+
+```javascript
+export const main = async (): Promise<object> => {
+  return { now: new Date().toISOString() };
+};
+```
+
+3. Thêm hành động **Cập nhật bản ghi**:
+   - Bản ghi: Cơ hội kích hoạt
+   - Trường: Lần cuối vào Mới
+   - Giá trị: `now` từ nút Mã
+
+---
+
+**Nhánh 2: Giai đoạn = Đủ điều kiện**
+
+Khi chuyển sang Đủ điều kiện, ghi nhận thời gian vào VÀ tính số ngày ở giai đoạn Mới.
+
+1. Thêm nút **Bộ lọc**: Giai đoạn = Đủ điều kiện
+2. Thêm hành động **Mã**:
+
+```javascript
+export const main = async (params: {
+  lastEnteredPreviousStage: Date;
+}): Promise<object> => {
+  const { lastEnteredPreviousStage } = params;
+
+  const now = new Date();
+  const entryDate = new Date(lastEnteredPreviousStage);
+  const diffTime = Math.abs(now.getTime() - entryDate.getTime());
+  const daysInPreviousStage = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return {
+    now: now.toISOString(),
+    daysInPreviousStage: daysInPreviousStage
+  };
+};
+```
+
+3. Cấu hình đầu vào nút Mã: ánh xạ `lastEnteredPreviousStage` đến trường **Lần cuối vào Mới**
+4. Thêm hành động **Cập nhật bản ghi**:
+   - Bản ghi: Cơ hội kích hoạt
+   - Trường cần cập nhật:
+     - Lần cuối vào Đủ điều kiện = `now`
+     - Số ngày trong Mới = `daysInPreviousStage`
+
+---
+
+**Nhánh 3: Giai đoạn = Cuộc họp**
+
+Khi chuyển sang Cuộc họp, ghi nhận thời gian vào VÀ tính số ngày ở giai đoạn Đủ điều kiện.
+
+1. Thêm nút **Bộ lọc**: Giai đoạn = Cuộc họp
+2. Thêm hành động **Mã**:
+
+```javascript
+export const main = async (params: {
+  lastEnteredPreviousStage: Date;
+}): Promise<object> => {
+  const { lastEnteredPreviousStage } = params;
+
+  const now = new Date();
+  const entryDate = new Date(lastEnteredPreviousStage);
+  const diffTime = Math.abs(now.getTime() - entryDate.getTime());
+  const daysInPreviousStage = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return {
+    now: now.toISOString(),
+    daysInPreviousStage: daysInPreviousStage
+  };
+};
+```
+
+3. Cấu hình đầu vào nút Mã: ánh xạ `lastEnteredPreviousStage` đến trường **Lần cuối vào Đủ điều kiện**
+4. Thêm hành động **Cập nhật bản ghi**:
+   - Bản ghi: Cơ hội kích hoạt
+   - Trường cần cập nhật:
+     - Lần cuối vào Cuộc họp = `now`
+     - Số ngày trong Đủ điều kiện = `daysInPreviousStage`
+
+---
+
+**Tiếp tục cho các giai đoạn còn lại:**
+
+| Giai đoạn | Ghi nhận | Tính |
+|-------|---------|------------|
+| Đề xuất | Lần cuối vào Đề xuất | Số ngày trong Cuộc họp |
+| Đàm phán | Lần cuối vào Đàm phán | Số ngày trong Đề xuất |
+| Chốt thành công | Lần cuối vào Chốt thành công | Số ngày trong Đàm phán |
+| Chốt thất bại | Lần cuối vào Chốt thất bại | Số ngày trong Đàm phán |
+
+Các nhánh không cần hội tụ — mỗi nhánh chạy độc lập khi điều kiện giai đoạn được đáp ứng.
+
+## Bước 3: Phân tích thời gian trong giai đoạn
+
+Với thời gian và số ngày được ghi nhận, bạn có thể phân tích tốc độ giao dịch.
+
+### Tạo chế độ xem "Giao dịch chậm"
+
+1. Tạo chế độ xem Bảng của Cơ hội
+2. Thêm cột: Tên, Giai đoạn, Số ngày trong [giai đoạn trước], Số tiền
+3. Sắp xếp theo trường "Số ngày trong" (giảm dần)
+4. Lọc theo Giai đoạn để tập trung vào từng giai đoạn
+
+Giao dịch ở đầu danh sách đã ở giai đoạn trước lâu nhất.
+
+### Sử dụng tổng hợp
+
+Trong chế độ xem Kanban pipeline:
+1. Nhấp vào số bên cạnh tên Giai đoạn
+2. Chọn **Trung bình**
+3. Chọn trường "Số ngày trong"
+
+Điều này hiển thị thời gian trung bình giao dịch ở mỗi giai đoạn.
+
+## Tóm tắt
+
+| Thành phần | Mục đích |
+|-----------|---------|
+| **Trường Lần cuối vào** | Lưu khi cơ hội vào mỗi giai đoạn |
+| **Trường Số ngày trong** | Lưu số ngày ở mỗi giai đoạn |
+| **Workflow** | Ghi nhận thời gian VÀ tính số ngày trong một lần xử lý |
+| **Chế độ xem & Tổng hợp** | Phân tích tốc độ giao dịch và xác định điểm nghẽn |
+
+## Liên quan
+
+- [Workflow](/l/vi/user-guide/workflows/overview) — kiến thức cơ bản về tự động hóa
+- [Cách tạo trường tùy chỉnh](/l/vi/user-guide/data-model/how-tos/create-custom-fields) — cấu hình trường
+- [Chế độ xem Kanban](/l/vi/user-guide/views-pipelines/capabilities/kanban-views) — tổng hợp

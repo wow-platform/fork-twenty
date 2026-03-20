@@ -1,0 +1,92 @@
+---
+title: Icons
+image: /images/user-guide/objects/objects.png
+---
+<Frame>
+  <img src="/images/user-guide/objects/objects.png" alt="Header" />
+</Frame>
+
+Danh sách các biểu tượng được sử dụng xuyên suốt ứng dụng.
+
+## Tabler Icons
+
+Chúng tôi sử dụng Tabler icons cho React xuyên suốt ứng dụng.
+
+<Tabs>
+
+<Tab title="Cài đặt">
+<br/>
+
+```
+yarn add @tabler/icons-react
+```
+
+</Tab>
+
+<Tab title="Props">
+
+Bạn có thể import từng biểu tượng như một component. Đây là một ví dụ:
+<br />
+
+```jsx
+import { IconArrowLeft } from "@tabler/icons-react";
+
+export const MyComponent = () => {
+  return <IconArrowLeft color="red" size={48} />;
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả | Mặc định |
+|-------|------|-------|----------|
+| size | number | Chiều cao và chiều rộng của biểu tượng tính bằng pixel | 24 |
+| color | string | Màu của biểu tượng | currentColor |
+| stroke | number | Độ rộng nét vẽ của biểu tượng tính bằng pixel | 2 |
+
+
+
+</Tab>
+
+</Tabs>
+
+
+
+## Biểu tượng tùy chỉnh
+
+Ngoài Tabler icons, ứng dụng cũng sử dụng một số biểu tượng tùy chỉnh.
+
+### Icon Address Book
+
+Hiển thị biểu tượng sổ địa chỉ.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconAddressBook } from 'twenty-ui/display';
+
+export const MyComponent = () => {
+  return <IconAddressBook size={24} stroke={2} />;
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả | Mặc định |
+|-------|------|-------|----------|
+| size | number | Chiều cao và chiều rộng của biểu tượng tính bằng pixel | 24 |
+| stroke | number | Độ rộng nét vẽ của biểu tượng tính bằng pixel | 2 |
+
+
+
+</Tab>
+
+</Tabs>

@@ -1,0 +1,140 @@
+---
+title: API
+description: Truy vấn và chỉnh sửa dữ liệu CRM theo chương trình bằng REST hoặc GraphQL.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+Twenty được xây dựng thân thiện với nhà phát triển, cung cấp các API mạnh mẽ thích ứng với mô hình dữ liệu tùy chỉnh của bạn. Chúng tôi cung cấp bốn loại API riêng biệt để đáp ứng các nhu cầu tích hợp khác nhau.
+
+## Phương pháp ưu tiên nhà phát triển
+
+Twenty tạo API đặc biệt cho mô hình dữ liệu của bạn:
+- **Không cần ID dài**: Sử dụng tên đối tượng và trường trực tiếp trong endpoint
+- **Đối tượng chuẩn và tùy chỉnh được đối xử như nhau**: Đối tượng tùy chỉnh của bạn nhận được cùng API như các đối tượng có sẵn
+- **Endpoint riêng biệt**: Mỗi đối tượng và trường có endpoint API riêng
+- **Tài liệu tùy chỉnh**: Được tạo đặc biệt cho mô hình dữ liệu của workspace
+
+<Note>
+Tài liệu API cá nhân hóa của bạn có sẵn tại **Settings -> API & Webhooks** sau khi tạo API key. Vì Twenty tạo API phù hợp với mô hình dữ liệu tùy chỉnh, tài liệu là duy nhất cho workspace của bạn.
+</Note>
+
+## Hai loại API
+
+### Core API
+Truy cập trên `/rest/` hoặc `/graphql/`
+
+Làm việc với **bản ghi** thực tế (dữ liệu):
+- Tạo, đọc, cập nhật, xóa People, Companies, Opportunities, v.v.
+- Truy vấn và lọc dữ liệu
+- Quản lý mối quan hệ giữa các bản ghi
+
+### Metadata API
+Truy cập trên `/rest/metadata/` hoặc `/metadata/`
+
+Quản lý **workspace và mô hình dữ liệu**:
+- Tạo, chỉnh sửa hoặc xóa đối tượng và trường
+- Cấu hình cài đặt workspace
+- Định nghĩa mối quan hệ giữa các đối tượng
+
+## REST vs GraphQL
+
+Cả Core và Metadata API đều có sẵn ở định dạng REST và GraphQL:
+
+| Định dạng | Các thao tác có sẵn |
+|--------|---------------------|
+| **REST** | CRUD, thao tác hàng loạt, upsert |
+| **GraphQL** | Tương tự + **batch upsert**, truy vấn mối quan hệ trong một lần gọi |
+
+Chọn dựa trên nhu cầu của bạn -- cả hai định dạng truy cập cùng dữ liệu.
+
+## API Endpoint
+
+| Môi trường | URL gốc |
+|-------------|----------|
+| **Cloud** | `https://api.twenty.com/` |
+| **Tự lưu trữ** | `https://{tên-miền-của-bạn}/` |
+
+## Xác thực
+
+Mọi yêu cầu API cần một API key trong header:
+
+```
+Authorization: Bearer YOUR_API_KEY
+```
+
+### Tạo API Key
+
+1. Vào **Settings -> APIs & Webhooks**
+2. Nhấn **+ Create key**
+3. Cấu hình:
+   - **Name**: Tên mô tả cho key
+   - **Expiration Date**: Thời điểm key hết hạn
+4. Nhấn **Save**
+5. **Sao chép ngay** -- key chỉ hiển thị một lần
+
+<VimeoEmbed videoId="928786722" title="Creating API key" />
+
+<Warning>
+API key của bạn cấp quyền truy cập dữ liệu nhạy cảm. Không chia sẻ với các dịch vụ không đáng tin cậy. Nếu bị lộ, hãy vô hiệu hóa ngay và tạo key mới.
+</Warning>
+
+### Gán Role cho API Key
+
+Để bảo mật tốt hơn, gán một role cụ thể để giới hạn quyền truy cập:
+
+1. Vào **Settings -> Roles**
+2. Nhấn vào role cần gán
+3. Mở tab **Assignment**
+4. Tại **API Keys**, nhấn **+ Assign to API key**
+5. Chọn API key
+
+Key sẽ thừa kế quyền của role đó. Xem [Permissions](/l/vi/user-guide/permissions-access/capabilities/permissions) để biết chi tiết.
+
+### Quản lý API Key
+
+**Tạo lại**: Settings -> APIs & Webhooks -> Nhấn key -> **Regenerate**
+
+**Xóa**: Settings -> APIs & Webhooks -> Nhấn key -> **Delete**
+
+## API Playground
+
+Kiểm thử API trực tiếp trên trình duyệt với playground tích hợp -- có sẵn cho cả **REST** và **GraphQL**.
+
+### Truy cập Playground
+
+1. Vào **Settings -> APIs & Webhooks**
+2. Tạo API key (bắt buộc)
+3. Nhấn vào **REST API** hoặc **GraphQL API** để mở playground
+
+### Những gì bạn nhận được
+
+- **Tài liệu tương tác**: Được tạo cho mô hình dữ liệu cụ thể của bạn
+- **Kiểm thử trực tiếp**: Thực thi các lời gọi API thực trên workspace
+- **Trình khám phá schema**: Duyệt các đối tượng, trường và mối quan hệ có sẵn
+- **Trình tạo request**: Xây dựng truy vấn với tự động hoàn thành
+
+Playground phản ánh các đối tượng và trường tùy chỉnh của bạn, nên tài liệu luôn chính xác cho workspace của bạn.
+
+## Thao tác hàng loạt
+
+Cả REST và GraphQL đều hỗ trợ thao tác hàng loạt:
+- **Kích thước batch**: Tối đa 60 bản ghi mỗi yêu cầu
+- **Thao tác**: Tạo, cập nhật, xóa nhiều bản ghi
+
+**Tính năng chỉ có trên GraphQL:**
+- **Batch Upsert**: Tạo hoặc cập nhật trong một lần gọi
+- Sử dụng tên đối tượng số nhiều (ví dụ: `CreateCompanies` thay vì `CreateCompany`)
+
+## Giới hạn tốc độ
+
+Các yêu cầu API được điều tiết để đảm bảo sự ổn định của nền tảng:
+
+| Giới hạn | Giá trị |
+|-------|-------|
+| **Yêu cầu** | 100 lần gọi mỗi phút |
+| **Kích thước batch** | 60 bản ghi mỗi lần gọi |
+
+<Tip>
+Sử dụng thao tác hàng loạt để tối đa hóa thông lượng -- xử lý tối đa 60 bản ghi trong một lần gọi API thay vì thực hiện các yêu cầu riêng lẻ.
+</Tip>

@@ -1,0 +1,165 @@
+---
+title: Hiển thị dữ liệu bản ghi liên quan
+description: "Hiển thị dữ liệu từ bản ghi liên quan (ví dụ: thông tin Công ty trên Cơ hội) bằng workflow."
+---
+
+Hiển thị dữ liệu từ bản ghi liên quan trực tiếp trên bản ghi — ví dụ, hiển thị số nhân viên từ Công ty trên Cơ hội. Giải pháp workflow này hữu ích cho đến khi trường lồng nhau khả dụng gốc.
+
+## Trường hợp sử dụng phổ biến
+
+| Nguồn | Đích | Trường sao chép |
+|--------|-------------|----------------|
+| Công ty | Cơ hội | Ngành, Quy mô, ARR |
+| Người | Cơ hội | Email, Điện thoại, Chức danh |
+| Cơ hội | Công ty | Giá trị giao dịch cuối, Ngày thắng cuối |
+
+## Sao chép trường cơ bản
+
+### Ví dụ: Sao chép email liên hệ sang Cơ hội
+
+**Mục tiêu**: Khi đặt Đầu mối liên hệ trên cơ hội, sao chép email sang cơ hội để dễ truy cập.
+
+### Điều kiện tiên quyết
+
+Tạo trường đích trong **Cài đặt → Mô hình dữ liệu → Cơ hội** trước khi xây dựng workflow:
+- Email liên hệ (loại: Email)
+- Điện thoại liên hệ (loại: Điện thoại)
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được cập nhật (Cơ hội, trường Đầu mối liên hệ)
+
+2. **Bộ lọc**: Kiểm tra Đầu mối liên hệ không rỗng
+
+3. **Tìm kiếm bản ghi**: Tìm người được liên kết
+   - Đối tượng: Người
+   - Bộ lọc: ID bằng `{{trigger.object.pointOfContact.id}}`
+
+4. **Cập nhật bản ghi**:
+   - Đối tượng: Cơ hội
+   - Bản ghi: `{{trigger.object.id}}`
+   - Email liên hệ: `{{searchRecords[0].email}}`
+   - Điện thoại liên hệ: `{{searchRecords[0].phone}}`
+
+## Sao chép nhiều trường
+
+### Ví dụ: Đồng bộ thông tin Công ty sang tất cả Cơ hội liên quan
+
+**Mục tiêu**: Khi chi tiết công ty thay đổi, cập nhật tất cả cơ hội liên quan.
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được cập nhật (Công ty)
+   - Trường: Ngành, Quy mô, Doanh thu hàng năm
+
+2. **Tìm kiếm bản ghi**: Tìm tất cả cơ hội của công ty
+   - Đối tượng: Cơ hội
+   - Bộ lọc: ID Công ty bằng `{{trigger.object.id}}`
+
+3. **Iterator**: Lặp qua mỗi cơ hội
+
+4. **Cập nhật bản ghi** (bên trong iterator):
+   - Đối tượng: Cơ hội
+   - Bản ghi: `{{iterator.currentItem.id}}`
+   - Ngành Công ty: `{{trigger.object.industry}}`
+   - Quy mô Công ty: `{{trigger.object.companySize}}`
+   - ARR Công ty: `{{trigger.object.annualRevenue}}`
+
+## Sao chép khi tạo bản ghi
+
+### Ví dụ: Điền trước Cơ hội với dữ liệu Công ty
+
+**Mục tiêu**: Khi tạo cơ hội liên kết với công ty, tự động sao chép thông tin công ty chính.
+
+### Điều kiện tiên quyết
+
+Tạo trường đích trong **Cài đặt → Mô hình dữ liệu → Cơ hội**:
+- Ngành Công ty (loại: Văn bản)
+- Quy mô Công ty (loại: Số)
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được tạo (Cơ hội)
+   - Bộ lọc: Công ty không rỗng
+
+2. **Tìm kiếm bản ghi**: Lấy chi tiết công ty liên kết
+   - Đối tượng: Công ty
+   - Bộ lọc: ID bằng `{{trigger.object.company.id}}`
+
+3. **Cập nhật bản ghi**:
+   - Đối tượng: Cơ hội
+   - Bản ghi: `{{trigger.object.id}}`
+   - Ngành Công ty: `{{searchRecords[0].industry}}`
+   - Quy mô Công ty: `{{searchRecords[0].employees}}`
+
+<Note>
+**Giới hạn Tác vụ và Ghi chú**: Quan hệ trên Tác vụ và Ghi chú được mã hóa cứng dạng nhiều-nhiều và chưa khả dụng trong trigger hoặc hành động workflow. Để truy cập quan hệ này, sử dụng [API](/l/vi/developers/extend/api) thay thế.
+</Note>
+
+## Đồng bộ hai chiều
+
+### Ví dụ: Giữ liên hệ chính đồng bộ
+
+**Mục tiêu**: Khi liên hệ chính của công ty thay đổi, cập nhật liên hệ. Khi người trở thành liên hệ chính, cập nhật công ty.
+
+### Workflow 1: Công ty → Người
+
+1. **Trigger**: Bản ghi được cập nhật (Công ty, trường Liên hệ chính)
+2. **Cập nhật bản ghi**: Đặt "Là liên hệ chính" của người thành đúng
+3. **Tìm kiếm bản ghi**: Tìm liên hệ chính trước đó
+4. **Cập nhật bản ghi**: Đặt "Là liên hệ chính" của liên hệ trước thành sai
+
+### Workflow 2: Người → Công ty
+
+1. **Trigger**: Bản ghi được cập nhật (Người, Là liên hệ chính = đúng)
+2. **Cập nhật bản ghi**: Đặt Liên hệ chính của công ty thành người này
+
+<Note>
+Cẩn thận với đồng bộ hai chiều để tránh vòng lặp vô hạn. Sử dụng bộ lọc để kiểm tra giá trị thực sự thay đổi trước khi cập nhật.
+</Note>
+
+## Sử dụng Mã nguồn cho ánh xạ phức tạp
+
+### Ví dụ: Biến đổi dữ liệu khi sao chép
+
+**Mục tiêu**: Sao chép và định dạng số điện thoại từ người sang cơ hội.
+
+```javascript
+export const main = async (params) => {
+  const { phone } = params;
+
+  if (!phone) return { formattedPhone: null };
+
+  // Loại bỏ ký tự không phải số
+  const digits = phone.replace(/\D/g, '');
+
+  // Định dạng thành (XXX) XXX-XXXX
+  const formatted = digits.length === 10
+    ? `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`
+    : phone;
+
+  return { formattedPhone: formatted };
+};
+```
+
+## Thực hành tốt nhất
+
+### Tránh vòng lặp
+- Không tạo workflow kích hoạt lẫn nhau liên tục
+- Sử dụng điều kiện trường cụ thể
+- Thêm kiểm tra xem giá trị thực sự thay đổi
+
+### Xử lý dữ liệu thiếu
+- Luôn kiểm tra bản ghi nguồn tồn tại trước khi sao chép
+- Cung cấp giá trị mặc định cho trường tùy chọn
+- Sử dụng bộ lọc để bỏ qua khi trường nguồn rỗng
+
+### Hiệu suất
+- Gộp cập nhật khi sao chép sang nhiều bản ghi
+- Sử dụng workflow theo lịch trình cho thao tác đồng bộ hàng loạt
+- Xem xét sử dụng Iterator cho cập nhật nhiều bản ghi
+
+## Liên quan
+
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)

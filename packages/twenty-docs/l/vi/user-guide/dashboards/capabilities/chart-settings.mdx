@@ -1,0 +1,271 @@
+---
+title: Cài đặt biểu đồ
+description: Cấu hình biểu đồ để hiển thị dữ liệu chính xác theo cách bạn cần.
+---
+
+import { ChartIcon } from '/snippets/chart-icon.mdx';
+
+## Truy cập cài đặt biểu đồ
+
+1. Nhấp nút **Chỉnh sửa** ở góc trên bên phải của dashboard
+
+<img src="/images/user-guide/dashboard/dashboard-edit.png" alt="Chế độ chỉnh sửa" />
+
+
+2. Dashboard chuyển sang chế độ chỉnh sửa
+3. Nhấp vào bất kỳ widget nào để chọn
+4. Bảng cài đặt mở ở bên phải
+
+Cài đặt được tổ chức thành các phần:
+- **Dữ liệu**: Dữ liệu nào cần lấy và cách lọc
+- **Trục X**: Cách nhóm và sắp xếp danh mục (biểu đồ cột/đường)
+- **Trục Y**: Đo gì và cách hiển thị (biểu đồ cột/đường)
+- **Kiểu**: Màu sắc, nhãn và tùy chọn trực quan
+
+<Note>
+Một số cài đặt chỉ xuất hiện khi các cài đặt khác đã được cấu hình. Ví dụ: **Độ chi tiết ngày** chỉ xuất hiện khi bạn chọn trường ngày.
+</Note>
+
+---
+
+## Cài đặt dữ liệu
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="database"  />Nguồn </span>
+
+Chọn đối tượng nào để lấy dữ liệu.
+
+1. Nhấp **Nguồn**
+2. Chọn đối tượng (Cơ hội, Người, Công ty, v.v.)
+
+Tất cả đối tượng tiêu chuẩn và tùy chỉnh đều khả dụng. Thay đổi nguồn sẽ đặt lại các cài đặt khác vì tùy chọn trường phụ thuộc vào đối tượng được chọn.
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-source.png" alt="Nguồn" />
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="filter"  />Bộ lọc </span>
+
+
+Giới hạn bản ghi nào được bao gồm trong biểu đồ.
+
+1. Nhấp **Bộ lọc**
+2. Trình xây dựng bộ lọc mở ra
+3. Nhấp **+ Thêm bộ lọc**
+4. Chọn trường, điều kiện và giá trị
+5. Thêm bộ lọc khác nếu cần
+
+Bộ lọc hoạt động giống như trong chế độ xem bảng. Sử dụng chúng để tập trung vào phân khúc dữ liệu cụ thể.
+
+**Ví dụ**: Lọc cơ hội có Giai đoạn bằng "Thắng" để chỉ hiển thị giao dịch đã chốt.
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-filters.png" alt="Bộ lọc" />
+
+<Tip>
+Với trường ngày, hãy thử **Là tương đối** để tạo bộ lọc động như "7 ngày qua" hoặc "Tháng này" tự động cập nhật.
+</Tip>
+
+<Tip>
+Bộ lọc nâng cao được hỗ trợ — thêm nhiều quy tắc lọc và kết hợp chúng với logic **Và** hoặc **Hoặc**.
+</Tip>
+
+---
+
+## Cài đặt trục X
+
+Các cài đặt này kiểm soát trục ngang của biểu đồ cột và đường — thường là cách dữ liệu được nhóm thành danh mục.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="axis-x" />Dữ liệu hiển thị </span>
+
+Chọn trường để nhóm dữ liệu. Điều này xác định danh mục hiển thị trên trục X.
+
+**Ví dụ**: Chọn "Giai đoạn" để xem dữ liệu nhóm theo giai đoạn pipeline, hoặc "Ngày tạo" để xem dữ liệu theo thời gian.
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-x-data-on-display.png" alt="Dữ liệu hiển thị" />
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="calendar" />Độ chi tiết ngày </span>
+
+Khi nhóm theo trường ngày, chọn khoảng thời gian để nhóm.
+
+| Tùy chọn | Nhóm dữ liệu theo | Ví dụ đầu ra |
+|--------|---------------|----------------|
+| **Ngày** | Mỗi ngày dương lịch | 1/1, 2/1, 3/1... |
+| **Tuần** | Tuần dương lịch | Tuần 1, Tuần 2, Tuần 3... |
+| **Tháng** | Tháng dương lịch | Tháng 1, Tháng 2, Tháng 3... |
+| **Quý** | Quý tài chính | Q1, Q2, Q3, Q4 |
+| **Năm** | Năm dương lịch | 2023, 2024, 2025 |
+| **Ngày trong tuần** | Ngày trong tuần (tổng hợp) | Thứ Hai, Thứ Ba... (tất cả các Thứ Hai gộp lại) |
+| **Tháng trong năm** | Tháng (tổng hợp) | Tháng 1, Tháng 2... (tất cả Tháng 1 gộp lại) |
+| **Quý trong năm** | Quý (tổng hợp) | Q1, Q2, Q3, Q4 (tất cả Q1 gộp lại) |
+
+Các tùy chọn "trong tuần/năm" tổng hợp qua mọi thời kỳ. Sử dụng **Ngày trong tuần** để xem ngày nào thường có nhiều giao dịch nhất. Sử dụng **Tháng** để xem xu hướng theo từng tháng.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="arrows-sort" />Sắp xếp theo </span>
+
+Kiểm soát thứ tự danh mục trên trục X.
+
+- **Vị trí** – Sử dụng thứ tự được định nghĩa trong cài đặt trường Lựa chọn
+- **Theo bảng chữ cái** – A đến Z (hoặc theo thời gian cho ngày)
+- **Theo giá trị** – Sắp xếp theo chỉ số (cao nhất hoặc thấp nhất trước)
+- **Thủ công** – Kéo để đặt thứ tự riêng
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-x-sort.png" alt="Sắp xếp theo" />
+
+**Mẹo**: Cho các giai đoạn pipeline, sử dụng **Vị trí** để hiển thị giai đoạn theo thứ tự quy trình bán hàng (Tiềm năng → Đủ điều kiện → Đề xuất → Thắng).
+
+<Note>
+Các tùy chọn hiển thị phụ thuộc vào loại trường. Trường Lựa chọn có tất cả tùy chọn; trường ngày và văn bản hiển thị ít hơn.
+</Note>
+
+<Tip>
+Với sắp xếp **Thủ công**, kéo danh mục để tạo thứ tự tùy chỉnh — hoàn hảo để làm nổi bật phân khúc cụ thể hoặc kể câu chuyện với dữ liệu.
+</Tip>
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="eye-off" />Bỏ qua giá trị bằng không </span>
+
+Ẩn danh mục không có dữ liệu hoặc có giá trị bằng không.
+
+- **Bật**: Danh mục không có bản ghi được ẩn
+- **Tắt**: Tất cả danh mục được hiển thị, kể cả trống
+
+Sử dụng tính năng này để làm sạch biểu đồ có dữ liệu thưa thớt.
+
+---
+
+## Cài đặt trục Y
+
+Các cài đặt này kiểm soát những gì bạn đo và cách hiển thị.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="axis-y" />Dữ liệu hiển thị </span>
+
+Chọn trường và phép toán để tính chỉ số.
+
+- **Đếm** – Đếm tất cả, Đếm trống, Đếm không trống, Đếm giá trị duy nhất
+- **Toán học** – Tổng, Trung bình, Nhỏ nhất, Lớn nhất (trường số)
+- **Phần trăm** – Phần trăm trống, Phần trăm không trống
+
+Trường Boolean thêm Đếm đúng/sai. Biểu đồ tổng hợp với trường ngày hiển thị Sớm nhất/Muộn nhất.
+
+**Ví dụ**: Chọn "Số tiền" với Tổng để xem tổng giá trị giao dịch theo danh mục, hoặc Đếm tất cả để xem số lượng giao dịch.
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-y-data-on-display.png" alt="Dữ liệu hiển thị" />
+
+<Note>
+Các tùy chọn hiển thị phụ thuộc vào trường và loại biểu đồ. Nếu bạn không thấy phép toán mong đợi, hãy kiểm tra loại trường.
+</Note>
+
+### Tỷ lệ
+
+Cho trường Lựa chọn, Đa lựa chọn hoặc Boolean, bạn có thể tính phần trăm của một giá trị cụ thể.
+
+1. Chọn trường Lựa chọn, Đa lựa chọn hoặc Boolean
+2. Bật **Tỷ lệ**
+3. Chọn tùy chọn cần đo
+
+**Ví dụ**: Hiển thị giao dịch "Thắng" dưới dạng phần trăm của tất cả cơ hội. Nếu bạn có 10 Thắng trong tổng 50, biểu đồ hiển thị 20%.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="filters" />Nhóm theo </span>
+
+Thêm chiều thứ hai để tạo nhiều chuỗi (nhiều cột hoặc đường).
+
+1. Đặt trường trục X trước
+2. Nhấp **Nhóm theo**
+3. Chọn trường thứ hai
+
+**Ví dụ**: Nhóm giao dịch theo Giai đoạn (trục X) VÀ theo Chủ sở hữu (Nhóm theo) để xem pipeline phân tích của từng người bên cạnh nhau.
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-y-group-by.png" alt="Nhóm theo" />
+
+Khi Nhóm theo được đặt, bạn sẽ thấy nhiều màu trong biểu đồ và chú thích xuất hiện.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="calendar" />Độ chi tiết ngày </span>
+
+Khi Nhóm theo là trường ngày, chọn khoảng thời gian (cùng tùy chọn như trục X).
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="arrows-sort" />Sắp xếp theo </span>
+
+Khi **Nhóm theo** được đặt, kiểm soát thứ tự chuỗi nhóm (ví dụ: cột của chủ sở hữu nào xuất hiện trước trong mỗi danh mục).
+
+Cùng tùy chọn như sắp xếp trục X — Vị trí, Theo bảng chữ cái và Thủ công — ngoại trừ **sắp xếp theo giá trị không khả dụng** cho nhóm phụ.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="chart-bar-popular" />Tích lũy </span>
+
+Hiển thị tổng lũy kế thay vì giá trị riêng lẻ.
+
+- **Tắt**: Mỗi cột/điểm hiển thị giá trị riêng
+- **Bật**: Mỗi cột/điểm hiển thị tổng tất cả giá trị trước cộng với giá trị riêng
+
+**Ví dụ**: Tháng 1 = 10, Tháng 2 = 15
+- Tích lũy tắt: Hiển thị 10 và 15
+- Tích lũy bật: Hiển thị 10 và 25 (10 + 15)
+
+Sử dụng tích lũy để theo dõi tiến độ hướng đến mục tiêu theo thời gian.
+
+<img src="/images/user-guide/dashboard/dashboard-chart-settings-y-cumulative.png" alt="Tích lũy" />
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="math-min" />Phạm vi nhỏ nhất / <ChartIcon icon="math-max" />Phạm vi lớn nhất </span>
+
+Đặt giá trị nhỏ nhất và lớn nhất cố định cho trục Y.
+
+- Để trống cho tự động điều chỉnh tỷ lệ
+- Nhập số để cố định ranh giới
+
+**Khi nào sử dụng:**
+- Đặt Nhỏ nhất là 0 cho so sánh trực quan chính xác
+- Đặt cả hai cho tỷ lệ nhất quán giữa nhiều biểu đồ
+- Tập trung vào phạm vi giá trị cụ thể bằng cách đặt cả hai
+
+---
+
+## Cài đặt kiểu
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="color-swatch" />Màu sắc </span>
+
+Đặt bảng màu cho biểu đồ. Chọn từ nhiều bảng màu khác nhau.
+
+<Note>
+Khi nhóm theo trường Lựa chọn, biểu đồ tự động sử dụng màu được định nghĩa cho mỗi tùy chọn trong cài đặt trường.
+</Note>
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="gizmo" />Tên trục </span>
+
+Chọn nhãn trục nào hiển thị: **Không**, **Trục X**, **Trục Y** hoặc **Cả hai** (chỉ biểu đồ cột và đường).
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="stack-2" />Cột xếp chồng / Đường xếp chồng </span>
+
+Khi Nhóm theo được đặt, chọn cách hiển thị nhiều chuỗi.
+
+- **Tắt (Nhóm)**: Chuỗi xuất hiện cạnh nhau. Sử dụng khi so sánh giá trị chính xác giữa các nhóm.
+- **Bật (Xếp chồng)**: Chuỗi xếp chồng lên nhau. Sử dụng khi hiển thị thành phần — các phần tạo nên tổng thể.
+
+**Ví dụ**: Giao dịch theo giai đoạn, nhóm theo chủ sở hữu
+- Nhóm: Xem số liệu chính xác của từng chủ sở hữu bên cạnh nhau
+- Xếp chồng: Xem tổng giao dịch theo giai đoạn, với đóng góp của từng chủ sở hữu xếp chồng
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="badge-2k" />Nhãn dữ liệu </span>
+
+Hiển thị giá trị trực tiếp trên phần tử biểu đồ (cột, điểm, lát).
+
+- **Bật**: Giá trị xuất hiện trên biểu đồ
+- **Tắt**: Không hiển thị giá trị (giao diện sạch hơn)
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}> <ChartIcon icon="text-caption" />Chú thích </span>
+
+Hiển thị hoặc ẩn chú thích (chỉ xuất hiện khi Nhóm theo được đặt).
+
+- **Bật**: Chú thích hiển thị mỗi màu đại diện cho gì
+- **Tắt**: Không hiển thị chú thích
+
+<Tip>
+**Di chuột** qua mục chú thích để làm nổi bật nhóm đó. **Nhấp** để tạm ẩn khỏi biểu đồ.
+</Tip>
+
+---
+
+## Ghi chú theo loại biểu đồ
+
+### Biểu đồ tròn
+- <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}><ChartIcon icon="chart-pie" size={16} /></span> **Mỗi lát đại diện cho** – Định nghĩa cách nhóm các lát
+- <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}><ChartIcon icon="eye-off" size={16} /></span> **Ẩn danh mục trống** – Xóa lát có giá trị bằng không
+- <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}><ChartIcon icon="number-123" size={16} /></span> **Hiển thị giá trị ở giữa** – Hiển thị giá trị tổng hợp (tổng, trung bình, đếm, v.v.)
+
+### Biểu đồ tổng hợp
+- <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}><ChartIcon icon="caret-left" size={16} /></span> **Tiền tố** – Thêm văn bản trước số (ví dụ: `$`)
+- <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}><ChartIcon icon="caret-right" size={16} /></span> **Hậu tố** – Thêm văn bản sau số (ví dụ: `%`)

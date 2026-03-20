@@ -1,0 +1,59 @@
+---
+title: Tạo trường quan hệ
+description: Hướng dẫn từng bước để kết nối các đối tượng bằng trường quan hệ.
+---
+
+Trường quan hệ kết nối bản ghi từ các đối tượng khác nhau — ví dụ, liên kết People với Companies.
+
+<Note>
+**Tên quan hệ không thể thay đổi sau khi tạo** (chúng ảnh hưởng đến API). Hãy lên kế hoạch đặt tên cẩn thận.
+</Note>
+
+## Trước khi bắt đầu
+
+Quyết định:
+- Bạn đang kết nối đối tượng nào? (ví dụ: People → Companies)
+- Phía "một" là gì? (ví dụ: Company)
+- Phía "nhiều" là gì? (ví dụ: People — nhiều người làm việc tại một công ty)
+- Trường nên được đặt tên gì ở mỗi phía?
+
+Xem [Trường quan hệ](/l/vi/user-guide/data-model/capabilities/relation-fields) để biết các loại quan hệ được giải thích.
+
+## Các bước
+
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng nơi bạn muốn quan hệ (thường là phía "nhiều")
+3. Nhấp **+ Add Field**
+4. Chọn **Relation** làm loại trường
+5. Chọn **đối tượng đích**
+6. Chọn **One-to-Many** hoặc **Many-to-One**
+7. Nhập tên trường cho **cả hai phía** của quan hệ
+8. Nhấp **Save**
+
+## Ví dụ: People → Companies
+
+- Vào **Settings → Data Model → People**
+- Thêm trường Relation
+- Đích: **Companies**
+- Loại: **Many-to-One**
+- Trường trên People: **Company**
+- Trường trên Companies: **Employees**
+
+Bây giờ mỗi Person có thể được liên kết với một Company, và mỗi Company hiển thị People của nó.
+
+## Xóa quan hệ
+
+1. Vào **Settings → Data Model**
+2. Tìm trường quan hệ
+3. Nhấp **⋮ → Deactivate**
+
+Liên kết được bảo toàn nhưng bị ẩn. Kích hoạt lại để khôi phục.
+
+<Note>
+**Xóa quan hệ không xóa bản ghi.** Chỉ liên kết giữa chúng bị loại bỏ.
+</Note>
+
+## Liên quan
+
+- [Trường quan hệ](/l/vi/user-guide/data-model/capabilities/relation-fields) — loại và giới hạn
+- [Cách nhập quan hệ](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv) — nhập hàng loạt bản ghi liên kết

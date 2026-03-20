@@ -1,0 +1,108 @@
+---
+title: Thiết lập pipeline bán hàng
+description: Cấu hình pipeline bán hàng để theo dõi cơ hội qua các giai đoạn.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+Pipeline bán hàng trong Twenty là chế độ xem Kanban của đối tượng Cơ hội, trong đó mỗi cột đại diện cho một giai đoạn trong quy trình bán hàng.
+
+## Bước 1: Cấu hình giai đoạn
+
+Các giai đoạn được định nghĩa trong trường **Giai đoạn** của đối tượng Cơ hội.
+
+1. Đi tới **Cài đặt → Mô hình dữ liệu**
+2. Chọn **Cơ hội**
+3. Tìm và nhấp vào trường **Giai đoạn**
+4. Thêm, xóa hoặc đổi tên giai đoạn để phù hợp với quy trình
+
+<VimeoEmbed videoId="927890428" title="Video demonstration" />
+
+### Các giai đoạn được đề xuất
+
+| Giai đoạn | Mục đích |
+|-------|---------|
+| **Mới** | Cơ hội vừa được xác định |
+| **Đủ điều kiện** | Xác nhận phù hợp |
+| **Cuộc họp** | Đang trong giai đoạn thảo luận |
+| **Đề xuất** | Đã gửi đề xuất |
+| **Đàm phán** | Đang thương lượng điều khoản |
+| **Chốt thành công** | Giao dịch thành công |
+| **Chốt thất bại** | Giao dịch không thành công |
+
+<Note>
+**5-7 giai đoạn là tối ưu.** Quá nhiều giai đoạn làm pipeline khó quét; quá ít mất khả năng theo dõi tiến độ giao dịch.
+</Note>
+
+## Bước 2: Tạo chế độ xem pipeline
+
+1. Đi tới **Cơ hội**
+2. Nhấp vào menu thả xuống chế độ xem → **+ Thêm chế độ xem**
+3. Đặt tên "Pipeline bán hàng"
+4. Nhấp **Tạo**
+5. Mở **Tùy chọn** và chọn **Kanban** làm bố cục
+
+Chế độ xem tự động sử dụng trường Giai đoạn cho các cột.
+
+## Bước 3: Cấu hình chế độ xem
+
+### Hiển thị trường chính
+1. Nhấp **Tùy chọn → Trường**
+2. Tìm trường trong phần "Trường ẩn"
+3. Nhấp **biểu tượng mắt** để hiển thị: Công ty, Số tiền, Ngày chốt, Chủ sở hữu
+
+### Bật tổng hợp
+Hiển thị tổng ở đầu mỗi cột:
+1. Nhấp vào số hiển thị bên cạnh tên Giai đoạn ở đầu cột
+2. Chọn loại tổng hợp (Đếm, Tổng, Trung bình, v.v.)
+3. Chọn trường để tổng hợp (ví dụ: Số tiền)
+
+**Ví dụ:** Hiển thị tổng giá trị giao dịch theo giai đoạn bằng cách tổng hợp Số tiền với phép Tổng.
+
+### Sử dụng chế độ xem thu gọn (Tùy chọn)
+Để có tổng quan cấp cao với nội dung thẻ tối thiểu:
+1. Nhấp **Tùy chọn**
+2. Bật công tắc **Chế độ xem thu gọn**
+
+## Bước 4: Tạo chế độ xem cá nhân và nhóm
+
+### "Pipeline của tôi"
+- **Bộ lọc**: Chủ sở hữu = Tôi
+- **Hiển thị**: Không công khai (chế độ xem cá nhân)
+
+### "Pipeline nhóm"
+- **Bộ lọc**: Không (hiển thị tất cả)
+- **Hiển thị**: Workspace (chế độ xem chia sẻ)
+
+### "Chốt tháng này"
+- **Loại**: Bảng
+- **Bộ lọc**: Ngày chốt = Tháng này, Giai đoạn khác Chốt thành công, Giai đoạn khác Chốt thất bại
+- **Sắp xếp**: Ngày chốt tăng dần
+
+## Làm việc với cơ hội
+
+### Tạo cơ hội
+- Nhấp **+ Mới** trong chế độ xem Cơ hội
+- Hoặc nhấp **+** trong cột giai đoạn cụ thể
+
+### Di chuyển qua các giai đoạn
+Kéo và thả thẻ cơ hội giữa các cột để cập nhật giai đoạn.
+
+<VimeoEmbed videoId="927888627" title="Video demonstration" />
+
+## Thực hành tốt nhất
+
+### Vệ sinh pipeline
+- Cập nhật giao dịch hàng ngày khi chúng tiến triển
+- Di chuyển hoặc đóng giao dịch trì trệ kịp thời
+- Giữ ngày chốt thực tế
+
+### Kỷ luật giai đoạn
+- Xác định tiêu chí rõ ràng cho mỗi giai đoạn
+- Di chuyển giao dịch kịp thời khi đáp ứng tiêu chí
+- Không để giao dịch ở trong giai đoạn quá lâu
+
+## Liên quan
+
+- [Chế độ xem Kanban](/l/vi/user-guide/views-pipelines/capabilities/kanban-views) — tổng hợp và chế độ xem thu gọn
+- [Bộ lọc và sắp xếp](/l/vi/user-guide/views-pipelines/capabilities/filters-and-sorting) — tạo chế độ xem có bộ lọc

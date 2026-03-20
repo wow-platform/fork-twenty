@@ -1,0 +1,46 @@
+---
+title: Tôi không thấy email trên bản ghi
+description: Khắc phục sự cố email bị thiếu trên bản ghi.
+---
+
+## Nguyên nhân phổ biến
+
+### 1. Đồng bộ ban đầu vẫn đang tiến hành
+Đồng bộ email mất thời gian, đặc biệt với hộp thư lớn. Twenty nhập email với tốc độ khoảng **400 tin nhắn mỗi phút** (bị giới hạn bởi tốc độ API Gmail).
+
+- **Đồng bộ lịch**: Hoàn thành trong vài phút
+- **Đồng bộ email**: Phụ thuộc vào kích thước hộp thư (ví dụ: 10.000 email ≈ 25 phút, 50.000 email ≈ 2 giờ)
+
+**Giải pháp**: Đợi cho đến khi lần nhập ban đầu hoàn thành. Bạn có thể ước tính thời gian dựa trên kích thước hộp thư.
+
+### 2. Liên hệ chưa tồn tại trong Twenty
+Email chỉ xuất hiện trên bản ghi Người hiện có. Nếu liên hệ chưa được tạo:
+- Bật **Tự động tạo liên hệ** trong cài đặt hộp thư
+- Hoặc tạo bản ghi Người thủ công trước
+
+**Giải pháp**: Vào **Cài đặt → Tài khoản**, chọn hộp thư và bật tự động tạo liên hệ.
+
+### 3. Email nội bộ bị loại trừ
+Email giữa đồng nghiệp (cùng tên miền email) không bao giờ được đồng bộ để bảo vệ quyền riêng tư.
+
+**Giải pháp**: Đây là hành vi bình thường. Chỉ email bên ngoài được đồng bộ.
+
+### 4. Email từ nhóm hoặc danh sách phân phối
+Email nhóm và danh sách phân phối bị loại trừ khỏi đồng bộ.
+
+**Giải pháp**: Đây là hành vi bình thường.
+
+### 5. Thư mục chưa được chọn để đồng bộ
+Nếu bạn sử dụng tính năng Thư mục tin nhắn, một số thư mục có thể bị loại trừ.
+
+**Giải pháp**: Vào **Cài đặt → Tài khoản**, chọn hộp thư và kiểm tra cài đặt đồng bộ thư mục.
+
+### 6. Địa chỉ email sai trên bản ghi
+Bản ghi Người có thể có địa chỉ email khác với địa chỉ được sử dụng trong email.
+
+**Giải pháp**: Thêm địa chỉ email chính xác vào bản ghi Người.
+
+## Vẫn không hoạt động?
+
+1. Thử ngắt kết nối và kết nối lại hộp thư
+2. Liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục

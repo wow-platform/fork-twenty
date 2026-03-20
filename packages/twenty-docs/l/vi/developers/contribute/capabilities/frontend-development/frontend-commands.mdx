@@ -1,0 +1,89 @@
+---
+title: Các lệnh Frontend
+---
+
+
+## Các lệnh hữu ích
+
+### Khởi động ứng dụng
+
+```bash
+npx nx start twenty-front
+```
+
+### Tạo lại schema GraphQL dựa trên schema API GraphQL
+
+```bash
+npx nx run twenty-front:graphql:generate --configuration=metadata
+```
+HOẶC
+```bash
+npx nx run twenty-front:graphql:generate
+```
+
+### Lint
+
+```bash
+npx nx run twenty-front:lint # thêm --fix để sửa lỗi lint
+```
+
+## Bản dịch
+
+```bash
+npx nx run twenty-front:lingui:extract
+npx nx run twenty-front:lingui:compile
+```
+
+### Test
+
+```bash
+npx nx run twenty-front:test # chạy jest test
+npx nx run twenty-front:storybook:serve:dev # chạy storybook
+npx nx run twenty-front:storybook:test # chạy test # (cần yarn storybook:serve:dev đang chạy)
+npx nx run twenty-front:storybook:coverage # (cần yarn storybook:serve:dev đang chạy)
+```
+
+## Công nghệ sử dụng
+
+Dự án có stack sạch và đơn giản, với code boilerplate tối thiểu.
+
+**Ứng dụng**
+
+- [React](https://react.dev/)
+- [Apollo](https://www.apollographql.com/docs/)
+- [GraphQL Codegen](https://the-guild.dev/graphql/codegen)
+- [Jotai](https://jotai.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+
+**Kiểm thử**
+
+- [Jest](https://jestjs.io/)
+- [Storybook](https://storybook.js.org/)
+
+**Công cụ**
+
+- [Yarn](https://yarnpkg.com/)
+- [Craco](https://craco.js.org/docs/)
+- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html)
+
+## Kiến trúc
+
+### Định tuyến
+
+[React Router](https://reactrouter.com/) xử lý định tuyến.
+
+Để tránh [re-render](/l/vi/developers/contribute/capabilities/frontend-development/best-practices-front#managing-re-renders) không cần thiết, tất cả logic định tuyến nằm trong `useEffect` trong `PageChangeEffect`.
+
+### Quản lý trạng thái
+
+[Jotai](https://jotai.org/) xử lý quản lý trạng thái.
+
+Xem [thực hành tốt nhất](/l/vi/developers/contribute/capabilities/frontend-development/best-practices-front#state-management) để biết thêm thông tin về quản lý trạng thái.
+
+## Kiểm thử
+
+[Jest](https://jestjs.io/) là công cụ kiểm thử đơn vị trong khi [Storybook](https://storybook.js.org/) là cho kiểm thử component.
+
+Jest chủ yếu để kiểm thử hàm tiện ích, không phải component.
+
+Storybook để kiểm thử hành vi của component cô lập, cũng như hiển thị hệ thống thiết kế.

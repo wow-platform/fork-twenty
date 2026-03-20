@@ -1,0 +1,67 @@
+---
+title: Cấu hình không gian làm việc
+description: "Mỗi doanh nghiệp hoạt động khác nhau. Bắt đầu với 3 bước này để định hình Twenty theo nhu cầu của bạn."
+---
+
+<Note>**Mẹo nhanh**: Bắt đầu bằng việc kết nối hộp thư. Điều này mang lại giá trị ngay lập tức và giúp nhóm bạn thấy Twenty hoạt động với dữ liệu thực. Bạn có thể thực hiện tại Settings → Accounts.</Note>
+
+## 1. Tùy chỉnh mô hình dữ liệu
+Twenty cung cấp sự linh hoạt bạn cần để định hình mô hình dữ liệu hỗ trợ tốt nhất công việc hàng ngày.
+Tạo các đối tượng và trường thuộc mọi loại, bao gồm các mối quan hệ giữa các đối tượng khác nhau. Bạn có thể thực hiện tại Settings → Data Model.
+Dưới đây là một vài mẹo:
+- **Bạn không bị giới hạn số lượng trường tùy chỉnh hay đối tượng tùy chỉnh**. Thêm đối tượng và trường tùy chỉnh sẽ không dẫn đến nâng cấp gói của bạn.
+- **People, Companies và Opportunities là ba đối tượng mà từ đó bạn có thể truy cập email và cuộc họp được đồng bộ từ hộp thư và lịch**. Chúng tôi khuyến nghị sử dụng chúng nhiều nhất có thể, thêm trường để phân loại bản ghi nếu cần. Đây là một ví dụ:
+    - Tốt nhất nên sử dụng đối tượng People cho khách hàng tiềm năng và đối tác, tạo một trường trên đối tượng People có tên ```Person Type```, thay vì tạo đối tượng tùy chỉnh Partner. Vì bạn sẽ không thể truy cập email trao đổi với người này từ bản ghi Partner.
+    - Tạo các chế độ xem khác nhau trong People, một để hiển thị đối tác và một để hiển thị khách hàng tiềm năng.
+- Hai People không thể có cùng địa chỉ email. Hai Companies không thể có cùng tên miền.
+- Bạn có thể vô hiệu hóa các trường và đối tượng tiêu chuẩn mà bạn không muốn sử dụng.
+- Bạn có thể ẩn trường khỏi chế độ xem: đừng ngại tạo trường, bạn không phải hiển thị tất cả chúng.
+
+Đọc [bài viết này](/l/vi/user-guide/data-model/overview) để tìm hiểu cách thiết kế mô hình dữ liệu.
+
+## 2. Đưa dữ liệu vào
+Đưa dữ liệu hiện có vào Twenty giúp nhóm bạn có bối cảnh ngay từ đầu.
+
+### Kết nối hộp thư
+Nếu bạn chưa thực hiện khi tạo không gian làm việc, kết nối **tài khoản Google hoặc Microsoft** tại Settings → Accounts. Điều này cho phép Twenty:
+- Nhập tin nhắn và cuộc họp
+- Tự động tạo liên hệ dựa trên tương tác (tùy chọn)
+- Giữ lịch sử giao tiếp hiển thị cho nhóm bạn
+
+**Sử dụng nhà cung cấp khác?**
+Bạn có thể thêm hộp thư khác qua SMTP hoặc lịch khác qua CalDAV. Vào **Settings → Accounts** để cấu hình.
+
+### Nhập dữ liệu qua CSV
+Sử dụng Command menu (```Cmd + K``` hoặc ```Ctrl + K```) để nhập People, Companies, Opportunities hoặc bất kỳ đối tượng tùy chỉnh nào qua CSV.
+
+**Hướng dẫn chính**:
+- Tải tệp mẫu để hiểu định dạng mong đợi
+- Giới hạn mỗi tệp 10.000 bản ghi
+- Loại bỏ email trùng lặp cho People hoặc tên miền trùng lặp cho Companies
+- Xem lại và sửa lỗi (được đánh dấu màu vàng) trước khi nhập
+
+Đọc [bài viết này](/l/vi/user-guide/data-migration/overview) để tìm hiểu thêm về nhập dữ liệu.
+
+## 3. Tạo chế độ xem đầu tiên
+Tạo các chế độ xem khác nhau là chìa khóa để dữ liệu trở nên hữu ích cho nhóm bạn.
+Cách thực hiện:
+-  **Thêm hoặc ẩn cột**
+    Quản lý các trường hiển thị trong chế độ xem nhất định bằng cách nhấp Options → Fields (từ phía trên bên phải). Bạn có thể hiện/ẩn trường từ đó.
+
+- **Sắp xếp lại trường**
+    Sắp xếp lại các trường từ chế độ xem nhất định bằng cách nhấp Options → Fields (từ phía trên bên phải). Kéo và thả các trường để sắp xếp lại.
+
+- **Lọc chế độ xem**
+    Thu hẹp các bản ghi hiển thị bằng Filters từ phía trên bên phải.
+
+- **Sắp xếp bản ghi**
+    Sắp xếp lại bản ghi hiển thị bằng chức năng Sort từ phía trên bên phải, hoặc bằng cách nhấp trực tiếp vào tên cột.
+
+-  **Chọn bố cục**
+    Bạn có thể chuyển sang **bố cục Kanban** hoặc bố cục **Group By** dạng danh sách, miễn là đối tượng có trường `Stage` hoặc trường kiểu select tương tự.
+
+- **Lưu chế độ xem vào Favorites**
+    Có thể thực hiện bằng menu thả xuống hiển thị các chế độ xem khác nhau.
+
+## Tiếp theo?
+Bắt đầu tạo tự động hóa bằng [quy trình tự động](/l/vi/user-guide/workflows/overview).

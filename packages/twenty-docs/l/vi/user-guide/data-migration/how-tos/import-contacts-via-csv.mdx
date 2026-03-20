@@ -1,0 +1,232 @@
+---
+title: Nhập liên hệ qua CSV
+description: Hướng dẫn từng bước đầy đủ để nhập people/liên hệ vào Twenty.
+---
+
+## Tổng quan
+
+Hướng dẫn này hướng dẫn bạn nhập liên hệ (People) vào Twenty. **Nhập Companies trước** nếu bạn muốn liên kết People với Companies.
+
+## Trước khi bắt đầu
+
+### Danh sách kiểm tra tiên quyết
+<Check>
+Tệp ở định dạng CSV, XLSX hoặc XLS
+</Check>
+<Check>
+Tệp có dưới 10.000 bản ghi
+</Check>
+<Check>
+Không có địa chỉ email trùng lặp trong tệp
+</Check>
+<Check>
+**Companies đã nhập trước** (nếu liên kết People với Companies)
+</Check>
+<Check>
+Tất cả trường tùy chỉnh tồn tại trong **Settings → Data Model**
+</Check>
+
+<Warning>
+**Nhập Companies trước People**
+
+Nếu bạn muốn liên kết People với Companies, hãy nhập Companies trước. Company phải tồn tại trước khi bạn có thể tham chiếu đến nó.
+</Warning>
+
+## Bước 1: Chuẩn bị dữ liệu liên hệ
+
+### Trường bắt buộc và khuyến nghị
+
+| Trường | Bắt buộc? | Định dạng | Ghi chú |
+|-------|-----------|--------|-------|
+| **Email** | Khuyến nghị | `name@domain.com` | Phải duy nhất |
+| **First Name** | Khuyến nghị | Text | |
+| **Last Name** | Khuyến nghị | Text | |
+| **Company** | Tùy chọn | Domain hoặc ID | Liên kết với Company hiện có |
+| **Phone** | Tùy chọn | Nhiều cột | Xem bên dưới |
+| **Job Title** | Tùy chọn | Text | |
+| **Trường tùy chỉnh** | Tùy chọn | Thay đổi | Phải tồn tại trong Data Model |
+
+### Định dạng email
+
+- Phải có định dạng email hợp lệ: `name@domain.com`
+- **Phải duy nhất** — không trùng lặp trong tệp hoặc trong Twenty
+- Cho email bổ sung, sử dụng cột **Emails / Additional Emails**:
+```
+["jane@twenty.com","jane.doe@twenty.com"]
+```
+
+### Định dạng điện thoại
+
+Điện thoại là **trường lồng nhau** yêu cầu nhiều cột:
+
+| Cột | Ví dụ |
+|--------|---------|
+| **Phones / Primary Phone Number** | `4159095555` |
+| **Phones / Primary Phone Country Code** | `US` |
+| **Phones / Primary Phone Calling Code** | `+1` |
+
+### Liên kết với Companies
+
+Thêm cột với định danh duy nhất của Company:
+
+| Tên cột | Định dạng | Ví dụ |
+|-------------|--------|---------|
+| `companyDomain` | Định dạng URL | `https://acme.com` |
+| `companyId` | UUID | `c776ee49-f608-4a77-8cc8-6fe96ae1e43f` |
+
+<Note>
+**Sử dụng định dạng Domain URL** (`https://acme.com`), không phải label. Điều này khớp với cách Companies được lưu trong Twenty.
+</Note>
+
+### Cấu trúc CSV mẫu
+
+```csv
+firstName,lastName,email,jobTitle,companyDomain,Phones / Primary Phone Number,Phones / Primary Phone Country Code
+John,Smith,john@acme.com,CEO,https://acme.com,4159095555,US
+Jane,Doe,jane@widgets.co,CTO,https://widgets.co,2125551234,US
+```
+
+<Note>
+**Mẹo chuyên nghiệp:** Nhấp **Download sample file** trong quá trình nhập hoặc xuất vài People hiện có để xem tên cột chính xác Twenty mong đợi.
+</Note>
+
+## Bước 2: Truy cập tính năng nhập
+
+**Tùy chọn 1: Từ chế độ xem People**
+1. Điều hướng đến **People** ở thanh bên trái
+2. Nhấp biểu tượng **⋮** ở phía trên bên phải
+3. Chọn **Import records**
+
+**Tùy chọn 2: Sử dụng Command Menu**
+1. Nhấn `Cmd + K` (Mac) hoặc `Ctrl + K` (Windows)
+2. Gõ "import"
+3. Chọn **Import records**
+4. Chọn **People**
+
+## Bước 3: Tải tệp lên
+
+1. Nhấp **Select file**
+2. Chọn tệp CSV, XLSX hoặc XLS
+3. Đợi Twenty phân tích tệp
+
+## Bước 4: Ánh xạ cột
+
+Twenty tự động cố gắng khớp cột với trường. Xem lại và điều chỉnh:
+
+1. **Kiểm tra ánh xạ tự động** — xác minh chúng đúng
+2. **Sửa ánh xạ sai** — nhấp danh sách thả xuống để chọn trường đúng
+3. **Bỏ qua cột** — chọn **Do not map** cho cột bạn không muốn nhập
+
+### Quy tắc ánh xạ quan trọng
+
+| Loại cột | Ánh xạ với | Ghi chú |
+|-------------|--------|-------|
+| Tham chiếu Company | Trường quan hệ **Company** | Sử dụng domain HOẶC id, không cả hai |
+| Email | **Email** | Địa chỉ email chính |
+| Email bổ sung | **Emails / Additional Emails** | Định dạng mảng |
+| Phone | Cột riêng biệt | Number, Country Code, Calling Code |
+
+<img src="/images/user-guide/import-export-data/match-columns.png" style={{width:'100%'}}/>
+
+### Ánh xạ quan hệ Company
+
+Khi ánh xạ cột company:
+1. Tìm cột tham chiếu company (ví dụ: `companyDomain`)
+2. Ánh xạ với trường quan hệ **Company**
+3. Twenty sẽ liên kết mỗi Person với Company phù hợp
+
+<Warning>
+**Chỉ ánh xạ MỘT định danh duy nhất cho quan hệ.**
+
+Đừng ánh xạ cả `companyId` VÀ `companyDomain`. Chọn một — ưu tiên domain vì dễ đọc.
+</Warning>
+
+## Bước 5: Ánh xạ giá trị trường Select
+
+Nếu bạn có trường Select hoặc Multi-Select (như Lead Source):
+
+1. Twenty hiển thị giá trị của bạn cạnh tùy chọn hiện có
+2. Khớp mỗi giá trị trong tệp với tùy chọn Twenty
+3. Hoặc tạo tùy chọn mới nếu cần
+
+<Note>
+Tùy chọn Select sử dụng **tên API**, không phải nhãn hiển thị. Kiểm tra **Settings → Data Model** → Bật **Advanced mode** để xem tên API.
+</Note>
+
+## Bước 6: Xem lại và sửa lỗi
+
+Trước khi hoàn tất nhập, Twenty xác thực dữ liệu:
+
+1. Nhấp **Next Steps**
+2. Hàng có lỗi được đánh dấu **màu vàng**
+3. **Sửa lỗi trực tiếp** — nhấp ô và chỉnh sửa giá trị
+4. **Xóa hàng có vấn đề** — nhấp X để bỏ qua hàng đó
+
+### Lỗi nhập liên hệ phổ biến
+
+| Lỗi | Nguyên nhân | Giải pháp |
+|-------|-------|----------|
+| **Email trùng lặp** | Email đã tồn tại trong Twenty hoặc tệp | Xóa trùng lặp hoặc cập nhật bản ghi hiện có |
+| **Định dạng email không hợp lệ** | Định dạng email sai | Sửa thành `name@domain.com` |
+| **Không tìm thấy quan hệ** | Company không tồn tại | Nhập Companies trước hoặc sửa tham chiếu |
+| **Thiếu trường bắt buộc** | Trường bắt buộc bị trống | Điền giá trị hoặc xóa hàng |
+
+## Bước 7: Hoàn tất nhập
+
+1. Xem lại tóm tắt nhập
+2. Nhấp **Confirm** để nhập
+3. Đợi nhập hoàn tất
+4. Xác minh bằng cách kiểm tra vài bản ghi và liên kết Company
+
+## Sau khi nhập liên hệ
+
+Liên hệ của bạn đã có trong Twenty! Bước tiếp theo:
+
+1. **Xác minh liên kết Company** — mở vài bản ghi People để xác nhận liên kết đúng Company
+2. **Nhập Opportunities** — nếu cần, liên kết với People và Companies
+3. **Thiết lập đồng bộ email** — kết nối hộp thư để xem lịch sử email trên bản ghi liên hệ
+
+## Cập nhật liên hệ hiện có
+
+Để cập nhật liên hệ thay vì tạo mới:
+
+1. Bao gồm cột `email` hoặc `id` trong tệp
+2. Twenty khớp bản ghi bằng định danh duy nhất này
+3. Liên hệ hiện có được cập nhật; liên hệ mới được tạo
+
+Xem [Cách cập nhật bản ghi hiện có](/l/vi/user-guide/data-migration/how-tos/update-existing-records-via-import) để biết chi tiết.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Tại sao hai People không thể có cùng email?">
+    Email là định danh duy nhất trong Twenty. Điều này ngăn liên hệ trùng lặp và đảm bảo đồng bộ email liên kết email đúng người.
+  </Accordion>
+
+  <Accordion title="Nếu tôi có người không có email thì sao?">
+    Bạn có thể để email trống. Tuy nhiên, chúng tôi khuyến nghị thêm email khi có thể để chất lượng dữ liệu tốt hơn và chức năng đồng bộ email.
+  </Accordion>
+
+  <Accordion title="Làm thế nào để liên kết People với Companies khi nhập?">
+    Thêm cột với domain của Company (ví dụ: `https://acme.com`) hoặc ID. Trong quá trình ánh xạ, kết nối cột này với trường quan hệ Company.
+  </Accordion>
+
+  <Accordion title="Nếu Company chưa tồn tại thì sao?">
+    Nhập Companies trước, sau đó nhập People. Company phải tồn tại trước khi bạn có thể tham chiếu đến nó.
+  </Accordion>
+
+  <Accordion title="Tôi có thể nhập ID từ CRM trước đây không?">
+    Có! Tạo trường tùy chỉnh đánh dấu "unique" trong mô hình dữ liệu để lưu ID bên ngoài. Lưu ý: tên trường `id` được dành riêng cho ID nội bộ Twenty.
+  </Accordion>
+
+  <Accordion title="Làm thế nào để sửa lỗi 'relation not found'?">
+    Company bạn đang tham chiếu không tồn tại. Nhập Company trước, hoặc kiểm tra domain/ID khớp chính xác với Company hiện có.
+  </Accordion>
+</AccordionGroup>
+
+## Xử lý sự cố
+
+Gặp vấn đề? Kiểm tra:
+- [Cách sửa lỗi nhập](/l/vi/user-guide/data-migration/how-tos/fix-import-errors)
+- [Cách nhập quan hệ](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv)
+- [Tham khảo ánh xạ trường](/l/vi/user-guide/data-migration/capabilities/field-mapping)

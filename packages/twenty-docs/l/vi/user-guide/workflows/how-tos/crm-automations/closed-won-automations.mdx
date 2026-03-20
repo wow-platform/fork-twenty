@@ -1,0 +1,170 @@
+---
+title: Tự động hóa khi thắng giao dịch
+description: Tự động hóa các hoạt động hậu thắng khi cơ hội hoàn tất.
+---
+
+Khi giao dịch hoàn tất, nhiều việc cần xảy ra: cập nhật trạng thái công ty, thông báo thành viên nhóm, tạo tác vụ onboarding. Tự động hóa tất cả với một workflow duy nhất.
+
+## Vấn đề
+
+Khi cơ hội chuyển sang "Closed Won":
+- Loại công ty cần thay đổi từ "Tiềm năng" sang "Khách hàng"
+- Tác vụ onboarding cần được tạo
+- Nhóm chăm sóc khách hàng cần được thông báo
+- Đại diện bán hàng cần xác nhận
+
+Làm thủ công tốn thời gian và dễ sai sót.
+
+## Giải pháp
+
+Tạo workflow xử lý tất cả hoạt động hậu thắng tự động.
+
+## Thiết lập Workflow hoàn chỉnh
+
+### Bước 1: Tạo Workflow
+
+1. Vào **Cài đặt → Workflow**
+2. Nhấp **+ Workflow mới**
+3. Đặt tên "Giao dịch thắng - Tự động hóa hậu thắng"
+
+### Bước 2: Cấu hình Trigger
+
+1. Chọn **Bản ghi được cập nhật**
+2. Chọn **Cơ hội**
+3. Trong "Trường giám sát", chọn **Giai đoạn**
+
+### Bước 3: Thêm bộ lọc giai đoạn
+
+1. Thêm hành động **Bộ lọc**
+2. Điều kiện: `{{trigger.object.stage}}` bằng "Closed Won"
+
+### Bước 4: Cập nhật loại công ty
+
+1. Thêm hành động **Cập nhật bản ghi**
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đối tượng** | Công ty |
+| **Bản ghi** | `{{trigger.object.company.id}}` |
+| **Loại** | Khách hàng |
+| **Ngày giao dịch đầu tiên** | `{{trigger.object.closedAt}}` |
+| **Chủ sở hữu tài khoản** | `{{trigger.object.owner.id}}` |
+
+### Bước 5: Tạo tác vụ Onboarding
+
+1. Thêm hành động **Tạo bản ghi**
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đối tượng** | Tác vụ |
+| **Tiêu đề** | `Onboarding: {{trigger.object.name}}` |
+| **Người được giao** | Thành viên nhóm chăm sóc khách hàng |
+| **Hạn** | 3 ngày kể từ bây giờ |
+| **Ưu tiên** | Cao |
+| **Công ty liên quan** | `{{trigger.object.company.id}}` |
+| **Cơ hội liên quan** | `{{trigger.object.id}}` |
+| **Mô tả** | `Onboarding khách hàng mới cho {{trigger.object.company.name}}. Giá trị giao dịch: {{trigger.object.amount}}` |
+
+### Bước 6: Thông báo nhóm chăm sóc khách hàng
+
+1. Thêm hành động **Gửi email**
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đến** | customer-success@yourcompany.com |
+| **Chủ đề** | `🎉 Khách hàng mới: {{trigger.object.company.name}}` |
+| **Nội dung** | Xem ví dụ bên dưới |
+
+**Ví dụ nội dung email**:
+```
+Xin chào nhóm CS,
+
+Chúng ta có khách hàng mới!
+
+Công ty: {{trigger.object.company.name}}
+Giao dịch: {{trigger.object.name}}
+Giá trị: {{trigger.object.amount}}
+Đại diện bán hàng: {{trigger.object.owner.name}}
+Ngày đóng: {{trigger.object.closedAt}}
+
+Tác vụ onboarding đã được tạo tự động.
+
+Hãy cho họ khởi đầu tuyệt vời!
+```
+
+### Bước 7: Xác nhận cho đại diện bán hàng
+
+1. Thêm hành động **Gửi email** khác
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đến** | `{{trigger.object.owner.email}}` |
+| **Chủ đề** | `✅ Giao dịch đóng: {{trigger.object.name}}` |
+| **Nội dung** | Chúc mừng! Giao dịch đã được xử lý. Nhóm chăm sóc khách hàng đã được thông báo và onboarding đã bắt đầu. |
+
+### Bước 8: Kiểm tra và kích hoạt
+
+1. Kiểm tra bằng cách chuyển cơ hội thử sang "Closed Won"
+2. Xác minh:
+   - Loại công ty đã thay đổi thành "Khách hàng"
+   - Tác vụ onboarding đã tạo
+   - Nhóm CS đã nhận email
+   - Đại diện bán hàng nhận xác nhận
+3. Kích hoạt khi sẵn sàng
+
+## Xử lý Closed Lost
+
+Tạo workflow tương tự cho giao dịch thua:
+
+### Trigger
+- Bản ghi được cập nhật (Cơ hội, Giai đoạn = "Closed Lost")
+
+### Hành động
+1. **Tạo bản ghi**: Tác vụ "Phân tích giao dịch thua"
+2. **Cập nhật bản ghi**: Thêm lý do thua vào bản ghi công ty
+3. **Gửi email**: Thông báo quản lý về giao dịch thua
+
+## Nâng cao: Onboarding nhiều bước
+
+Đối với onboarding phức tạp, tạo nhiều tác vụ:
+
+```javascript
+export const main = async (params) => {
+  const tasks = [
+    { title: "Cuộc gọi chào mừng", daysFromNow: 1, assignee: "CS" },
+    { title: "Gửi tài liệu onboarding", daysFromNow: 2, assignee: "CS" },
+    { title: "Thiết lập kỹ thuật", daysFromNow: 5, assignee: "Support" },
+    { title: "Kiểm tra 30 ngày", daysFromNow: 30, assignee: "CS" }
+  ];
+
+  return { tasks };
+};
+```
+
+Sử dụng **Iterator** để tạo mỗi tác vụ từ mảng.
+
+## Ý tưởng tùy chỉnh
+
+### Giữ công cụ khác cập nhật
+- Tạo khách hàng trong hệ thống thanh toán bằng **HTTP Request**
+
+### Hành động có điều kiện
+Sử dụng hành động **Bộ lọc** để:
+- Onboarding khác nhau cho doanh nghiệp lớn vs SMB
+- Người được giao khác nhau dựa trên khu vực
+- Bỏ qua thông báo cho giao dịch nhỏ
+
+### Bao gồm chi tiết giao dịch
+Sử dụng hành động **Mã nguồn** để định dạng:
+- Tài liệu tóm tắt giao dịch
+- Ghi chú bàn giao cho nhóm CS
+- Danh sách kiểm tra onboarding tùy chỉnh
+
+## Liên quan
+
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Gửi email từ Workflow](/l/vi/user-guide/workflows/capabilities/send-emails-from-workflows)

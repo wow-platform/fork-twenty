@@ -1,0 +1,168 @@
+---
+title: Thiết lập Trigger Webhook
+description: Nhận dữ liệu từ dịch vụ bên ngoài để kích hoạt workflow.
+image: /images/user-guide/workflows/workflow.png
+---
+
+Trigger webhook cho phép dịch vụ bên ngoài khởi động workflow bằng cách gửi dữ liệu đến URL duy nhất. Sử dụng chúng để kết nối biểu mẫu, ứng dụng bên thứ ba và tích hợp tùy chỉnh.
+
+## Khi nào sử dụng Webhook
+
+| Trường hợp sử dụng | Ví dụ |
+|----------|---------|
+| **Biểu mẫu web** | Bài gửi biểu mẫu liên hệ tạo lead |
+| **Ứng dụng bên thứ ba** | Thanh toán Stripe → tạo bản ghi khách hàng |
+| **Tích hợp tùy chỉnh** | Ứng dụng của bạn → tự động hóa Twenty |
+| **Công cụ no-code** | Kết nối Zapier, Make, n8n |
+
+## Thiết lập từng bước
+
+### Bước 1: Tạo Workflow
+
+1. Vào **Cài đặt → Workflow**
+2. Nhấp **+ Workflow mới**
+3. Đặt tên (ví dụ: "Bài gửi biểu mẫu Website")
+
+### Bước 2: Cấu hình Trigger Webhook
+
+1. Nhấp vào khối trigger
+2. Chọn **Webhook**
+3. Bạn sẽ nhận URL webhook duy nhất như:
+   ```
+   https://api.twenty.com/webhooks/workflow/abc123...
+   ```
+4. Sao chép URL này — bạn sẽ cần cho dịch vụ bên ngoài
+
+### Bước 3: Xác định cấu trúc dữ liệu mong đợi
+
+Đối với yêu cầu **POST**, xác định cấu trúc body mong đợi:
+
+1. Nhấp **Xác định body mong đợi**
+2. Nhập JSON mẫu khớp với dịch vụ sẽ gửi:
+
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@example.com",
+  "company": "Acme Inc",
+  "message": "Interested in your product"
+}
+```
+
+3. Nhấp **Lưu** — tạo biến bạn có thể sử dụng trong các bước tiếp theo
+
+### Bước 4: Thêm hành động
+
+Thêm hành động sử dụng dữ liệu webhook:
+
+**Ví dụ: Tạo bản ghi Người**
+
+1. Thêm hành động **Tạo bản ghi**
+2. Chọn đối tượng **Người**
+3. Ánh xạ trường:
+
+| Trường | Giá trị |
+|-------|-------|
+| Tên | `{{trigger.body.firstName}}` |
+| Họ | `{{trigger.body.lastName}}` |
+| Email | `{{trigger.body.email}}` |
+| Công ty | Tìm kiếm hoặc tạo dựa trên `{{trigger.body.company}}` |
+
+### Bước 5: Kiểm tra Webhook
+
+Trước khi kích hoạt, kiểm tra webhook:
+
+**Sử dụng cURL**:
+```bash
+curl -X POST https://api.twenty.com/webhooks/workflow/abc123... \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Test","lastName":"User","email":"test@example.com"}'
+```
+
+**Sử dụng Postman hoặc tương tự**:
+1. Tạo yêu cầu POST đến URL webhook
+2. Đặt header Content-Type là `application/json`
+3. Thêm JSON body thử
+4. Gửi và kiểm tra lần chạy workflow
+
+### Bước 6: Kích hoạt
+
+Sau khi kiểm tra, nhấp **Kích hoạt** để workflow hoạt động.
+
+## Xử lý cấu trúc dữ liệu khác nhau
+
+### Dữ liệu lồng nhau
+
+Nếu webhook gửi dữ liệu lồng nhau:
+```json
+{
+  "contact": {
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "source": "website"
+}
+```
+
+Tham chiếu bằng: `{{trigger.body.contact.email}}`
+
+### Mảng
+
+Nếu dữ liệu bao gồm mảng:
+```json
+{
+  "items": [
+    {"name": "Product A", "qty": 2},
+    {"name": "Product B", "qty": 1}
+  ]
+}
+```
+
+Cách xử lý mảng phụ thuộc trường hợp sử dụng:
+
+**Số mục không xác định → Sử dụng Iterator**
+
+Nếu bạn cần xử lý mỗi mục trong mảng (ví dụ: tạo bản ghi cho mỗi mục), thêm hành động **Mã nguồn** để phân tích mảng, sau đó sử dụng **Iterator**:
+
+```javascript
+export const main = async (params: { items: any }) => {
+  const items = typeof params.items === "string"
+    ? JSON.parse(params.items)
+    : params.items;
+  return { items };
+};
+```
+
+Sau đó sử dụng Iterator để lặp qua: `{{code.items}}`
+
+**Trường biết trước/cụ thể → Trích xuất thành trường có tên**
+
+Nếu mảng chứa trường cụ thể bạn muốn truy cập riêng lẻ (ví dụ: câu trả lời biểu mẫu vị trí 0 luôn là "tên", vị trí 1 luôn là "họ"), thêm hành động **Mã nguồn** để trích xuất:
+
+```javascript
+export const main = async (params: { items: any }) => {
+  const items = typeof params.items === "string"
+    ? JSON.parse(params.items)
+    : params.items;
+
+  return {
+    product: {
+      name: items[0]?.name || "",
+      qty: items[0]?.qty || 0
+    }
+  };
+};
+```
+
+Bây giờ bạn có thể chọn `product.name` và `product.qty` riêng lẻ trong các bước tiếp theo.
+
+<Tip>
+Để biết thêm chi tiết xử lý mảng, xem [Xử lý mảng trong hành động Mã nguồn](/l/vi/user-guide/workflows/how-tos/advanced-configurations/handle-arrays-in-code-actions).
+</Tip>
+
+
+## Liên quan
+
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)

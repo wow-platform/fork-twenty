@@ -1,0 +1,169 @@
+---
+title: Mô hình dữ liệu
+description: Tìm hiểu mô hình dữ liệu là gì và cách thiết kế một mô hình phù hợp với doanh nghiệp của bạn.
+image: /images/user-guide/fields/custom_data_model.png
+---
+
+<Frame>
+  <img src="/images/user-guide/fields/custom_data_model.png" alt="Mô hình dữ liệu" />
+</Frame>
+
+## Mô hình dữ liệu là gì?
+
+Mô hình dữ liệu là cấu trúc xác định cách thông tin được tổ chức trong CRM của bạn. Hãy coi nó như **bản thiết kế** dữ liệu khách hàng — bạn thiết kế một lần, sau đó điền dữ liệu thực tế vào.
+
+## Khái niệm chính
+
+### Đối tượng
+
+**Đối tượng** là các danh mục dữ liệu chính trong CRM. Mỗi đối tượng đại diện cho một loại thứ bạn muốn theo dõi.
+
+Twenty đi kèm với các đối tượng tiêu chuẩn:
+- **People** — cá nhân (liên hệ, khách hàng tiềm năng, đối tác)
+- **Companies** — tổ chức
+- **Opportunities** — giao dịch hoặc bán hàng
+- **Notes** — ghi chú đính kèm trên bản ghi
+- **Tasks** — tác vụ liên kết với bản ghi
+
+Bạn cũng có thể tạo **đối tượng tùy chỉnh** cho bất kỳ thứ gì cụ thể cho doanh nghiệp (ví dụ: Projects, Subscriptions, Events).
+
+### Trường
+
+**Trường** là các thuộc tính mô tả mỗi đối tượng. Chúng lưu trữ thông tin thực tế.
+
+Ví dụ, đối tượng **People** có các trường như:
+- Name
+- Email
+- Phone
+- Job Title
+- Company (mối quan hệ với đối tượng Companies)
+
+Trường có các **loại** khác nhau: text, number, date, select, multi-select, relation và nhiều hơn nữa. Bạn có thể thêm trường tùy chỉnh vào bất kỳ đối tượng nào.
+
+### Bản ghi
+
+**Bản ghi** là các mục nhập riêng lẻ trong một đối tượng — dữ liệu thực tế bạn tạo và quản lý.
+
+Ví dụ:
+- "John Smith" là một **bản ghi** trong đối tượng People
+- "Acme Corp" là một **bản ghi** trong đối tượng Companies
+
+**Ví dụ tương tự:**
+| Khái niệm mô hình dữ liệu | Ví dụ thực tế |
+|-------------------|-------------------|
+| **Đối tượng** | Các phần trong sách (các danh mục) |
+| **Trường** | Các cột trong bảng tính (các thuộc tính) |
+| **Bản ghi** | Các hàng trong bảng tính (các mục nhập thực tế) |
+
+Bạn thiết kế mô hình dữ liệu (đối tượng + trường) một lần, sau đó tạo nhiều bản ghi trong cấu trúc đó.
+
+## Tại sao nên tùy chỉnh mô hình dữ liệu?
+
+Mỗi doanh nghiệp hoạt động khác nhau. Tùy chỉnh mô hình dữ liệu có nghĩa là bạn có thể định hình Twenty xung quanh **quy trình của bạn** thay vì ép quy trình vào một hệ thống cứng nhắc.
+
+Twenty cung cấp sự linh hoạt đầy đủ:
+- Tạo bao nhiêu đối tượng tùy chỉnh tùy ý
+- Thêm trường tùy chỉnh không giới hạn
+- Giá không thay đổi dựa trên tùy chỉnh
+
+## Mẹo thiết kế mô hình dữ liệu
+
+### 1. Bắt đầu với các đối tượng cốt lõi
+
+Xác định các khái niệm chính bạn làm việc. Twenty đã cung cấp sẵn:
+- **People** — liên hệ của bạn
+- **Companies** — tài khoản của bạn
+- **Opportunities** — giao dịch của bạn
+
+Hãy nghĩ xem bạn có thể cần gì thêm:
+- Stripe sẽ cần một đối tượng `Subscriptions`
+- Airbnb sẽ cần một đối tượng `Trips`
+- Một vườn ươm khởi nghiệp sẽ cần một đối tượng `Batches`
+
+### 2. Sử dụng trường cho các biến thể, không phải đối tượng mới
+
+Nếu thứ gì đó chỉ là đặc điểm của một đối tượng hiện có, hãy biến nó thành **trường**.
+
+**Sử dụng trường cho:**
+- Danh mục và nhãn (ví dụ: `Industry` cho Companies)
+- Giá trị trạng thái (ví dụ: `Stage` cho Opportunities)
+- Thuộc tính và đặc tính
+
+### 3. Tạo đối tượng khi nó tồn tại độc lập
+
+Nếu khái niệm có vòng đời, thuộc tính hoặc mối quan hệ riêng, nó xứng đáng có một đối tượng.
+
+**Tạo đối tượng cho:**
+- **Projects** — có thời hạn, chủ sở hữu và tác vụ
+- **Subscriptions** — kết nối công ty, sản phẩm và hóa đơn
+- **Events** — liên quan đến người tham dự và hành động theo dõi
+
+Những thứ này vượt ra ngoài một trường đơn lẻ vì chúng mang dữ liệu và mối quan hệ riêng.
+
+### 4. Tạo đối tượng khi bản ghi không giới hạn
+
+Nếu thứ gì đó có thể được liên kết nhiều lần và bạn không biết bao nhiêu, hãy sử dụng đối tượng.
+
+**Cách tiếp cận tệ:**
+Tạo các trường như `Product 1`, `Product 2`, `Product 3`...
+
+**Cách tiếp cận tốt:**
+Tạo đối tượng `Products` và liên kết với bản ghi. Điều này hỗ trợ một, hai hoặc hàng trăm sản phẩm mà không thay đổi mô hình.
+
+### 5. Giữ đơn giản trước
+
+Bắt đầu với trường. Chuyển sang đối tượng mới chỉ khi bạn cảm thấy giới hạn:
+- Quá nhiều trường trên một đối tượng
+- Các bản ghi lặp lại nên tách riêng
+- Các mối quan hệ không khớp gọn gàng
+
+## Lưu ý đặc biệt về People, Companies và Opportunities
+
+<Warning>
+**Đồng bộ email và lịch chỉ hoạt động với People, Companies và Opportunities.**
+
+Đây là các đối tượng duy nhất mà bạn có thể truy cập email và cuộc họp đã đồng bộ từ hộp thư/lịch. Chúng tôi khuyến nghị sử dụng chúng nhiều nhất có thể.
+</Warning>
+
+**Phương pháp tốt nhất:**
+- Nếu bạn cần phân loại People, hãy sử dụng trường (không phải đối tượng mới)
+- Ví dụ: Sử dụng trường `Person Type` với các giá trị "Prospect" và "Partner" thay vì tạo đối tượng riêng biệt
+- Tạo các **chế độ xem** khác nhau để lọc: một hiển thị đối tác, một hiển thị khách hàng tiềm năng
+
+**Không sao nếu có trường không áp dụng cho mọi bản ghi.** Ví dụ, trường `Referral Link` trên People chỉ áp dụng khi `Person Type = Partner`. Ẩn trường này khỏi chế độ xem nơi nó không liên quan.
+
+## Câu hỏi hướng dẫn lựa chọn
+
+Hãy tự hỏi:
+
+<Check>Đây chỉ là thuộc tính của thứ tôi đã có, hay nó cần thuộc tính riêng?</Check>
+<Check>Tôi có bao giờ cần theo dõi nhiều thứ này trên mỗi bản ghi, mà không biết bao nhiêu không?</Check>
+<Check>Khái niệm này có kết nối với nhiều đối tượng khác nhau, không chỉ một?</Check>
+<Check>Nó sẽ có vòng đời riêng (giai đoạn, ngày bắt đầu/kết thúc)?</Check>
+
+Nếu câu trả lời là "có" cho một hoặc nhiều câu, có lẽ đã đến lúc tạo đối tượng mới.
+
+## Truy cập mô hình dữ liệu
+
+1. Vào **Settings** ở thanh bên trái
+2. Nhấp **Data Model**
+3. Xem tất cả đối tượng (tiêu chuẩn và tùy chỉnh)
+4. Nhấp vào bất kỳ đối tượng nào để xem và chỉnh sửa trường
+
+<Note>
+**Không thấy Data Model trong Settings?**
+
+Quyền truy cập mô hình dữ liệu thường bị hạn chế cho quản trị viên. Liên hệ quản trị viên không gian làm việc nếu bạn cần quyền truy cập.
+</Note>
+
+## Bước tiếp theo
+
+Sau khi đã lên kế hoạch mô hình dữ liệu:
+
+- [Cách tạo đối tượng tùy chỉnh](/l/vi/user-guide/data-model/how-tos/create-custom-objects)
+- [Cách tạo trường tùy chỉnh](/l/vi/user-guide/data-model/how-tos/create-custom-fields)
+- [Cách tạo trường quan hệ](/l/vi/user-guide/data-model/how-tos/create-relation-fields)
+
+## Cần trợ giúp?
+
+Đội ngũ của chúng tôi có thể giúp bạn thiết kế và tạo mô hình dữ liệu bạn cần. Khám phá [Dịch vụ triển khai](/l/vi/user-guide/getting-started/capabilities/implementation-services).

@@ -1,0 +1,40 @@
+---
+title: Image Input
+image: /images/user-guide/objects/objects.png
+---
+<Frame>
+  <img src="/images/user-guide/objects/objects.png" alt="Header" />
+</Frame>
+
+Cho phép người dùng tải lên và xóa hình ảnh.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { ImageInput } from "@/ui/input/components/ImageInput";
+
+export const MyComponent = () => {
+  return <ImageInput/>;
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| picture | string | URL nguồn hình ảnh |
+| onUpload | function | Hàm được gọi khi người dùng tải lên hình ảnh mới. Nhận đối tượng `File` làm tham số |
+| onRemove | function | Hàm được gọi khi người dùng nhấp vào nút xóa |
+| onAbort | function | Hàm được gọi khi người dùng nhấp vào nút hủy trong quá trình tải hình ảnh |
+| isUploading | boolean | Chỉ ra rằng hình ảnh đang được tải lên |
+| errorMessage | string | Thông báo lỗi tùy chọn hiển thị bên dưới ô nhập hình ảnh |
+| disabled | boolean | Nếu `true`, toàn bộ ô nhập bị vô hiệu hóa và các nút không thể nhấp được |
+
+
+
+
+</Tab>
+</Tabs>

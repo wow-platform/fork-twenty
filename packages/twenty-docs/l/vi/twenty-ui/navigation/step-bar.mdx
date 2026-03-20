@@ -1,0 +1,41 @@
+---
+title: Step Bar
+image: /images/user-guide/api/api.png
+---
+<Frame>
+  <img src="/images/user-guide/api/api.png" alt="Header" />
+</Frame>
+
+Hiển thị tiến trình qua một chuỗi các bước được đánh số bằng cách tô sáng bước đang active. Nó render một container với các bước, mỗi bước được đại diện bởi component `Step`.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { StepBar } from "@/ui/navigation/step-bar/components/StepBar";
+
+export const MyComponent = () => {
+  return (
+    <StepBar activeStep={2}>
+      <StepBar.Step>Step 1</StepBar.Step>
+      <StepBar.Step>Step 2</StepBar.Step>
+      <StepBar.Step>Step 3</StepBar.Step>
+    </StepBar>
+  );
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| activeStep | number | Chỉ số của bước hiện đang active. Giá trị này xác định bước nào sẽ được tô sáng trực quan |
+
+
+
+
+</Tab>
+</Tabs>

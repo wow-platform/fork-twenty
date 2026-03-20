@@ -1,0 +1,238 @@
+---
+title: 1 chạm với Docker Compose
+---
+
+
+<Warning>
+Docker container dành cho lưu trữ sản xuất hoặc tự lưu trữ. Để đóng góp, vui lòng kiểm tra [Thiết lập cục bộ](/l/vi/developers/contribute/capabilities/local-setup).
+</Warning>
+
+## Tổng quan
+
+Hướng dẫn này cung cấp chỉ dẫn từng bước để cài đặt và cấu hình ứng dụng Twenty bằng Docker Compose. Mục tiêu là làm cho quá trình đơn giản và ngăn chặn các vấn đề phổ biến có thể làm hỏng thiết lập.
+
+**Quan trọng:** Chỉ chỉnh sửa các cài đặt được đề cập rõ ràng trong hướng dẫn này. Thay đổi các cấu hình khác có thể dẫn đến vấn đề.
+
+Xem [Thiết lập biến môi trường](/l/vi/developers/self-host/capabilities/setup) để biết cấu hình nâng cao. Tất cả biến môi trường phải được khai báo trong file `docker-compose.yml` ở cấp server và/hoặc worker, tùy thuộc vào biến.
+
+## Yêu cầu hệ thống
+
+- RAM: Đảm bảo môi trường có ít nhất 2GB RAM. Thiếu bộ nhớ có thể khiến tiến trình bị crash.
+- Docker & Docker Compose: Đảm bảo cả hai đều được cài đặt và cập nhật.
+
+## Tùy chọn 1: Script một dòng
+
+Cài đặt phiên bản ổn định mới nhất của Twenty với một lệnh duy nhất:
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/twentyhq/twenty/main/packages/twenty-docker/scripts/install.sh)
+```
+
+Để cài đặt phiên bản hoặc nhánh cụ thể:
+```bash
+VERSION=vx.y.z BRANCH=branch-name bash <(curl -sL https://raw.githubusercontent.com/twentyhq/twenty/main/packages/twenty-docker/scripts/install.sh)
+```
+- Thay x.y.z bằng số phiên bản mong muốn.
+- Thay branch-name bằng tên nhánh bạn muốn cài đặt.
+
+## Tùy chọn 2: Các bước thủ công
+Làm theo các bước sau để thiết lập thủ công.
+
+### Bước 1: Thiết lập file môi trường
+
+1. **Tạo file .env**
+
+    Sao chép file môi trường ví dụ sang file .env mới trong thư mục làm việc:
+    ```bash
+    curl -o .env https://raw.githubusercontent.com/twentyhq/twenty/refs/heads/main/packages/twenty-docker/.env.example
+    ```
+
+2. **Tạo token bí mật**
+
+    Chạy lệnh sau để tạo chuỗi ngẫu nhiên duy nhất:
+    ```bash
+    openssl rand -base64 32
+    ```
+    **Quan trọng:** Giữ bí mật giá trị này / không chia sẻ.
+
+3. **Cập nhật `.env`**
+
+    Thay thế giá trị tạm trong file .env bằng token đã tạo:
+
+    ```ini
+    APP_SECRET=first_random_string
+    ```
+
+4. **Đặt mật khẩu Postgres**
+
+    Cập nhật giá trị `PG_DATABASE_PASSWORD` trong file .env với mật khẩu mạnh không có ký tự đặc biệt.
+
+    ```ini
+    PG_DATABASE_PASSWORD=my_strong_password
+    ```
+
+### Bước 2: Lấy file Docker Compose
+
+Tải file `docker-compose.yml` về thư mục làm việc:
+
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/twentyhq/twenty/refs/heads/main/packages/twenty-docker/docker-compose.yml
+```
+
+### Bước 3: Khởi chạy ứng dụng
+
+Khởi động các container Docker:
+```bash
+docker compose up -d
+```
+
+### Bước 4: Truy cập ứng dụng
+
+Nếu bạn lưu trữ twentyCRM trên máy tính, mở trình duyệt và truy cập [http://localhost:3000](http://localhost:3000).
+
+Nếu bạn lưu trữ trên máy chủ, kiểm tra máy chủ đang chạy và mọi thứ ổn với
+```bash
+curl http://localhost:3000
+```
+
+## Cấu hình
+
+### Cung cấp Twenty cho truy cập bên ngoài
+
+Mặc định, Twenty chạy trên `localhost` cổng `3000`. Để truy cập qua tên miền hoặc địa chỉ IP bên ngoài, bạn cần cấu hình `SERVER_URL` trong file `.env`.
+
+#### Hiểu về `SERVER_URL`
+
+- **Giao thức:** Sử dụng `http` hoặc `https` tùy thuộc vào thiết lập.
+    - Sử dụng `http` nếu chưa thiết lập SSL.
+    - Sử dụng `https` nếu đã cấu hình SSL.
+- **Tên miền/IP:** Là tên miền hoặc địa chỉ IP nơi ứng dụng có thể truy cập.
+- **Cổng:** Bao gồm số cổng nếu không sử dụng cổng mặc định (`80` cho `http`, `443` cho `https`).
+
+### Yêu cầu SSL
+
+SSL (HTTPS) cần thiết để một số tính năng trình duyệt hoạt động đúng. Mặc dù các tính năng này có thể hoạt động khi phát triển cục bộ (vì trình duyệt đối xử localhost khác biệt), thiết lập SSL đúng cần thiết khi lưu trữ Twenty trên tên miền thường.
+
+Ví dụ, API clipboard có thể yêu cầu ngữ cảnh bảo mật - một số tính năng như nút sao chép trong ứng dụng có thể không hoạt động khi không bật HTTPS.
+
+Chúng tôi khuyến nghị mạnh mẽ thiết lập Twenty sau reverse proxy với kết thúc SSL để bảo mật và chức năng tối ưu.
+
+#### Cấu hình `SERVER_URL`
+
+1. **Xác định URL truy cập**
+    - **Không có Reverse Proxy (truy cập trực tiếp):**
+
+        Nếu bạn truy cập ứng dụng trực tiếp không qua reverse proxy:
+        ```ini
+        SERVER_URL=http://your-domain-or-ip:3000
+        ```
+
+    - **Với Reverse Proxy (cổng chuẩn):**
+
+        Nếu bạn sử dụng reverse proxy như Nginx hoặc Traefik và đã cấu hình SSL:
+        ```ini
+        SERVER_URL=https://your-domain-or-ip
+        ```
+
+    - **Với Reverse Proxy (cổng tùy chỉnh):**
+
+        Nếu bạn sử dụng cổng không chuẩn:
+        ```ini
+        SERVER_URL=https://your-domain-or-ip:custom-port
+        ````
+
+2. **Cập nhật file `.env`**
+
+    Mở file `.env` và cập nhật `SERVER_URL`:
+
+    ```ini
+    SERVER_URL=http(s)://your-domain-or-ip:your-port
+    ```
+
+    **Ví dụ:**
+    - Truy cập trực tiếp không SSL:
+        ```ini
+        SERVER_URL=http://123.45.67.89:3000
+        ```
+    - Truy cập qua tên miền với SSL:
+        ```ini
+        SERVER_URL=https://mytwentyapp.com
+        ```
+
+3. **Khởi động lại ứng dụng**
+
+    Để thay đổi có hiệu lực, khởi động lại các container Docker:
+    ```bash
+    docker compose down
+    docker compose up -d
+    ```
+
+#### Lưu ý
+
+- **Cấu hình Reverse Proxy:**
+
+    Đảm bảo reverse proxy chuyển tiếp yêu cầu đến cổng nội bộ chính xác (`3000` mặc định). Cấu hình kết thúc SSL và các header cần thiết.
+
+- **Cài đặt Firewall:**
+
+    Mở các cổng cần thiết trong firewall để cho phép truy cập bên ngoài.
+
+- **Nhất quán:**
+
+    `SERVER_URL` phải khớp với cách người dùng truy cập ứng dụng trên trình duyệt.
+
+#### Lưu trữ lâu dài
+
+- **Volume dữ liệu:**
+
+    Cấu hình Docker Compose sử dụng volume để lưu trữ lâu dài dữ liệu cho database và bộ nhớ máy chủ.
+
+- **Môi trường không trạng thái:**
+
+    Nếu triển khai trên môi trường không trạng thái (ví dụ: một số dịch vụ cloud), cấu hình bộ nhớ bên ngoài để lưu trữ dữ liệu lâu dài.
+
+
+## Sao lưu và phục hồi
+
+Sao lưu thường xuyên bảo vệ dữ liệu CRM khỏi mất mát.
+
+### Tạo sao lưu database
+
+```bash
+docker exec twenty-postgres pg_dump -U postgres twenty > backup_$(date +%Y%m%d).sql
+```
+
+### Tự động sao lưu hàng ngày
+
+Thêm vào crontab (`crontab -e`):
+
+```bash
+0 2 * * * docker exec twenty-postgres pg_dump -U postgres twenty > /backups/twenty_$(date +\%Y\%m\%d).sql
+```
+
+### Phục hồi từ sao lưu
+
+1. Dừng ứng dụng:
+```bash
+docker compose stop twenty-server twenty-front
+```
+
+2. Phục hồi database:
+```bash
+docker exec -i twenty-postgres psql -U postgres twenty < backup_20240115.sql
+```
+
+3. Khởi động lại dịch vụ:
+```bash
+docker compose up -d
+```
+
+### Các thực hành sao lưu tốt nhất
+
+- **Kiểm tra phục hồi thường xuyên** -- xác minh sao lưu thực sự hoạt động
+- **Lưu sao lưu ngoài nơi** -- sử dụng cloud storage (S3, GCS, v.v.)
+- **Mã hóa dữ liệu nhạy cảm** -- bảo vệ sao lưu bằng mã hóa
+- **Giữ nhiều bản sao** -- giữ sao lưu hàng ngày, hàng tuần và hàng tháng
+
+## Xử lý sự cố
+
+Nếu gặp bất kỳ vấn đề nào, kiểm tra [Xử lý sự cố](/l/vi/developers/self-host/capabilities/troubleshooting) để tìm giải pháp.

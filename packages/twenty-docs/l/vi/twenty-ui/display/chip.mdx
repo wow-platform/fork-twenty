@@ -1,0 +1,155 @@
+---
+title: Chip
+image: /images/user-guide/github/github-header.png
+---
+<Frame>
+  <img src="/images/user-guide/github/github-header.png" alt="Header" />
+</Frame>
+
+Một phần tử trực quan mà bạn có thể sử dụng như một container có thể nhấp hoặc không thể nhấp với nhãn, các component bên trái và bên phải tùy chọn, cùng nhiều tùy chọn kiểu dáng để hiển thị nhãn và thẻ.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { Chip } from 'twenty-ui/components';
+
+export const MyComponent = () => {
+  return (
+    <Chip
+      size="large"
+      label="Clickable Chip"
+      clickable={true}
+      variant="highlighted"
+      accent="text-primary"
+      leftComponent
+      rightComponent
+      maxWidth="200px"
+      className
+    />
+  );
+};
+
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| linkToEntity | string | Liên kết đến thực thể |
+| entityId | string | Mã định danh duy nhất cho thực thể |
+| name | string | Tên của thực thể |
+| pictureUrl | string | Ảnh của thực thể |
+| avatarType | Avatar Type | Loại avatar bạn muốn hiển thị. Có hai tùy chọn: `rounded` và `squared` |
+| variant | `EntityChipVariant` enum | Biến thể của entity chip bạn muốn hiển thị. Có hai tùy chọn: `regular` và `transparent` |
+| LeftIcon | IconComponent | Một React component đại diện cho biểu tượng. Hiển thị ở bên trái của chip |
+
+
+
+</Tab>
+</Tabs>
+
+## Ví dụ
+
+### Transparent Disabled Chip
+
+```jsx
+import { Chip } from 'twenty-ui/components';
+
+export const MyComponent = () => {
+  return (
+      <Chip
+      size="large"
+      label="Transparent Disabled Chip"
+      clickable={false}
+      variant="rounded"
+      accent="text-secondary"
+      leftComponent
+      rightComponent
+      maxWidth="200px"
+      className
+      />
+  );
+};
+
+```
+
+<br/>
+
+### Disabled Chip với Tooltip
+
+```jsx
+import { Chip } from "twenty-ui/components";
+
+export const MyComponent = () => {
+  return (
+      <Chip
+      size="large"
+      label="Disabled chip that triggers a tooltip when overflowing."
+      clickable={false}
+      variant="regular"
+      accent="text-primary"
+      leftComponent
+      rightComponent
+      maxWidth="200px"
+      className
+      />
+  );
+};
+```
+
+
+
+## Entity Chip
+
+Một phần tử giống Chip để hiển thị thông tin về một thực thể.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { BrowserRouter as Router } from 'react-router-dom';
+import { IconTwentyStar } from 'twenty-ui/display';
+import { Chip } from 'twenty-ui/components';
+
+export const MyComponent = () => {
+  return (
+    <Router>
+      <Chip
+        linkToEntity="/entity-link"
+        entityId="entityTest"
+        name="Entity name"
+        pictureUrl=""
+        avatarType="rounded"
+        variant="regular"
+        LeftIcon={IconTwentyStar}
+      />
+    </Router>
+  );
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| linkToEntity | string | Liên kết đến thực thể |
+| entityId | string | Mã định danh duy nhất cho thực thể |
+| name | string | Tên của thực thể |
+| pictureUrl | string | Ảnh của thực thể |
+| avatarType | Avatar Type | Loại avatar bạn muốn hiển thị. Có hai tùy chọn: `rounded` và `squared` |
+| variant | `EntityChipVariant` enum | Biến thể của entity chip bạn muốn hiển thị. Có hai tùy chọn: `regular` và `transparent` |
+| LeftIcon | IconComponent | Một React component đại diện cho biểu tượng. Hiển thị ở bên trái của chip |
+
+
+
+</Tab>
+</Tabs>

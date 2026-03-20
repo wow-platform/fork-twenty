@@ -1,0 +1,218 @@
+---
+title: Nhập quan hệ giữa các đối tượng qua CSV
+description: Hướng dẫn từng bước đầy đủ để liên kết bản ghi trong quá trình nhập CSV.
+---
+
+## Tổng quan
+
+Hướng dẫn này hướng dẫn bạn nhập quan hệ giữa các đối tượng — ví dụ, liên kết People với Companies, hoặc Opportunities với People.
+
+<Note>**Có thể nhập:** Chỉ quan hệ một-nhiều trỏ đến một loại đối tượng duy nhất. Quan hệ trỏ đến nhiều loại đối tượng (như Notes liên kết với People VÀ Companies) chưa được hỗ trợ nhập.</Note>
+
+## Hiểu quan hệ
+
+### Quan hệ "Một-nhiều" là gì?
+
+Trong quan hệ một-nhiều:
+- **Một** Company có **nhiều** People (nhân viên)
+- **Một** Company có **nhiều** Opportunities
+- **Một** Person có **nhiều** Tasks
+
+Phía "một" là **cha**. Phía "nhiều" là **con**.
+
+### Quan hệ phổ biến trong Twenty
+
+| Quan hệ | Phía "Một" (Cha) | Phía "Nhiều" (Con) |
+|----------|---------------------|---------------------|
+| Companies → People | Company | People |
+| Companies → Opportunities | Company | Opportunities |
+| People → Tasks | Person | Tasks |
+| People → Notes | Person | Notes |
+
+## Bước 1: Xác định phía "Một" và "Nhiều"
+
+Trước khi nhập, xác định đối tượng nào là cha và đối tượng nào là con.
+
+**Hãy tự hỏi:** "MỘT [Đối tượng A] có NHIỀU [Đối tượng B] không?"
+
+- Một Company → Nhiều People ✓ (Company là cha)
+- Một Person → Nhiều Companies ✗ (Sai — một người thuộc về một công ty)
+
+## Bước 2: Nhập bản ghi cha trước
+
+Cha (phía "một") phải tồn tại trong Twenty trước khi bạn có thể tham chiếu.
+
+**Thứ tự nhập:**
+1. **Companies** trước (không phụ thuộc)
+2. **People** sau (liên kết với Companies)
+3. **Opportunities** thứ ba (liên kết với Companies và/hoặc People)
+4. **Tasks/Notes** (liên kết với bất kỳ đối tượng nào trên)
+
+<Warning>
+**Nếu bản ghi cha không tồn tại, nhập sẽ thất bại.**
+
+Luôn xác minh Companies đã được nhập trước khi nhập People có tham chiếu company.
+</Warning>
+
+## Bước 3: Ghi lại định danh duy nhất của cha
+
+Bạn cần tham chiếu bản ghi cha bằng **định danh duy nhất**. Các tùy chọn khả dụng:
+
+| Đối tượng cha | Định danh duy nhất khả dụng |
+|---------------|------------------------------|
+| **Companies** | `id` (UUID), `domain` (khuyến nghị), hoặc bất kỳ trường tùy chỉnh duy nhất |
+| **People** | `id` (UUID), `email`, hoặc bất kỳ trường tùy chỉnh duy nhất |
+| **Workspace Members** | `id` (UUID), `email` (không phải tên) |
+| **Đối tượng tùy chỉnh** | `id` (UUID), hoặc bất kỳ trường đánh dấu duy nhất |
+
+<Note>**Khuyến nghị:** Sử dụng `domain` cho Companies và `email` cho People. Chúng dễ đọc và dễ xác minh trong bảng tính.</Note>
+
+### Tìm định danh
+
+Nếu bạn cần `id`:
+1. Xuất bản ghi cha từ Twenty
+2. Xuất bao gồm cột `id`
+3. Sử dụng các ID này trong tệp bản ghi con
+
+## Bước 4: Xác minh trường quan hệ tồn tại
+
+Trước khi nhập, đảm bảo trường quan hệ tồn tại giữa các đối tượng.
+
+**Để kiểm tra hoặc tạo:**
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng con (ví dụ: People)
+3. Tìm trường quan hệ trỏ đến cha (ví dụ: Company)
+4. Nếu không tồn tại, tạo:
+   - Nhấp **+ Add field**
+   - Chọn loại **Relation**
+   - Chọn đối tượng cha
+
+## Bước 5: Chuẩn bị tệp CSV
+
+Thêm cột vào CSV con tham chiếu cha bằng định danh duy nhất.
+
+### Ví dụ: People liên kết với Companies
+
+**CSV People:**
+```csv
+firstName,lastName,email,jobTitle,companyDomain
+John,Smith,john@acme.com,CEO,https://acme.com
+Jane,Doe,jane@widgets.co,CTO,https://widgets.co
+Bob,Johnson,bob@techstart.io,Developer,https://techstart.io
+```
+
+Cột `companyDomain` tham chiếu domain của Company.
+
+### Yêu cầu định dạng
+
+| Định danh | Định dạng | Ví dụ |
+|------------|--------|---------|
+| Domain | Định dạng URL | `https://acme.com` |
+| Email | Email tiêu chuẩn | `john@acme.com` |
+| ID | UUID | `c776ee49-f608-4a77-8cc8-6fe96ae1e43f` |
+
+<Warning>
+**Định dạng domain quan trọng!**
+
+Sử dụng `https://domain.com` (không chỉ `domain.com`). Điều này khớp với cách Twenty lưu domain Company và ngăn lỗi khớp.
+</Warning>
+
+### Quy tắc quan trọng
+
+1. **Yêu cầu khớp chính xác** — giá trị phải khớp chính xác bản ghi cha
+2. **Chỉ ánh xạ MỘT định danh duy nhất** — đừng bao gồm cả `companyId` VÀ `companyDomain`
+3. **Phân biệt chữ hoa/thường** — `Acme.com` ≠ `acme.com`
+
+## Bước 6: Tải lên và ánh xạ quan hệ
+
+1. Điều hướng đến đối tượng con (ví dụ: People)
+2. Nhấp **⋮** → **Import records**
+3. Tải tệp CSV lên
+4. Trong bước ánh xạ trường:
+   - Tìm cột quan hệ (ví dụ: `companyDomain`)
+   - Ánh xạ với trường quan hệ **Company**
+5. Hoàn thành ánh xạ còn lại
+6. Xem lại lỗi và xác nhận
+
+Twenty sẽ tự động liên kết mỗi bản ghi con với cha phù hợp.
+
+## Bước 7: Xác minh nhập
+
+Sau khi nhập:
+1. Mở vài bản ghi con (ví dụ: People)
+2. Xác minh trường quan hệ hiển thị cha đúng (ví dụ: Company)
+3. Mở bản ghi cha và kiểm tra phần bản ghi liên quan
+
+## Lỗi phổ biến cần tránh
+
+| Lỗi | Vấn đề | Giải pháp |
+|---------|---------|----------|
+| **Thứ tự nhập sai** | Nhập People trước Companies | Luôn nhập cha trước, sau đó con |
+| **Định dạng domain sai** | Sử dụng `acme.com` thay vì `https://acme.com` | Sử dụng định dạng URL đầy đủ với `https://` |
+| **Nhiều trường duy nhất** | Ánh xạ cả `companyId` VÀ `companyDomain` | Chỉ ánh xạ MỘT định danh duy nhất |
+| **Thiếu trường quan hệ** | Trường quan hệ không tồn tại trong mô hình dữ liệu | Tạo trong **Settings → Data Model** trước khi nhập |
+| **Bản ghi không tồn tại** | Bản ghi cha không tồn tại trong Twenty | Nhập bản ghi cha trước, hoặc kiểm tra lỗi chính tả |
+| **Không khớp chữ hoa/thường** | `Acme.com` trong tệp nhưng `acme.com` trong Twenty | Đảm bảo khớp chính xác chữ hoa/thường |
+
+## Liên kết với Workspace Members
+
+Khi liên kết với Workspace Members (nhóm của bạn):
+
+- Sử dụng **địa chỉ email**, không phải tên
+- Ví dụ: `owner@yourcompany.com`, không phải "John Smith"
+
+```csv
+taskName,assignedTo
+Follow up with client,john@yourcompany.com
+Review proposal,jane@yourcompany.com
+```
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Nếu bản ghi cha không có domain hoặc email thì sao?">
+    Bạn có hai tùy chọn:
+    1. Sử dụng `id` Twenty (xuất bản ghi cha để lấy ID)
+    2. Tạo trường tùy chỉnh duy nhất trong mô hình dữ liệu để lưu ID bên ngoài từ hệ thống trước
+  </Accordion>
+
+  <Accordion title="Tôi có thể cập nhật quan hệ trên bản ghi hiện có không?">
+    Có! Bao gồm định danh duy nhất của bản ghi con (ví dụ: `email` cho People) và giá trị quan hệ mới. Nhập sẽ cập nhật quan hệ.
+  </Accordion>
+
+  <Accordion title="Tôi có thể nhập quan hệ nhiều-nhiều không?">
+    Quan hệ nhiều-nhiều chưa được hỗ trợ nhập. Điều này được lên kế hoạch cho H1 2026.
+  </Accordion>
+
+  <Accordion title="Tôi có thể liên kết đến nhiều loại đối tượng (như Notes đến People VÀ Companies) không?">
+    Quan hệ trỏ đến nhiều loại đối tượng chưa được hỗ trợ nhập/xuất. Điều này nằm trong lộ trình phát triển.
+  </Accordion>
+
+  <Accordion title="Điều gì xảy ra nếu bản ghi cha không tồn tại?">
+    Nhập sẽ hiển thị lỗi cho hàng đó. Bạn có thể:
+    - Nhập bản ghi cha trước, sau đó nhập lại
+    - Sửa giá trị tham chiếu
+    - Xóa hàng khỏi nhập
+  </Accordion>
+
+  <Accordion title="Tại sao quan hệ không liên kết đúng?">
+    Nguyên nhân phổ biến:
+    - Định dạng sai (sử dụng `https://domain.com` cho domain)
+    - Không khớp chữ hoa/thường (kiểm tra chính tả chính xác)
+    - Cha không tồn tại (nhập cha trước)
+    - Ánh xạ nhiều định danh (chỉ sử dụng một)
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+**Nhớ: Bản ghi xóa mềm được tính vào tính duy nhất.**
+
+Nếu bạn gặp lỗi "not found" nhưng bản ghi có vẻ tồn tại, kiểm tra Command Menu → See deleted records. Cha có thể đã bị xóa mềm.
+</Warning>
+
+## Xử lý sự cố
+
+Gặp vấn đề? Kiểm tra:
+- [Cách sửa lỗi nhập](/l/vi/user-guide/data-migration/how-tos/fix-import-errors)
+- [Khả năng nhập quan hệ](/l/vi/user-guide/data-migration/capabilities/import-relations)
+- [Ràng buộc tính duy nhất](/l/vi/user-guide/data-migration/capabilities/uniqueness-constraints)

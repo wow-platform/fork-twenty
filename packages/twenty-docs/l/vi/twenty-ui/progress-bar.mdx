@@ -1,0 +1,83 @@
+---
+title: Feedback
+image: /images/user-guide/emails/emails_header.png
+---
+<Frame>
+  <img src="/images/user-guide/emails/emails_header.png" alt="Header" />
+</Frame>
+
+Hiển thị tiến trình hoặc đếm ngược và di chuyển từ phải sang trái.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { ProgressBar } from "twenty-ui/feedback";
+
+export const MyComponent = () => {
+  return (
+    <ProgressBar
+      duration={6000}
+      delay={0}
+      easing="easeInOut"
+      barHeight={10}
+      barColor="#4bb543"
+      autoStart={true}
+    />
+  );
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả | Mặc định |
+|-------|------|-------|----------|
+| duration | number | Tổng thời gian hoạt ảnh của thanh tiến trình tính bằng mili giây | 3 |
+| delay | number | Độ trễ trước khi bắt đầu hoạt ảnh thanh tiến trình tính bằng mili giây | 0 |
+| easing | string | Hàm easing cho hoạt ảnh thanh tiến trình | easeInOut |
+| barHeight | number | Chiều cao của thanh tính bằng pixel | 24 |
+| barColor | string | Màu của thanh | gray80 |
+| autoStart | boolean | Nếu `true`, hoạt ảnh thanh tiến trình sẽ tự động bắt đầu khi component được mount | `true` |
+
+
+
+</Tab>
+</Tabs>
+
+
+## Circular Progress Bar
+
+Hiển thị tiến trình của một tác vụ, thường được sử dụng trong màn hình tải hoặc các khu vực mà bạn muốn thông báo các quá trình đang diễn ra cho người dùng.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { CircularProgressBar } from "@/ui/feedback/progress-bar/components/CircularProgressBar";
+
+export const MyComponent = () => {
+  return <CircularProgressBar size={80} barWidth={6} barColor="green" />;
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả | Mặc định |
+|-------|------|-------|----------|
+| size | number | Kích thước của thanh tiến trình tròn | 50 |
+| barWidth | number | Độ rộng của đường thanh tiến trình | 5 |
+| barColor | string | Màu của thanh tiến trình | currentColor |
+
+
+
+</Tab>
+
+</Tabs>

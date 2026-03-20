@@ -1,0 +1,73 @@
+---
+title: Credit Workflow
+description: Hiểu về tiêu thụ và quản lý credit workflow.
+---
+
+Credit workflow cung cấp năng lượng cho tự động hóa trong Twenty. Hiểu cách chúng hoạt động giúp bạn tối ưu chi phí và quản lý ngân sách tự động hóa hiệu quả.
+
+## Phân bổ credit
+
+Credit workflow được phân bổ dựa trên chu kỳ thanh toán, không phải gói dịch vụ:
+
+| Chu kỳ thanh toán | Credit |
+|---------------|---------|
+| **Đăng ký hàng tháng** | 5 triệu credit mỗi tháng |
+| **Đăng ký hàng năm** | 50 triệu credit mỗi năm |
+
+<Note>
+5 triệu credit hàng tháng là rất hào phóng cho tự động hóa tiêu chuẩn. Hầu hết nhóm sẽ không vượt quá giới hạn này với cách sử dụng workflow thông thường. Credit bổ sung chủ yếu cần cho hành động Mã nguồn nâng cao và workflow sử dụng AI.
+</Note>
+
+## Cách tiêu thụ credit hoạt động
+
+Credit được tiêu thụ khi workflow thực thi, không phải khi bạn tạo chúng. Mỗi hành động workflow tiêu thụ credit dựa trên độ phức tạp:
+
+### Tiêu thụ credit theo loại hành động
+
+- **Thao tác nội bộ cơ bản**: Tiêu thụ credit rất thấp
+  - Tìm kiếm bản ghi
+  - Tạo bản ghi
+  - Cập nhật bản ghi
+  - Xóa bản ghi
+  - Hành động biểu mẫu
+
+- **Thao tác phức tạp**: Tiêu thụ credit cao hơn
+  - Hành động Mã nguồn (thực thi JavaScript)
+  - HTTP Request đến dịch vụ bên ngoài
+
+
+- **Tính năng AI**: Tiêu thụ credit cao hơn
+  - Hành động AI Agent tiêu thụ credit dựa trên mô hình AI được sử dụng
+  - Prompt phức tạp hơn và đầu ra dài hơn sử dụng nhiều credit hơn
+
+- **Hành động trì hoãn**: Tiêu thụ credit tối thiểu
+  - Nút Trì hoãn tiêu thụ **1 credit** khi thực thi
+  - **Không tiêu thụ credit** trong thời gian chờ
+  - Trì hoãn 5 phút tốn tương đương trì hoãn 5 ngày
+
+### Trừ theo thời gian thực
+
+Credit được trừ theo thời gian thực khi workflow thực thi. Điều này có nghĩa:
+- Workflow nháp không tiêu thụ credit
+- Chỉ workflow đang hoạt động, đang chạy mới sử dụng phân bổ credit
+- Workflow thất bại vẫn tiêu thụ credit cho các bước đã hoàn thành
+
+## Quản lý credit
+
+### Kiểm tra sử dụng credit
+1. Vào **Cài đặt → Thanh toán**
+2. Xem tiêu thụ credit hiện tại và số dư còn lại
+3. Giám sát mẫu sử dụng để tối ưu workflow
+
+### Mua thêm credit
+Nếu bạn cần nhiều credit hơn phân bổ gói:
+1. Vào **Cài đặt → Thanh toán**
+2. Nhấp tùy chọn mua thêm credit. Có các gói kích thước khác nhau.
+3. Credit được thêm vào số dư hiện tại
+
+## Thực hành tốt nhất
+
+- **Xử lý theo lô**: Sử dụng thao tác hàng loạt và hành động Iterator hiệu quả
+- **Tối ưu trigger thủ công**: Đối với trigger thủ công, chọn khả dụng `Hàng loạt` để xử lý nhiều bản ghi trong một lần chạy workflow
+- Tối ưu hành động Mã nguồn cho hiệu quả
+- Gộp thao tác để giảm gọi hành động riêng lẻ

@@ -1,0 +1,76 @@
+---
+title: Workflow
+description: Tìm hiểu cách xây dựng tự động hóa trong Twenty.
+image: /images/user-guide/workflows/workflow.png
+---
+
+<Frame>
+  <img src="/images/user-guide/workflows/workflow.png" alt="Workflow" />
+</Frame>
+
+## Tại sao Workflow quan trọng
+
+Twenty được xây dựng để mang lại sự linh hoạt tối đa cho người dùng. Thay vì buộc bạn phải thích nghi quy trình kinh doanh với các tính năng cứng nhắc, có sẵn, workflow cho phép bạn xây dựng các tự động hóa tạo ra CRM phù hợp nhất với các trường hợp sử dụng kinh doanh độc đáo của bạn.
+
+Workflow là tính năng tích hợp trong ứng dụng của Twenty để xây dựng các tự động hóa này. Chúng cung cấp cho bạn các khối xây dựng để tạo chính xác những gì doanh nghiệp bạn cần, khi cần.
+
+## Tôi có thể làm gì với workflow?
+
+Chúng tôi khuyến nghị xây dựng tự động hóa cho hai mục đích chính:
+
+1. **Tự động hóa nội bộ để hỗ trợ công việc hàng ngày của nhóm**: Giảm số lượng nhập liệu thủ công và tác vụ lặp đi lặp lại làm chậm nhóm của bạn.
+2. **Đưa dữ liệu vào và ra khỏi Twenty**: Kết nối Twenty qua API call và webhook với cơ sở dữ liệu và các công cụ khác của bạn.
+
+## Xây dựng Workflow đầu tiên
+
+### Bước 1: Tạo Workflow mới
+1. Vào **Workflow** có thể truy cập bên dưới các đối tượng khác
+2. Nhấp **+ Bản ghi mới**
+3. Đặt tên cho workflow
+
+### Bước 2: Thêm Trigger
+Mỗi workflow bắt đầu với một trigger. Chọn từ:
+- **Sự kiện bản ghi**: Khi bản ghi được tạo, cập nhật hoặc xóa
+- **Lịch trình**: Chạy vào thời điểm cụ thể (hàng ngày, hàng tuần, v.v.)
+- **Thủ công**: Được kích hoạt bởi hành động người dùng
+- **Webhook**: Được kích hoạt bởi webhook
+
+<img src="/images/user-guide/workflows/workflow_triggers.png" style={{width:'100%'}}/>
+
+### Bước 3: Thêm hành động
+Sau trigger, thêm một hoặc nhiều hành động:
+- **Tạo bản ghi**: Thêm bản ghi mới vào bất kỳ đối tượng nào
+- **Cập nhật bản ghi**: Sửa đổi dữ liệu bản ghi hiện có
+- **Xóa bản ghi**: Xóa bản ghi khỏi đối tượng
+- **Tìm kiếm bản ghi**: Tìm bản ghi phù hợp với tiêu chí
+- **Upsert bản ghi**: Tạo hoặc cập nhật dựa trên tiêu chí khớp
+- **Iterator**: Lặp qua mảng bản ghi
+- **Bộ lọc**: Kiểm soát bản ghi nào tiếp tục
+- **Trì hoãn**: Chờ trước khi tiếp tục (thời lượng hoặc ngày đã lên lịch)
+- **Gửi email**: Gửi email qua tài khoản đã kết nối
+- **Mã nguồn**: Chạy JavaScript tùy chỉnh
+- **HTTP Request**: Gọi API bên ngoài
+- **Biểu mẫu**: Nhận đầu vào từ người dùng trong giao diện Twenty tại thời điểm thực thi
+- **AI Agent** (Sắp ra mắt): Chạy các tác vụ AI thông minh
+
+<img src="/images/user-guide/workflows/workflow_actions.png" style={{width:'100%'}}/>
+
+
+### Bước 4: Kiểm tra và kích hoạt
+1. Sử dụng nút **Kiểm tra** để chạy workflow với dữ liệu mẫu
+2. Xem lại kết quả để đảm bảo hoạt động như mong đợi
+3. Chuyển workflow sang **Hoạt động** khi sẵn sàng
+
+## Thực hành tốt nhất cho Workflow
+
+- **Chỉnh sửa tên bước**: Đổi tên các bước workflow để mô tả rõ ràng mỗi bước làm gì. Điều này giúp bảo trì và dễ bàn giao cho đồng nghiệp
+- **Tận dụng dữ liệu bước trước**: Bạn có thể sử dụng trường từ bản ghi được trả về bởi bất kỳ bước trước nào trong workflow
+- **Bắt đầu đơn giản**: Bắt đầu với workflow cơ bản và thêm độ phức tạp theo thời gian khi bạn quen thuộc hơn với hệ thống
+- **Lập kế hoạch trước khi xây dựng**: Vạch ra logic workflow trước khi bắt đầu xây dựng để tránh bị mắc kẹt giữa chừng
+
+
+## Bước tiếp theo
+
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Tự động hóa CRM](/l/vi/user-guide/workflows/how-tos/crm-automations/closed-won-automations)

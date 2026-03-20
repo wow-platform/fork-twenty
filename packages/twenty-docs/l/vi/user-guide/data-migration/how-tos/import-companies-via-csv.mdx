@@ -1,0 +1,192 @@
+---
+title: Nhập công ty qua CSV
+description: Hướng dẫn từng bước đầy đủ để nhập công ty vào Twenty.
+---
+
+## Tổng quan
+
+Hướng dẫn này hướng dẫn bạn nhập công ty vào Twenty. **Companies nên được nhập trước** vì People và Opportunities liên kết với Companies.
+
+## Trước khi bắt đầu
+
+### Danh sách kiểm tra tiên quyết
+<Check>
+Tệp ở định dạng CSV, XLSX hoặc XLS
+</Check>
+<Check>
+Tệp có dưới 10.000 bản ghi
+</Check>
+<Check>
+Không có domain trùng lặp trong tệp
+</Check>
+<Check>
+Tất cả trường tùy chỉnh tồn tại trong **Settings → Data Model**
+</Check>
+
+<Note>
+Cần nhập hơn 10.000 công ty? Chia thành nhiều tệp hoặc sử dụng [nhập API](/l/vi/user-guide/data-migration/how-tos/import-data-via-api).
+</Note>
+
+## Bước 1: Chuẩn bị dữ liệu công ty
+
+### Trường bắt buộc và khuyến nghị
+
+| Trường | Bắt buộc? | Định dạng | Ghi chú |
+|-------|-----------|--------|-------|
+| **Name** | Khuyến nghị | Text | Tên hiển thị công ty |
+| **Domain** | Khuyến nghị | `https://domain.com` | Định danh duy nhất |
+| **Address** | Tùy chọn | Nhiều cột | Xem bên dưới |
+| **Employees** | Tùy chọn | Number | Số nhân viên |
+| **Trường tùy chỉnh** | Tùy chọn | Thay đổi | Phải tồn tại trong Data Model |
+
+### Định dạng domain
+
+<Warning>
+**Sử dụng định dạng `https://domain.com` cho domain.**
+
+Điều này khớp với định dạng sử dụng khi Companies được tạo tự động từ đồng bộ email/lịch, ngăn trùng lặp sau này.
+</Warning>
+
+**Cột domain:**
+- **Domain / Domain Label**: `acme.com`
+- **Domain / Domain URL**: `https://acme.com`
+
+### Định dạng địa chỉ
+
+Địa chỉ là trường lồng nhau với nhiều cột:
+```
+Address / Address 1,Address / City,Address / State,Address / Country,Address / Post Code
+123 Main Street,San Francisco,CA,USA,94105
+```
+
+### Cấu trúc CSV mẫu
+
+```csv
+name,Domain / Domain URL,Domain / Domain Label,Address / City,Address / Country,employees
+Acme Corp,https://acme.com,acme.com,San Francisco,USA,250
+Widget Co,https://widgets.co,widgets.co,New York,USA,50
+```
+
+<Note>
+**Mẹo chuyên nghiệp:** Nhấp **Download sample file** trong quá trình nhập để xem tên cột chính xác Twenty mong đợi.
+</Note>
+
+## Bước 2: Truy cập tính năng nhập
+
+**Tùy chọn 1: Từ chế độ xem Companies**
+1. Điều hướng đến **Companies** ở thanh bên trái
+2. Nhấp biểu tượng **⋮** ở phía trên bên phải
+3. Chọn **Import records**
+
+**Tùy chọn 2: Sử dụng Command Menu**
+1. Nhấn `Cmd + K` (Mac) hoặc `Ctrl + K` (Windows)
+2. Gõ "import"
+3. Chọn **Import records**
+4. Chọn **Companies**
+
+## Bước 3: Tải tệp lên
+
+1. Nhấp **Select file**
+2. Chọn tệp CSV, XLSX hoặc XLS
+3. Đợi Twenty phân tích tệp
+
+## Bước 4: Ánh xạ cột
+
+Twenty tự động cố gắng khớp cột với trường. Xem lại và điều chỉnh:
+
+1. **Kiểm tra ánh xạ tự động** — xác minh chúng đúng
+2. **Sửa ánh xạ sai** — nhấp danh sách thả xuống để chọn trường đúng
+3. **Bỏ qua cột** — chọn **Do not map** cho cột bạn không muốn nhập
+
+### Quy tắc ánh xạ quan trọng
+
+- **Domain**: Ánh xạ với **Domain / Domain URL** (không phải Domain Label)
+- **Address**: Ánh xạ mỗi phần với cột cụ thể (City, State, v.v.)
+- **Trường Select**: Giá trị phải khớp tùy chọn hiện có (hoặc bạn sẽ ánh xạ ở bước tiếp theo)
+
+<img src="/images/user-guide/import-export-data/match-columns.png" style={{width:'100%'}}/>
+
+## Bước 5: Ánh xạ giá trị trường Select
+
+Nếu bạn có trường Select hoặc Multi-Select:
+
+1. Twenty hiển thị giá trị của bạn cạnh tùy chọn hiện có
+2. Khớp mỗi giá trị trong tệp với tùy chọn Twenty
+3. Hoặc tạo tùy chọn mới nếu cần
+
+<Note>
+Tùy chọn Select sử dụng **tên API**, không phải nhãn hiển thị. Kiểm tra **Settings → Data Model** → Bật **Advanced mode** để xem tên API.
+</Note>
+
+## Bước 6: Xem lại và sửa lỗi
+
+Trước khi hoàn tất nhập, Twenty xác thực dữ liệu:
+
+1. Nhấp **Next Steps**
+2. Hàng có lỗi được đánh dấu **màu vàng**
+3. **Sửa lỗi trực tiếp** — nhấp ô và chỉnh sửa giá trị
+4. **Xóa hàng có vấn đề** — nhấp X để bỏ qua hàng đó
+
+### Lỗi nhập công ty phổ biến
+
+| Lỗi | Nguyên nhân | Giải pháp |
+|-------|-------|----------|
+| **Domain trùng lặp** | Domain đã tồn tại trong Twenty | Xóa khỏi tệp hoặc cập nhật bản ghi hiện có |
+| **Định dạng domain không hợp lệ** | Định dạng sai | Sử dụng `https://domain.com` |
+| **Thiếu trường bắt buộc** | Trường bắt buộc bị trống | Điền giá trị hoặc xóa hàng |
+
+## Bước 7: Hoàn tất nhập
+
+1. Xem lại tóm tắt nhập
+2. Nhấp **Confirm** để nhập
+3. Đợi nhập hoàn tất
+4. Xác minh bằng cách kiểm tra vài bản ghi
+
+## Sau khi nhập Companies
+
+Bây giờ bạn có thể nhập bản ghi liên kết với Companies:
+
+1. **[Nhập People](/l/vi/user-guide/data-migration/how-tos/import-contacts-via-csv)** — liên kết với Companies bằng domain
+2. **Nhập Opportunities** — liên kết với Companies
+3. **Xác minh nhập** — kiểm tra ngẫu nhiên vài bản ghi để đảm bảo dữ liệu chính xác
+
+## Cập nhật Companies hiện có
+
+Để cập nhật companies thay vì tạo mới:
+
+1. Bao gồm cột `domain` hoặc `id` trong tệp
+2. Twenty khớp bản ghi bằng định danh duy nhất này
+3. Companies hiện có được cập nhật; companies mới được tạo
+
+Xem [Cách cập nhật bản ghi hiện có](/l/vi/user-guide/data-migration/how-tos/update-existing-records-via-import) để biết chi tiết.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Tại sao hai Companies không thể có cùng domain?">
+    Domain là định danh duy nhất trong Twenty. Điều này ngăn công ty trùng lặp và đảm bảo đồng bộ email liên kết email đúng công ty.
+  </Accordion>
+
+  <Accordion title="Nếu tôi có companies không có domain thì sao?">
+    Bạn có thể để domain trống. Tuy nhiên, chúng tôi khuyến nghị thêm domain khi có thể để chất lượng dữ liệu tốt hơn và liên kết email tự động.
+  </Accordion>
+
+  <Accordion title="Tôi có thể nhập companies mà không liên kết People không?">
+    Có! Bạn có thể nhập companies trước, sau đó nhập People và liên kết bằng domain công ty.
+  </Accordion>
+
+  <Accordion title="Điều gì xảy ra nếu tôi nhập domain đã tồn tại?">
+    Nếu bạn bao gồm định danh duy nhất (domain hoặc id) khớp company hiện có, Twenty cập nhật company đó thay vì tạo trùng lặp.
+  </Accordion>
+
+  <Accordion title="Làm thế nào để sửa lỗi 'duplicate domain'?">
+    Xóa trùng lặp khỏi tệp, hoặc bao gồm `id` của company để cập nhật bản ghi hiện có thay thế.
+  </Accordion>
+</AccordionGroup>
+
+## Xử lý sự cố
+
+Gặp vấn đề? Kiểm tra:
+- [Cách sửa lỗi nhập](/l/vi/user-guide/data-migration/how-tos/fix-import-errors)
+- [Tham khảo ánh xạ trường](/l/vi/user-guide/data-migration/capabilities/field-mapping)
+- [Ràng buộc tính duy nhất](/l/vi/user-guide/data-migration/capabilities/uniqueness-constraints)

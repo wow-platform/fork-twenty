@@ -1,0 +1,327 @@
+---
+title: Các thực hành tốt nhất
+---
+
+
+Tài liệu này trình bày các thực hành tốt nhất bạn nên tuân thủ khi làm việc trên frontend.
+
+## Quản lý trạng thái
+
+React và Jotai xử lý quản lý trạng thái trong codebase.
+
+### Sử dụng Jotai atom để lưu trạng thái
+
+Thực hành tốt là tạo nhiều atom cần thiết để lưu trạng thái.
+
+<Warning>
+
+Tốt hơn là sử dụng thêm atom hơn là cố gắng quá ngắn gọn với prop drilling.
+
+</Warning>
+
+```tsx
+import { createAtomState } from '@/ui/utilities/state/jotai/utils/createAtomState';
+import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
+
+export const myAtomState = createAtomState<string>({
+  key: 'myAtomState',
+  defaultValue: 'default value',
+});
+
+export const MyComponent = () => {
+  const [myAtom, setMyAtom] = useAtomState(myAtomState);
+
+  return (
+    <div>
+      <input
+        value={myAtom}
+        onChange={(e) => setMyAtom(e.target.value)}
+      />
+    </div>
+  );
+}
+```
+
+### Không sử dụng `useRef` để lưu trạng thái
+
+Tránh sử dụng `useRef` để lưu trạng thái.
+
+Nếu bạn muốn lưu trạng thái, bạn nên sử dụng `useState` hoặc Jotai atom với `useAtomState`.
+
+Xem [cách quản lý re-render](#managing-re-renders) nếu bạn cảm thấy cần `useRef` để ngăn một số re-render xảy ra.
+
+## Quản lý re-render
+
+Re-render có thể khó quản lý trong React.
+
+Đây là một số quy tắc để tuân theo nhằm tránh re-render không cần thiết.
+
+Lưu ý rằng bạn **luôn** có thể tránh re-render bằng cách hiểu nguyên nhân của chúng.
+
+### Làm việc ở cấp gốc
+
+Tránh re-render trong tính năng mới bây giờ được làm dễ dàng bằng cách loại bỏ chúng ở cấp gốc.
+
+Component sidecar `PageChangeEffect` chứa chỉ một `useEffect` giữ tất cả logic thực thi khi thay đổi trang.
+
+Bằng cách đó bạn biết chỉ có một nơi có thể kích hoạt re-render.
+
+### Luôn suy nghĩ kỹ trước khi thêm `useEffect` vào codebase
+
+Re-render thường do `useEffect` không cần thiết gây ra.
+
+Bạn nên suy nghĩ liệu có cần `useEffect` hay không, hoặc có thể chuyển logic vào hàm xử lý sự kiện.
+
+Bạn thường dễ dàng chuyển logic vào hàm `handleClick` hoặc `handleChange`.
+
+Bạn cũng có thể tìm thấy chúng trong các thư viện như Apollo: `onCompleted`, `onError`, v.v.
+
+### Sử dụng component anh em để trích xuất `useEffect` hoặc logic lấy dữ liệu
+
+Nếu bạn cảm thấy cần thêm `useEffect` vào component gốc, bạn nên xem xét trích xuất nó vào component sidecar.
+
+Bạn có thể áp dụng tương tự cho logic lấy dữ liệu, với Apollo hook.
+
+```tsx
+// ❌ Xấu, sẽ gây re-render ngay cả khi dữ liệu không thay đổi,
+//    vì useEffect cần được đánh giá lại
+export const PageComponent = () => {
+  const [data, setData] = useAtomState(dataState);
+  const [someDependency] = useAtomState(someDependencyState);
+
+  useEffect(() => {
+    if(someDependency !== data) {
+      setData(someDependency);
+    }
+  }, [someDependency]);
+
+  return <div>{data}</div>;
+};
+
+export const App = () => (
+  <PageComponent />
+);
+```
+
+```tsx
+// ✅ Tốt, sẽ không gây re-render nếu dữ liệu không thay đổi,
+//   vì useEffect được đánh giá lại trong component anh em khác
+export const PageComponent = () => {
+  const [data, setData] = useAtomState(dataState);
+
+  return <div>{data}</div>;
+};
+
+export const PageData = () => {
+  const [data, setData] = useAtomState(dataState);
+  const [someDependency] = useAtomState(someDependencyState);
+
+  useEffect(() => {
+    if(someDependency !== data) {
+      setData(someDependency);
+    }
+  }, [someDependency]);
+
+  return <></>;
+};
+
+export const App = () => (
+  <>
+    <PageData />
+    <PageComponent />
+  </>
+);
+```
+
+### Sử dụng atom family state và selector
+
+Atom family state và selector là cách tuyệt vời để tránh re-render.
+
+Chúng hữu ích khi bạn cần lưu danh sách các mục.
+
+### Không nên sử dụng `React.memo(MyComponent)`
+
+Tránh sử dụng `React.memo()` vì nó không giải quyết nguyên nhân của re-render, mà thay vào đó phá vỡ chuỗi re-render, có thể dẫn đến hành vi không mong muốn và làm code khó refactor.
+
+### Giới hạn sử dụng `useCallback` hoặc `useMemo`
+
+Chúng thường không cần thiết và sẽ làm code khó đọc và bảo trì hơn cho mức tăng hiệu năng không đáng kể.
+
+## Console.log
+
+Các lệnh `console.log` có giá trị trong quá trình phát triển, cung cấp thông tin trực tiếp về giá trị biến và luồng code. Nhưng để chúng trong code sản xuất có thể dẫn đến nhiều vấn đề:
+
+1. **Hiệu năng**: Log quá nhiều có thể ảnh hưởng hiệu năng runtime, đặc biệt trên ứng dụng phía client.
+
+2. **Bảo mật**: Log dữ liệu nhạy cảm có thể phơi bài thông tin quan trọng cho bất kỳ ai kiểm tra console trình duyệt.
+
+3. **Sạch sẽ**: Làm đầy console với log có thể che các cảnh báo hoặc lỗi quan trọng mà nhà phát triển hoặc công cụ cần thấy.
+
+4. **Chuyên nghiệp**: Người dùng cuối hoặc khách hàng kiểm tra console và thấy nhiều log có thể nghi ngờ chất lượng code.
+
+Đảm bảo xóa tất cả `console.log` trước khi đẩy code lên sản xuất.
+
+## Đặt tên
+
+### Đặt tên biến
+
+Tên biến nên mô tả chính xác mục đích hoặc chức năng của biến.
+
+#### Vấn đề với tên chung chung
+Tên chung chung trong lập trình không lý tưởng vì chúng thiếu tính cụ thể, dẫn đến sự mơ hồ và giảm khả năng đọc code. Các tên như vậy không truyền đạt mục đích của biến hoặc hàm, khiến nhà phát triển khó hiểu ý định code mà không điều tra sâu hơn.
+
+```tsx
+// ❌ Xấu, sử dụng tên chung không truyền đạt mục đích hoặc nội dung rõ ràng
+const [value, setValue] = useState('');
+```
+
+```tsx
+// ✅ Tốt, sử dụng tên mô tả
+const [email, setEmail] = useState('');
+```
+
+#### Một số từ nên tránh trong tên biến
+
+ - dummy
+
+### Xử lý sự kiện
+
+Tên hàm xử lý sự kiện nên bắt đầu với `handle`, trong khi `on` là tiền tố dùng để đặt tên sự kiện trong props của component.
+
+```tsx
+// ❌ Xấu
+const onEmailChange = (val: string) => {
+  // ...
+};
+```
+
+```tsx
+// ✅ Tốt
+const handleEmailChange = (val: string) => {
+  // ...
+};
+```
+
+## Props tùy chọn
+
+Tránh truyền giá trị mặc định cho prop tùy chọn.
+
+**VÍ DỤ**
+
+Xét component `EmailField` được định nghĩa bên dưới:
+
+```tsx
+type EmailFieldProps = {
+  value: string;
+  disabled?: boolean;
+};
+
+const EmailField = ({ value, disabled = false }: EmailFieldProps) => (
+  <TextInput value={value} disabled={disabled} fullWidth />
+);
+```
+
+**Sử dụng**
+
+```tsx
+// ❌ Xấu, truyền cùng giá trị với giá trị mặc định không thêm giá trị gì
+const Form = () => <EmailField value="username@email.com" disabled={false} />;
+```
+
+```tsx
+// ✅ Tốt, giả định giá trị mặc định
+const Form = () => <EmailField value="username@email.com" />;
+```
+
+## Component làm props
+
+Cố gắng truyền component chưa được khởi tạo làm props, để component con có thể tự quyết định props cần truyền.
+
+Ví dụ phổ biến nhất là component icon:
+
+```tsx
+const SomeParentComponent = () => <MyComponent Icon={MyIcon} />;
+
+// Trong MyComponent
+const MyComponent = ({ MyIcon }: { MyIcon: IconComponent }) => {
+  const theme = useTheme();
+
+  return (
+    <div>
+      <MyIcon size={theme.icon.size.md}>
+    </div>
+  )
+};
+```
+
+Để React hiểu component là component, bạn cần sử dụng PascalCase, để sau đó khởi tạo với `<MyIcon>`
+
+## Prop Drilling: Giữ tối thiểu
+
+Prop drilling trong React là việc truyền biến trạng thái và setter qua nhiều lớp component, ngay cả khi component trung gian không sử dụng chúng. Mặc dù đôi khi cần thiết, prop drilling quá mức có thể dẫn đến:
+
+1. **Giảm khả năng đọc**: Truy vết nơi prop bắt nguồn hoặc được sử dụng có thể trở nên phức tạp trong cấu trúc component lồng sâu.
+
+2. **Thách thức bảo trì**: Thay đổi cấu trúc props của một component có thể yêu cầu điều chỉnh nhiều component, ngay cả khi chúng không trực tiếp sử dụng prop.
+
+3. **Giảm khả năng tái sử dụng Component**: Component nhận nhiều props chỉ để truyền xuống trở nên ít đa năng và khó tái sử dụng trong các ngữ cảnh khác.
+
+Nếu bạn cảm thấy đang sử dụng prop drilling quá mức, xem [thực hành tốt quản lý trạng thái](#state-management).
+
+## Import
+
+Khi import, chọn alias được chỉ định thay vì đường dẫn đầy đủ hoặc tương đối.
+
+**Các Alias**
+
+```js
+{
+  alias: {
+    "~": path.resolve(__dirname, "src"),
+    "@": path.resolve(__dirname, "src/modules"),
+    "@testing": path.resolve(__dirname, "src/testing"),
+  },
+}
+```
+
+**Sử dụng**
+```tsx
+// ❌ Xấu, chỉ định toàn bộ đường dẫn tương đối
+import {
+  CatalogDecorator
+} from '../../../../../testing/decorators/CatalogDecorator';
+import {
+  ComponentDecorator
+} from '../../../../../testing/decorators/ComponentDecorator';
+```
+
+```tsx
+// ✅ Tốt, sử dụng alias được chỉ định
+import { CatalogDecorator } from '~/testing/decorators/CatalogDecorator';
+import { ComponentDecorator } from 'twenty-ui/testing';
+```
+
+## Xác thực Schema
+
+[Zod](https://github.com/colinhacks/zod) là trình xác thực schema cho đối tượng không có kiểu:
+
+```js
+const validationSchema = z
+  .object({
+    exist: z.boolean(),
+    email: z
+      .string()
+      .email('Email must be a valid email'),
+    password: z
+      .string()
+      .regex(PASSWORD_REGEX, 'Password must contain at least 8 characters'),
+  })
+  .required();
+
+type Form = z.infer<typeof validationSchema>;
+```
+
+
+## Thay đổi không tương thích ngược
+
+Luôn thực hiện kiểm thử thủ công kỹ lưỡng trước khi tiến hành để đảm bảo các chỉnh sửa không gây ra sự cố ở nơi khác, vì test chưa được tích hợp rộng rãi.

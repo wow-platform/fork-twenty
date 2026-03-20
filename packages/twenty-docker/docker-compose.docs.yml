@@ -1,0 +1,17 @@
+# Documentation site (Mintlify).
+#
+# Usage:
+#   docker compose -f docker-compose.docs.yml up -d          # start
+#   docker compose -f docker-compose.docs.yml up -d --build  # rebuild & start
+#   docker compose -f docker-compose.docs.yml down            # stop
+
+name: twenty-docs
+
+services:
+  docs:
+    build:
+      context: ../..
+      dockerfile: packages/twenty-docker/twenty-docs/Dockerfile
+    ports:
+      - "${DOCS_PORT:-3900}:3000"
+    restart: unless-stopped

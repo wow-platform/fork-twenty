@@ -1,0 +1,119 @@
+---
+title: Phát hành
+description: Phân phối ứng dụng Twenty của bạn đến marketplace hoặc triển khai nội bộ.
+---
+
+<Warning>
+Ứng dụng hiện đang trong giai đoạn thử nghiệm alpha. Tính năng đã hoạt động nhưng vẫn đang phát triển.
+</Warning>
+
+## Tổng quan
+
+Sau khi ứng dụng của bạn đã [được xây dựng và kiểm thử cục bộ](/l/vi/developers/extend/apps/building), bạn có hai con đường phân phối:
+
+- **Phát hành lên npm** -- đưa ứng dụng vào marketplace Twenty để bất kỳ workspace nào có thể khám phá và cài đặt.
+- **Đẩy tarball** -- triển khai ứng dụng lên máy chủ Twenty cụ thể để sử dụng nội bộ mà không công khai.
+
+## Phát hành lên npm
+
+Phát hành lên npm giúp ứng dụng của bạn có thể khám phá được trên marketplace Twenty. Bất kỳ workspace Twenty nào cũng có thể duyệt, cài đặt và nâng cấp ứng dụng marketplace trực tiếp từ giao diện.
+
+### Yêu cầu
+
+- Tài khoản [npm](https://www.npmjs.com)
+- Tên package của bạn **phải** sử dụng tiền tố `twenty-app-` (ví dụ: `twenty-app-postcard-sender`)
+
+### Các bước
+
+1. **Build ứng dụng** -- CLI biên dịch mã nguồn TypeScript và tạo manifest ứng dụng:
+
+```bash filename="Terminal"
+yarn twenty app:build
+```
+
+2. **Phát hành lên npm** -- đẩy package đã build lên npm registry:
+
+```bash filename="Terminal"
+npx twenty app:publish
+```
+
+### Tự động khám phá
+
+Các package có tiền tố `twenty-app-` được tự động khám phá bởi catalog marketplace Twenty. Sau khi phát hành, ứng dụng của bạn xuất hiện trên marketplace trong vài phút -- không cần đăng ký thủ công hay phê duyệt.
+
+### Phát hành CI
+
+Dự án scaffolded bao gồm workflow GitHub Actions phát hành mỗi khi release. Nó chạy `app:build`, sau đó `npm publish --provenance` từ output build:
+
+```yaml filename=".github/workflows/publish.yml"
+name: Publish
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+      - run: yarn install --immutable
+      - run: npx twenty app:build
+      - run: npm publish --provenance --access public
+        working-directory: .twenty/output
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+Với các hệ thống CI khác (GitLab CI, CircleCI, v.v.), cũng ba lệnh tương tự: `yarn install`, `npx twenty app:build`, sau đó `npm publish` từ `.twenty/output`.
+
+<Tip>
+**npm provenance** là tùy chọn nhưng được khuyến nghị. Phát hành với `--provenance` thêm huy hiệu tin cậy vào trang npm, cho phép người dùng xác minh package được build từ commit cụ thể trong pipeline CI công khai. Xem [tài liệu npm provenance](https://docs.npmjs.com/generating-provenance-statements) để biết cách thiết lập.
+</Tip>
+
+## Phân phối nội bộ
+
+Với các ứng dụng bạn không muốn công khai -- công cụ độc quyền, tích hợp chỉ dành cho doanh nghiệp hoặc bản build thử nghiệm -- bạn có thể đẩy tarball trực tiếp lên máy chủ Twenty.
+
+### Đẩy tarball
+
+Build ứng dụng và triển khai lên máy chủ cụ thể trong một bước:
+
+```bash filename="Terminal"
+npx twenty app:publish --server <server-url>
+```
+
+Bất kỳ workspace nào trên máy chủ đó đều có thể cài đặt và nâng cấp ứng dụng từ trang cài đặt **Applications**.
+
+### Quản lý phiên bản
+
+Để phát hành bản cập nhật:
+
+1. Tăng trường `version` trong `package.json`
+2. Đẩy tarball mới với `npx twenty app:publish --server <server-url>`
+3. Các workspace trên máy chủ đó sẽ thấy bản nâng cấp có sẵn trong cài đặt
+
+<Note>
+Ứng dụng nội bộ chỉ giới hạn trong máy chủ được đẩy lên. Chúng sẽ không xuất hiện trên marketplace công khai và không thể cài đặt bởi workspace trên máy chủ khác.
+</Note>
+
+## Danh mục ứng dụng
+
+Twenty tổ chức ứng dụng thành ba danh mục dựa trên cách phân phối:
+
+| Danh mục | Cách hoạt động | Hiển thị trên marketplace? |
+|----------|-------------|------------------------|
+| **Development** | Ứng dụng chế độ phát triển cục bộ chạy qua `yarn twenty app:dev`. Dùng để xây dựng và kiểm thử. | Không |
+| **Published** | Ứng dụng phát hành lên npm với tiền tố `twenty-app-`. Liệt kê trên marketplace để bất kỳ workspace nào cài đặt. | Có |
+| **Internal** | Ứng dụng triển khai qua tarball lên máy chủ cụ thể. Chỉ có sẵn cho workspace trên máy chủ đó. | Không |
+
+<Tip>
+Bắt đầu với chế độ **Development** khi xây dựng ứng dụng. Khi sẵn sàng, chọn **Published** (npm) để phân phối rộng hoặc **Internal** (tarball) để triển khai riêng tư.
+</Tip>

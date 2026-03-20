@@ -1,0 +1,186 @@
+---
+title: Xuất dữ liệu
+description: Hướng dẫn từng bước đầy đủ để xuất dữ liệu từ Twenty.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+## Tổng quan
+
+Xuất dữ liệu không gian làm việc sang CSV để sao lưu, báo cáo hoặc di chuyển.
+
+**Trường hợp sử dụng:**
+- **Sao lưu thường xuyên** — giữ bản sao dữ liệu
+- **Báo cáo bên ngoài** — phân tích dữ liệu trong Excel, Google Sheets hoặc công cụ BI
+- **Di chuyển** — chuyển dữ liệu sang hệ thống khác
+- **Cập nhật hàng loạt** — xuất, chỉnh sửa và nhập lại để cập nhật bản ghi
+
+## Những điều cần biết
+
+### Giới hạn xuất
+- **Tối đa 20.000 bản ghi** mỗi lần xuất
+- Chỉ xuất **các cột hiển thị**
+- Chỉ xuất **bản ghi đã lọc** (dựa trên chế độ xem hiện tại)
+
+<Note>Với xuất lớn hơn (20.000+ bản ghi), sử dụng bộ lọc để xuất theo lô hoặc sử dụng [API](/l/vi/developers/extend/api).</Note>
+
+### Quyền
+Bạn cần quyền **"Export CSV"** để xuất dữ liệu. Liên hệ quản trị viên không gian làm việc nếu bạn không có tùy chọn này.
+
+## Bước 1: Điều hướng đến đối tượng
+
+Vào đối tượng bạn muốn xuất:
+- **People** — cho liên hệ
+- **Companies** — cho tổ chức
+- **Opportunities** — cho giao dịch
+- **Đối tượng tùy chỉnh** — bất kỳ đối tượng nào bạn đã tạo
+
+## Bước 2: Cấu hình chế độ xem
+
+**Quan trọng:** Xuất chỉ bao gồm những gì hiển thị trong chế độ xem hiện tại.
+
+### Thêm/Xóa cột
+1. Nhấp **Options → Fields** (hoặc **+** ở cuối cột)
+2. Đánh dấu trường bạn muốn xuất
+3. Bỏ đánh dấu trường không cần
+
+### Lọc bản ghi (Tùy chọn)
+Nếu bạn chỉ cần một phần dữ liệu:
+1. Nhấp **Filter**
+2. Thêm điều kiện lọc (ví dụ: "Created date > January 1, 2024")
+3. Chỉ bản ghi khớp sẽ được xuất
+
+### Sắp xếp bản ghi (Tùy chọn)
+1. Nhấp vào tiêu đề cột để sắp xếp
+2. Xuất sẽ theo thứ tự sắp xếp
+
+<Note>**Tạo chế độ xem xuất chuyên dụng.** Lưu chế độ xem được cấu hình riêng cho xuất để không cần cấu hình lại mỗi lần.</Note>
+
+## Bước 3: Xuất dữ liệu
+
+1. Nhấp biểu tượng **⋮** ở phía trên bên phải bảng
+2. Chọn **Export view**
+3. Chọn nơi lưu tệp CSV
+4. Đợi tải xuống hoàn tất
+
+## Nội dung được xuất
+
+| Bao gồm | Không bao gồm |
+|----------|--------------|
+| Tất cả cột hiển thị | Cột bị ẩn |
+| Bản ghi khớp bộ lọc hiện tại | Bản ghi bị lọc ra |
+| Giá trị trường tùy chỉnh | Trường không trong chế độ xem |
+| ID bản ghi | Tệp đính kèm |
+| ID quan hệ | Hình ảnh |
+
+### Trường quan hệ
+ID quan hệ chỉ được xuất ở phía **"nhiều"** của mối quan hệ:
+
+- Xuất **People** bao gồm cột `companyId` (quan hệ People → Company)
+- Xuất **Companies** KHÔNG bao gồm `peopleIds` (Companies ở phía "một")
+
+Điều này có nghĩa bạn có thể sử dụng xuất People để nhập lại và duy trì liên kết Company, nhưng bạn cần nhập lại People sau Companies để tái tạo các mối quan hệ.
+
+## Xuất cho mục đích cụ thể
+
+### Cho sao lưu
+1. Tạo chế độ xem với **tất cả trường** hiển thị
+2. Xóa tất cả bộ lọc để bao gồm tất cả bản ghi
+3. Xuất từng loại đối tượng riêng biệt
+4. Lưu trữ xuất ở vị trí an toàn
+5. Đặt nhắc nhở định kỳ (hàng tuần/hàng tháng)
+
+### Cho báo cáo bên ngoài
+1. Chỉ bao gồm trường cần cho phân tích
+2. Áp dụng bộ lọc để tập trung vào dữ liệu liên quan
+3. Cân nhắc sắp xếp theo trường bạn sẽ phân tích
+
+### Cho cập nhật hàng loạt
+1. Xuất bản ghi bạn muốn cập nhật
+2. Bao gồm định danh duy nhất (`email`, `domain` hoặc `id`)
+3. Chỉnh sửa tệp đã xuất
+4. Nhập lại để cập nhật bản ghi
+Xem: [Cách cập nhật bản ghi hiện có](/l/vi/user-guide/data-migration/how-tos/update-existing-records-via-import)
+
+### Cho di chuyển
+Nếu bạn đang xuất để di chuyển sang hệ thống khác:
+1. **Xuất từng đối tượng riêng biệt** — People, Companies, Opportunities, v.v.
+2. **Bao gồm trường ID** — chúng giúp duy trì mối quan hệ
+3. **Ghi chú ánh xạ trường** — ghi lại cách trường Twenty ánh xạ đến hệ thống đích
+
+## Xử lý tập dữ liệu lớn (20.000+ bản ghi)
+
+Giới hạn xuất là 20.000 bản ghi. Với tập dữ liệu lớn hơn:
+
+### Tùy chọn 1: Xuất theo lô
+1. Thêm bộ lọc (ví dụ: phạm vi "Created date")
+2. Xuất lô đầu tiên
+3. Thay đổi bộ lọc
+4. Xuất lô tiếp theo
+5. Gộp tệp trong bảng tính
+
+**Ví dụ bộ lọc cho lô:**
+- Theo phạm vi ngày (Tháng 1, Tháng 2, Tháng 3...)
+- Theo chủ sở hữu (Thành viên A, Thành viên B...)
+- Theo trạng thái (Hoạt động, Không hoạt động...)
+
+### Tùy chọn 2: Sử dụng API
+API không có giới hạn bản ghi:
+1. Lấy API key từ **Settings → Developers**
+2. Sử dụng GraphQL API để truy vấn bản ghi
+3. Xử lý kết quả trong ứng dụng
+
+Xem: [Tài liệu API](/l/vi/developers/extend/api)
+
+## Mẹo và phương pháp tốt nhất
+
+### Tạo chế độ xem xuất
+Lưu chế độ xem được cấu hình riêng cho xuất:
+1. Cấu hình cột và bộ lọc
+2. Nhấp **View options** → **Save as new view**
+3. Đặt tên "Export - [Mục đích]"
+
+### Bảo mật xuất
+Tệp xuất có thể chứa dữ liệu nhạy cảm:
+- Lưu trữ ở vị trí an toàn
+- Xóa xuất cũ khi không cần nữa
+- Cẩn thận khi chia sẻ tệp xuất
+
+### Kiểm tra trước khi xuất
+<Check>Các cột chính xác đang hiển thị</Check>
+<Check>Bộ lọc được đặt đúng (hoặc đã xóa cho xuất toàn bộ)</Check>
+<Check>Bạn có quyền Export</Check>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Tại sao một số cột bị thiếu trong xuất?">
+    Chỉ cột hiển thị được xuất. Thêm cột bạn cần qua **Options → Fields** trước khi xuất.
+  </Accordion>
+
+  <Accordion title="Tại sao xuất không có tất cả bản ghi?">
+    Kiểm tra bộ lọc. Xuất chỉ bao gồm bản ghi khớp bộ lọc chế độ xem hiện tại. Xóa bộ lọc để xuất tất cả bản ghi.
+  </Accordion>
+
+  <Accordion title="Tôi có thể xuất hơn 20.000 bản ghi không?">
+    Không trong một lần xuất. Sử dụng bộ lọc để xuất theo lô, hoặc sử dụng API cho tập dữ liệu lớn hơn.
+  </Accordion>
+
+  <Accordion title="Định dạng tệp xuất là gì?">
+    CSV (Comma Separated Values). Mở được trong Excel, Google Sheets hoặc bất kỳ ứng dụng bảng tính nào.
+  </Accordion>
+
+  <Accordion title="ID quan hệ có được bao gồm không?">
+    Có, nhưng chỉ ở phía "nhiều" của mối quan hệ. Ví dụ, xuất People bao gồm `companyId`, nhưng xuất Companies không bao gồm ID của people.
+  </Accordion>
+
+  <Accordion title="Tôi có thể tự động hóa xuất không?">
+    Không trực tiếp qua giao diện. Sử dụng API để xây dựng quy trình xuất tự động.
+  </Accordion>
+</AccordionGroup>
+
+## Bước tiếp theo
+
+- [Cách cập nhật bản ghi hiện có](/l/vi/user-guide/data-migration/how-tos/update-existing-records-via-import) — chỉnh sửa và nhập lại xuất
+- [Cách nhập dữ liệu qua API](/l/vi/user-guide/data-migration/how-tos/import-data-via-api) — cho tập dữ liệu lớn
+- [Tài liệu API](/l/vi/developers/extend/api) — xây dựng quy trình xuất tùy chỉnh

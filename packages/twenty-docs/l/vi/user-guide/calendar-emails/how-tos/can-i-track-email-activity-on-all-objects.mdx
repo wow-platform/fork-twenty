@@ -1,0 +1,33 @@
+---
+title: Tôi có thể theo dõi hoạt động email trên tất cả đối tượng không?
+description: Tìm hiểu theo dõi hoạt động email trên các đối tượng khác nhau.
+---
+
+## Đối tượng được hỗ trợ
+
+Hoạt động email hiện khả dụng trên **ba đối tượng tiêu chuẩn**:
+
+| Đối tượng | Bạn thấy gì |
+|--------|--------------|
+| **Người** | Tất cả email trao đổi với liên hệ cụ thể đó |
+| **Công ty** | Tất cả email với bất kỳ ai từ công ty đó (dựa trên tên miền email) |
+| **Cơ hội** | Email liên quan đến công ty được liên kết với cơ hội |
+
+## Tại sao chỉ các đối tượng này?
+
+Người, Công ty và Cơ hội là các đối tượng quan hệ cốt lõi nơi ngữ cảnh email mang lại giá trị cao nhất. Chuỗi email được tự động liên kết dựa trên:
+- **Địa chỉ email** → khớp với bản ghi Người
+- **Tên miền email** → khớp với bản ghi Công ty
+- **Quan hệ Công ty** → liên kết đến Cơ hội
+
+## Đối tượng tùy chỉnh
+
+**Theo dõi email không khả dụng trên đối tượng tùy chỉnh** tại thời điểm này.
+
+Nếu bạn cần ngữ cảnh email trên đối tượng tùy chỉnh, hãy xem xét:
+- Sử dụng trường quan hệ để liên kết đối tượng tùy chỉnh với Người hoặc Công ty
+- Xem lịch sử email trên bản ghi Người/Công ty được liên kết
+
+## Kế hoạch tương lai
+
+Mở rộng hiển thị email đến đối tượng tùy chỉnh đang được xem xét. Chia sẻ trường hợp sử dụng của bạn trên [thảo luận GitHub](https://github.com/twentyhq/twenty/discussions) để giúp ưu tiên tính năng này.

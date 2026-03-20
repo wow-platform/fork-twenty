@@ -1,0 +1,129 @@
+---
+title: Đưa bài gửi Typeform vào Twenty
+description: Xử lý payload webhook của Typeform để tạo lead từ bài gửi biểu mẫu.
+---
+
+Để thiết lập webhook cơ bản, xem [Thiết lập Trigger Webhook](/l/vi/user-guide/workflows/how-tos/connect-to-other-tools/set-up-a-webhook-trigger). Bài viết này đề cập đến cách xử lý cụ thể cần thiết cho cấu trúc payload tùy chỉnh của Typeform.
+
+### Bước 1: Tạo Workflow Webhook
+
+1. Vào **Cài đặt → Workflow**
+2. Nhấp **+ Workflow mới**
+3. Chọn **Webhook** làm trigger
+4. Sao chép URL webhook
+
+### Bước 2: Cấu hình Typeform
+
+1. Trong Typeform, mở biểu mẫu
+2. Vào **Connect → Webhooks**
+3. Dán URL webhook Twenty
+4. Lưu
+
+### Bước 3: Hiểu payload Typeform
+
+Typeform gửi cấu trúc JSON lồng nhau. Đây là ví dụ đơn giản:
+
+```json
+{
+  "event_type": "form_response",
+  "form_response": {
+    "form_id": "abc123",
+    "submitted_at": "2025-01-15T10:30:00Z",
+    "answers": [
+      {
+        "text": "Jane",
+        "type": "text",
+        "field": { "id": "field1", "type": "short_text", "title": "First Name" }
+      },
+      {
+        "text": "Smith",
+        "type": "text",
+        "field": { "id": "field2", "type": "short_text", "title": "Last Name" }
+      },
+      {
+        "text": "Acme Corp",
+        "type": "text",
+        "field": { "id": "field3", "type": "short_text", "title": "Company" }
+      },
+      {
+        "email": "jane@acme.com",
+        "type": "email",
+        "field": { "id": "field4", "type": "email", "title": "Email" }
+      },
+      {
+        "type": "choice",
+        "field": { "id": "field5", "type": "dropdown", "title": "Team Size" },
+        "choice": { "label": "10-50" }
+      }
+    ]
+  }
+}
+```
+
+Lưu ý quan trọng:
+- Dữ liệu biểu mẫu lồng trong `form_response`
+- **Câu trả lời trả về dạng mảng**, không phải trường có tên
+- Mỗi câu trả lời bao gồm loại trường và tiêu đề để tham khảo
+
+### Bước 4: Trích xuất trường từ mảng Answers
+
+Vì `answers` là mảng, bạn chỉ có thể chọn toàn bộ mảng trong các bước tiếp theo — không phải trường riêng lẻ. Thêm hành động **Mã nguồn** để trích xuất trường cần thiết:
+
+```javascript
+export const main = async (params: {
+  answers: any;
+}): Promise<object> => {
+  const { answers } = params;
+
+  // Xử lý đầu vào có thể là chuỗi hoặc mảng
+  const answersFormatted = typeof answers === "string"
+    ? JSON.parse(answers)
+    : answers;
+
+  // Trích xuất trường theo vị trí hoặc tìm theo loại
+  const firstName = answersFormatted[0]?.text || "";
+  const lastName = answersFormatted[1]?.text || "";
+  const company = answersFormatted[2]?.text || "";
+  const email = answersFormatted.find(a => a.type === "email")?.email || "";
+  const teamSize = answersFormatted.find(a => a.type === "choice")?.choice?.label || "";
+
+  return {
+    contact: {
+      firstName,
+      lastName,
+      company,
+      email,
+      teamSize
+    }
+  };
+};
+```
+
+Bây giờ trong các bước tiếp theo, bạn có thể chọn `contact.firstName`, `contact.email`, v.v. từ bộ chọn biến.
+
+<Tip>
+Để biết thêm chi tiết về xử lý mảng trong hành động Mã nguồn, xem [Xử lý mảng trong hành động Mã nguồn](/l/vi/user-guide/workflows/how-tos/advanced-configurations/handle-arrays-in-code-actions).
+</Tip>
+
+### Bước 5: Tạo bản ghi
+
+Thêm hành động **Tạo bản ghi**:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đối tượng** | Người |
+| **Tên** | `{{code.contact.firstName}}` |
+| **Họ** | `{{code.contact.lastName}}` |
+| **Email** | `{{code.contact.email}}` |
+| **Công ty** | Tìm kiếm hoặc tạo dựa trên `{{code.contact.company}}` |
+
+### Bước 6: Kiểm tra và kích hoạt
+
+1. Gửi phản hồi thử trong Typeform
+2. Kiểm tra lần chạy workflow để xác minh dữ liệu được ghi nhận
+3. Kích hoạt workflow
+
+## Liên quan
+
+- [Thiết lập Trigger Webhook](/l/vi/user-guide/workflows/how-tos/connect-to-other-tools/set-up-a-webhook-trigger)
+- [Xử lý mảng trong hành động Mã nguồn](/l/vi/user-guide/workflows/how-tos/advanced-configurations/handle-arrays-in-code-actions)

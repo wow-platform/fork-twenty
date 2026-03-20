@@ -1,0 +1,113 @@
+---
+title: Radio
+image: /images/user-guide/create-workspace/workspace-cover.png
+---
+<Frame>
+  <img src="/images/user-guide/create-workspace/workspace-cover.png" alt="Header" />
+</Frame>
+
+Được sử dụng khi người dùng chỉ có thể chọn một tùy chọn từ một loạt các tùy chọn.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { Radio } from "twenty-ui/display";
+
+export const MyComponent = () => {
+
+  const handleRadioChange = (event) => {
+    console.log("Radio button changed:", event.target.checked);
+  };
+
+  const handleCheckedChange = (checked) => {
+    console.log("Checked state changed:", checked);
+  };
+
+
+  return (
+    <Radio
+      checked={true}
+      value="Option 1"
+      onChange={handleRadioChange}
+      onCheckedChange={handleCheckedChange}
+      size="large"
+      disabled={false}
+      labelPosition="right"
+    />
+  );
+};
+
+```
+
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| style | Thuộc tính `React.CSS` | Các kiểu dáng inline bổ sung cho component |
+| className | string | CSS class tùy chọn để tùy chỉnh thêm kiểu dáng |
+| checked | boolean | Chỉ ra xem radio button có được chọn hay không |
+| value | string | Nhãn hoặc văn bản liên kết với radio button |
+| onChange | function | Hàm được gọi khi radio button được chọn thay đổi |
+| onCheckedChange | function | Hàm được gọi khi trạng thái `checked` của radio button thay đổi |
+| size | string | Kích thước của radio button. Các tùy chọn bao gồm: `large` và `small` |
+| disabled | boolean | Nếu `true`, radio button bị vô hiệu hóa và không thể nhấp được |
+| labelPosition | string | Vị trí của văn bản nhãn so với radio button. Có hai tùy chọn: `left` và `right` |
+
+
+
+
+</Tab>
+</Tabs>
+
+
+## Radio Group
+
+Nhóm các radio button liên quan lại với nhau.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import React, { useState } from "react";
+import { Radio, RadioGroup } from "twenty-ui/display";
+
+export const MyComponent = () => {
+
+  const [selectedValue, setSelectedValue] = useState("Option 1");
+
+  const handleChange = (event) => {
+    setSelectedValue(event.target.value);
+  };
+
+  return (
+    <RadioGroup value={selectedValue} onChange={handleChange}>
+      <Radio value="Option 1" />
+      <Radio value="Option 2" />
+      <Radio value="Option 3" />
+    </RadioGroup>
+  );
+};
+
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| value | string | Giá trị của radio button hiện đang được chọn |
+| onChange | function | Hàm callback được kích hoạt khi radio button thay đổi |
+| onValueChange | function | Hàm callback được kích hoạt khi giá trị được chọn trong nhóm thay đổi |
+| children | `React.ReactNode` | Cho phép bạn truyền các React component (chẳng hạn như Radio) làm children cho Radio Group |
+
+
+
+
+</Tab>
+
+</Tabs>

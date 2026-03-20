@@ -1,0 +1,141 @@
+---
+title: Nhập quan hệ giữa các đối tượng
+description: Nhập mối quan hệ giữa các bản ghi qua CSV.
+---
+
+## Tổng quan
+
+Twenty hỗ trợ nhập quan hệ giữa các đối tượng trong quá trình nhập CSV. Điều này cho phép bạn liên kết các bản ghi (ví dụ: gắn People vào Companies) như một phần của di chuyển dữ liệu.
+
+<Note>**Hiện hỗ trợ nhập**: Quan hệ một-nhiều trỏ đến một loại đối tượng duy nhất ở mỗi phía (ví dụ: People → Companies). Quan hệ trỏ đến nhiều loại đối tượng chưa được hỗ trợ trong nhập/xuất.</Note>
+
+## Cách quan hệ hoạt động trong Twenty
+
+### Một-nhiều / Nhiều-một
+
+Twenty hỗ trợ quan hệ tiêu chuẩn nơi một bản ghi liên kết với nhiều bản ghi khác:
+
+- **Một Company → Nhiều People**: Một công ty có thể có nhiều nhân viên, nhưng mỗi người thuộc về một công ty
+- **Một Company → Nhiều Opportunities**: Một công ty có thể có nhiều giao dịch, nhưng mỗi cơ hội thuộc về một công ty
+
+### Quan hệ có thể trỏ đến nhiều loại đối tượng
+
+Một số quan hệ có thể kết nối đến các loại đối tượng khác nhau. Điều này hoạt động theo hai cách:
+
+**Mẫu 1: Nhiều bản ghi liên kết đến mỗi một bản ghi từ các loại đối tượng khác nhau**
+
+Nhiều Notes, Tasks hoặc Activities có thể được đính kèm vào nhiều loại đối tượng cùng lúc:
+- **Notes** có thể liên kết đến một Person, một Company và một Opportunity cùng lúc
+- **Tasks** có thể liên kết đến một Person, một Company và một Opportunity cùng lúc
+
+Ở đây, Notes/Tasks ở phía "nhiều". Mỗi cái liên kết đến một bản ghi cho mỗi loại đối tượng.
+<img src="/images/user-guide/fields/many-to-one-morph.png" style={{width:'100%'}}/>
+
+
+**Mẫu 2: Một bản ghi nhận liên kết từ nhiều bản ghi của các loại đối tượng khác nhau**
+
+Một Project có thể nhận liên kết từ nhiều bản ghi qua các loại đối tượng khác nhau:
+- **Một Project** có thể có nhiều People liên kết, nhiều Companies liên kết và nhiều Notes đính kèm
+
+Ở đây, Project ở phía "một". Nhiều bản ghi từ các đối tượng khác nhau đều có thể liên kết đến cùng Project.
+<img src="/images/user-guide/fields/one-to-many-morph.png" style={{width:'100%'}}/>
+
+<Warning>
+**Giới hạn nhập/xuất**: Quan hệ trỏ đến nhiều loại đối tượng (như Notes → People/Companies/Opportunities) **chưa được hỗ trợ** trong nhập hoặc xuất CSV.
+
+- **Nhập**: Chỉ quan hệ một-nhiều trỏ đến một loại đối tượng duy nhất ở mỗi phía có thể được nhập
+- **Xuất**: Cột cho quan hệ trỏ đến nhiều loại đối tượng hiện để trống
+
+Điều này nằm trong lộ trình phát triển.
+</Warning>
+
+
+### Chưa được hỗ trợ hiện tại
+
+**Quan hệ nhiều-nhiều** chưa khả dụng. Ví dụ, bạn hiện không thể tạo quan hệ nơi:
+- Nhiều People liên kết với nhiều Projects
+
+<Note>Quan hệ nhiều-nhiều được lên kế hoạch cho H1 2026.</Note>
+
+## Liên kết bản ghi trong quá trình nhập
+
+<Note>**Nhắc nhở**: Chỉ quan hệ một-nhiều trỏ đến một loại đối tượng duy nhất có thể được nhập (ví dụ: People → Companies). Quan hệ trỏ đến nhiều loại đối tượng (ví dụ: Notes → People/Companies/Opportunities) chưa được hỗ trợ.</Note>
+
+### Bước 1: Xác định phía "Một" và "Nhiều"
+
+Đầu tiên, xác định đối tượng nào ở phía "một" và đối tượng nào ở phía "nhiều" của mối quan hệ.
+
+**Ví dụ**:
+- **Company** ở phía "một" (một công ty có nhiều nhân viên)
+- **People** ở phía "nhiều" (mỗi người thuộc một công ty)
+
+### Bước 2: Đảm bảo bản ghi phía "Một" tồn tại
+
+Trước khi nhập phía "nhiều", bản ghi phía "một" phải đã tồn tại trong Twenty.
+
+- Nhập hoặc tạo bản ghi phía "một" trước (ví dụ: Companies)
+- Xác thực định danh duy nhất. Có thể là:
+  - `id` (UUID của Twenty)
+  - Trường được đặt là duy nhất (ví dụ: `domain` cho Companies, hoặc ID bên ngoài từ hệ thống trước)
+
+<Warning>Nhập sẽ thất bại nếu tham chiếu đến bản ghi không tồn tại.</Warning>
+
+### Bước 3: Chuẩn bị tệp CSV
+
+Thêm một cột trong tệp CSV phía "nhiều" tham chiếu đến bản ghi phía "một".
+
+**Ví dụ**: Cho tệp CSV People liên kết với Companies:
+```
+firstName,lastName,email,companyDomain
+John,Smith,john@acme.com,https://acme.com
+Jane,Doe,jane@widgets.co,https://widgets.co
+```
+
+**Quan trọng**:
+- Giá trị phải **khớp chính xác** với trường duy nhất trên bản ghi Company
+- Cho tên miền, sử dụng **Domain URL** (ví dụ: `https://acme.com`), không phải Domain Label
+- Chỉ ánh xạ **một** định danh duy nhất cho mỗi quan hệ: điều này giúp nhập mượt mà hơn
+
+### Bước 4: Đảm bảo trường quan hệ tồn tại
+
+Trước khi tải tệp lên, đảm bảo trường quan hệ tồn tại giữa các đối tượng.
+
+Nếu không tồn tại:
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng (ví dụ: People)
+3. Tạo trường quan hệ trỏ đến đối tượng đích (ví dụ: Company)
+
+### Bước 5: Tải lên và ánh xạ quan hệ
+
+1. Tải tệp CSV qua giao diện nhập
+2. Trong bước ánh xạ trường, tìm cột quan hệ (ví dụ: `companyDomain`)
+3. Ánh xạ với trường quan hệ (ví dụ: Company)
+4. Twenty sẽ tự động liên kết mỗi bản ghi với bản ghi cha phù hợp
+
+### Trường duy nhất khả dụng cho quan hệ
+
+| Đối tượng | Trường duy nhất khả dụng |
+|--------|------------------------|
+| **Companies** | `id`, `domain`, bất kỳ trường tùy chỉnh duy nhất nào |
+| **People** | `id`, `email`, bất kỳ trường tùy chỉnh duy nhất nào |
+| **Workspace Members** | `id`, `email` (không phải tên) |
+| **Đối tượng tiêu chuẩn và tùy chỉnh khác** | `id`, bất kỳ trường nào đánh dấu duy nhất |
+
+<Note>**Liên kết đến Workspace Members**: Khi quan hệ trỏ đến Workspace Members (nhóm đăng nhập Twenty), tham chiếu bằng **địa chỉ email**, không phải tên.</Note>
+
+<Note>Chúng tôi khuyến nghị sử dụng `domain` cho Companies và `email` cho People, vì chúng dễ đọc và dễ duy trì trong bảng tính.</Note>
+
+<Note>**Nhắc nhở**: Bản ghi xóa mềm (có thể thấy tại Command Menu → See deleted records) được tính vào tiêu chí tính duy nhất. Nếu bạn nhập bản ghi có cùng giá trị duy nhất với bản ghi đã xóa, bản ghi đã xóa sẽ được khôi phục. Xem [Ràng buộc tính duy nhất](/l/vi/user-guide/data-migration/capabilities/uniqueness-constraints) để biết thêm chi tiết.</Note>
+
+## Quy tắc thứ tự nhập
+
+<Warning>
+**Luôn nhập phía "một" trước!**
+
+1. **Companies** trước (không phụ thuộc)
+2. **People** sau (liên kết với Companies)
+3. **Opportunities** thứ ba (liên kết với Companies/People)
+4. **Đối tượng tùy chỉnh** theo thứ tự phụ thuộc
+
+Bản ghi cha phải tồn tại trước khi bạn có thể tham chiếu đến nó.
+</Warning>

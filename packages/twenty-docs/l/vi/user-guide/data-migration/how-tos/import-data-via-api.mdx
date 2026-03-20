@@ -1,0 +1,168 @@
+---
+title: Nhập dữ liệu qua API
+description: Khi nào và cách sử dụng API của Twenty cho nhập dữ liệu quy mô lớn.
+---
+
+## Tổng quan
+
+Twenty cung cấp cả **GraphQL** và **REST API** để nhập dữ liệu theo lập trình. Sử dụng API khi nhập CSV không phù hợp cho khối lượng dữ liệu của bạn hoặc khi bạn cần nhập tự động, định kỳ.
+
+## Khi nào sử dụng nhập API
+
+| Kịch bản | Phương thức khuyến nghị |
+|----------|-------------------|
+| Dưới 10.000 bản ghi | Nhập CSV |
+| 10.000 - 50.000 bản ghi | Nhập CSV (chia thành tệp) |
+| **50.000+ bản ghi** | **Nhập API** |
+| Di chuyển một lần | Tùy (dựa trên khối lượng) |
+| **Nhập định kỳ** | **Nhập API** |
+| **Đồng bộ thời gian thực** | **Nhập API** |
+| **Tích hợp với hệ thống khác** | **Nhập API** |
+
+<Note>Với tập dữ liệu hàng trăm nghìn, API nhanh hơn và đáng tin cậy hơn đáng kể so với nhập CSV nhiều lần.</Note>
+
+## Giới hạn tốc độ API
+
+Twenty thực thi giới hạn tốc độ để đảm bảo ổn định hệ thống:
+
+| Giới hạn | Giá trị |
+|-------|-------|
+| **Yêu cầu mỗi phút** | 100 |
+| **Bản ghi mỗi lần gọi batch** | 60 |
+| **Thông lượng tối đa** | ~6.000 bản ghi/phút |
+
+<Warning>
+**Lên kế hoạch nhập quanh các giới hạn này.**
+
+Cho 100.000 bản ghi ở thông lượng tối đa, dự kiến khoảng 17 phút thời gian nhập. Thêm thời gian đệm cho xử lý lỗi và thử lại.
+</Warning>
+
+## Bắt đầu
+
+### Bước 1: Lấy API Key
+
+1. Vào **Settings → Developers**
+2. Nhấp **+ Create API key**
+3. Đặt tên mô tả cho key
+4. Sao chép API key ngay lập tức (nó sẽ không được hiển thị lại)
+5. Lưu trữ an toàn
+
+<Warning>
+**Giữ bí mật API key.**
+
+Bất kỳ ai có API key của bạn đều có thể truy cập và sửa đổi dữ liệu không gian làm việc. Không bao giờ commit vào kho mã nguồn hoặc chia sẻ công khai.
+</Warning>
+
+### Bước 2: Chọn API
+
+Twenty hỗ trợ hai loại API:
+
+| API | Phù hợp cho | Tài liệu |
+|-----|----------|---------------|
+| **GraphQL** | Truy vấn linh hoạt, lấy dữ liệu liên quan, thao tác phức tạp | [Tài liệu API](/l/vi/developers/extend/api) |
+| **REST** | Thao tác CRUD đơn giản, mẫu REST quen thuộc | [Tài liệu API](/l/vi/developers/extend/api) |
+
+Cả hai API đều hỗ trợ:
+- Tạo, đọc, cập nhật và xóa bản ghi
+- **Thao tác batch** — tạo hoặc cập nhật đến 60 bản ghi mỗi lần gọi
+
+**Cho nhập, sử dụng thao tác batch** để tối đa hóa thông lượng trong giới hạn tốc độ.
+
+### Bước 3: Lên kế hoạch thứ tự nhập
+
+Giống như nhập CSV, **thứ tự quan trọng** cho quan hệ:
+
+1. **Companies** trước (không phụ thuộc)
+2. **People** sau (có thể liên kết với Companies)
+3. **Opportunities** thứ ba (có thể liên kết với Companies và People)
+4. **Tasks/Notes** (có thể liên kết với tất cả trên)
+5. **Đối tượng tùy chỉnh** (theo thứ tự phụ thuộc)
+
+## Phương pháp tốt nhất
+
+### Gom nhóm yêu cầu
+- Đừng gửi bản ghi từng cái một
+- Gom đến **60 bản ghi mỗi lần gọi API**
+- Điều này tối đa hóa thông lượng trong giới hạn tốc độ
+
+### Xử lý giới hạn tốc độ
+- Triển khai độ trễ giữa các yêu cầu (tối thiểu 600ms cho nhập liên tục)
+- Sử dụng exponential backoff khi gặp giới hạn
+- Theo dõi phản hồi 429 (Too Many Requests)
+
+### Xác thực dữ liệu trước
+- Dọn dẹp và xác thực dữ liệu trước khi nhập
+- Kiểm tra trường bắt buộc đã được điền
+- Xác minh định dạng khớp yêu cầu Twenty (xem [Ánh xạ trường](/l/vi/user-guide/data-migration/capabilities/field-mapping))
+
+### Ghi log mọi thứ
+- Ghi log mọi bản ghi đã nhập (bao gồm ID)
+- Ghi log lỗi với đầy đủ ngữ cảnh
+- Điều này giúp debug vấn đề và xác minh hoàn thành
+
+### Kiểm tra trước
+- Kiểm tra với lô nhỏ (10-20 bản ghi)
+- Xác minh dữ liệu hiển thị đúng trong Twenty
+- Sau đó chạy nhập đầy đủ
+
+### Upsert để tránh trùng lặp
+API GraphQL hỗ trợ **batch upsert** — cập nhật nếu bản ghi tồn tại, tạo nếu không. Điều này ngăn trùng lặp khi chạy lại nhập.
+
+## Tìm tên đối tượng và trường
+
+Để xem đối tượng và trường khả dụng:
+
+1. Vào **Settings → API and Webhooks**
+2. Duyệt **Metadata API**
+3. Xem tất cả đối tượng tiêu chuẩn và tùy chỉnh với trường của chúng
+
+Tài liệu hiển thị tất cả đối tượng tiêu chuẩn và tùy chỉnh, trường của chúng và kiểu dữ liệu mong đợi.
+
+## Dịch vụ chuyên nghiệp
+
+Cho di chuyển API phức tạp, đối tác của chúng tôi có thể giúp:
+
+| Dịch vụ | Bao gồm |
+|---------|-----------------|
+| **Thiết kế mô hình dữ liệu** | thiết kế cấu trúc dữ liệu tối ưu |
+| **Script di chuyển** | viết và chạy script nhập |
+| **Chuyển đổi dữ liệu** | xử lý ánh xạ phức tạp và dọn dẹp |
+| **Xác thực & QA** | xác minh di chuyển hoàn chỉnh |
+
+**Phù hợp nhất cho:**
+- Di chuyển 100.000+ bản ghi
+- Chuyển đổi dữ liệu phức tạp
+- Thời hạn gấp
+- Nhóm không có tài nguyên phát triển
+
+Liên hệ chúng tôi tại [contact@twenty.com](mailto:contact@twenty.com) hoặc khám phá [Dịch vụ triển khai](/l/vi/user-guide/getting-started/capabilities/implementation-services).
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Sự khác biệt giữa GraphQL và REST là gì?">
+    GraphQL cho phép bạn yêu cầu chính xác dữ liệu cần trong một truy vấn và tốt hơn cho thao tác phức tạp. REST sử dụng phương thức HTTP tiêu chuẩn (GET, POST, PUT, DELETE) và có thể quen thuộc hơn nếu bạn đã làm việc với API truyền thống.
+  </Accordion>
+
+  <Accordion title="Tôi có thể cập nhật bản ghi hiện có qua API không?">
+    Có! Sử dụng update mutations (GraphQL) hoặc yêu cầu PUT/PATCH (REST) với `id` của bản ghi.
+  </Accordion>
+
+  <Accordion title="Làm thế nào để xử lý trùng lặp?">
+    Truy vấn bản ghi hiện có trước bằng định danh duy nhất (email, domain). Cập nhật nếu tồn tại, tạo nếu không.
+  </Accordion>
+
+  <Accordion title="Tôi có thể xóa bản ghi qua API không?">
+    Có, sử dụng delete mutations (GraphQL) hoặc yêu cầu DELETE (REST).
+  </Accordion>
+
+  <Accordion title="Có SDK Python hoặc Node.js không?">
+    Hiện chưa có, nhưng cả hai API đều hoạt động với bất kỳ HTTP client nào trong bất kỳ ngôn ngữ nào.
+  </Accordion>
+</AccordionGroup>
+
+## Tài liệu API
+
+Để biết chi tiết triển khai đầy đủ, ví dụ mã và tham khảo schema:
+
+- [Tài liệu API](/l/vi/developers/extend/api)

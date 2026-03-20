@@ -1,0 +1,238 @@
+---
+title: FAQ Workflow
+description: Câu hỏi thường gặp về workflow trong Twenty.
+---
+
+<AccordionGroup>
+
+  <Accordion title="Tại sao tôi không thể kích hoạt workflow?">
+    Đây có thể là vấn đề quyền. Bạn cần quyền truy cập workflow để tạo và kích hoạt chúng.
+
+    **Giải pháp**: Liên hệ quản trị viên không gian làm việc để cấp quyền truy cập workflow trong **Cài đặt → Vai trò**.
+
+    Nếu bạn không thấy phần Workflow trong thanh bên, điều này xác nhận là vấn đề quyền.
+  </Accordion>
+
+  <Accordion title="Tại sao tôi không thấy nút workflow thủ công trong thanh điều hướng?">
+    Workflow thủ công chỉ xuất hiện trong thanh điều hướng nếu được cấu hình đúng:
+
+    1. Workflow phải được **kích hoạt** (không ở chế độ nháp)
+    2. Vị trí thanh điều hướng phải được đặt thành **Ghim**
+    3. Đối với trigger Đơn/Hàng loạt, bạn phải ở đúng trang đối tượng
+
+    **Để kiểm tra**: Mở workflow → nhấp trigger → xác minh "Vị trí thanh điều hướng" được đặt thành "Ghim".
+
+    Bạn luôn có thể truy cập workflow thủ công qua **Cmd + K** (hoặc **Ctrl + K**) bất kể cài đặt thanh điều hướng.
+  </Accordion>
+
+  <Accordion title="Sự khác biệt giữa trigger thủ công Đơn, Toàn cục và Hàng loạt là gì?">
+    | Loại | Bản ghi cần thiết | Lần chạy Workflow |
+    |------|------------------|---------------|
+    | **Toàn cục** | Không | Một lần, không có đầu vào bản ghi |
+    | **Đơn** | Một hoặc nhiều đã chọn | Một lần cho mỗi bản ghi đã chọn |
+    | **Hàng loạt** | Một hoặc nhiều đã chọn | Một lần, với tất cả bản ghi dưới dạng mảng |
+
+    - **Toàn cục**: Sử dụng khi workflow không cần ngữ cảnh bản ghi (ví dụ: tạo báo cáo)
+    - **Đơn**: Sử dụng khi bạn muốn xử lý mỗi bản ghi đã chọn độc lập (ví dụ: gửi email riêng)
+    - **Hàng loạt**: Sử dụng khi bạn cần xử lý bản ghi cùng nhau hoặc tối ưu sử dụng credit (yêu cầu hành động Iterator)
+
+    Xem [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers) để biết chi tiết.
+  </Accordion>
+
+  <Accordion title="Tôi không thấy nút If/Else. Tôi nên làm gì?">
+    Nút If/Else rõ ràng chưa khả dụng nhưng nằm trong lộ trình.
+
+    **Giải pháp hiện tại**: Tạo nhiều nhánh từ bước, mỗi nhánh bắt đầu với hành động **Bộ lọc**:
+
+    ```
+    Bước 1
+       │
+       ├── Nhánh A: Bộ lọc (điều kiện = đúng) → Hành động...
+       │
+       └── Nhánh B: Bộ lọc (điều kiện = sai) → Hành động...
+    ```
+
+    Chỉ nhánh có điều kiện bộ lọc thỏa mãn mới thực thi các hành động tiếp theo.
+
+    Xem [Cách sử dụng nhánh](/l/vi/user-guide/workflows/capabilities/workflow-branches) để biết hướng dẫn từng bước.
+  </Accordion>
+
+  <Accordion title="Các nhánh workflow có chạy song song không?">
+    **Có**, nhánh chạy song song theo mặc định.
+
+    Nếu bạn muốn chỉ một nhánh thực thi:
+    - Thêm hành động **Bộ lọc** ở đầu mỗi nhánh
+    - Đặt điều kiện ngược nhau (ví dụ: Nhánh A: trạng thái = "Mở", Nhánh B: trạng thái ≠ "Mở")
+
+    Nhánh không thỏa điều kiện bộ lọc sẽ dừng thực thi, trong khi nhánh khác tiếp tục.
+  </Accordion>
+
+  <Accordion title="Tôi có thể hợp nhất nhánh lại không?">
+    **Có**. Sau khi các nhánh song song hoàn thành, bạn có thể thêm bước mà cả hai nhánh kết nối đến.
+
+    Trong trình chỉnh sửa workflow:
+    1. Hoàn thành các hành động nhánh
+    2. Thêm bước mới sau các nhánh
+    3. Kéo kết nối từ cuối mỗi nhánh đến bước mới này
+
+    Bước hợp nhất sẽ thực thi sau khi tất cả nhánh kết nối hoàn thành.
+  </Accordion>
+
+  <Accordion title="Giới hạn kết quả Tìm kiếm bản ghi là bao nhiêu?">
+    **Tìm kiếm bản ghi trả về tối đa 200 bản ghi.**
+
+    Nếu bạn cần xử lý nhiều hơn:
+    - Thêm bộ lọc cụ thể hơn để giảm kết quả
+    - Sử dụng workflow theo lịch trình để xử lý theo lô
+    - Xem xét sử dụng API cho thao tác hàng loạt
+
+    Với hầu hết workflow, 200 bản ghi là đủ. Nếu bạn thường xuyên đạt giới hạn này, hãy xem xét tái cấu trúc tự động hóa.
+  </Accordion>
+
+  <Accordion title="Tôi có thể CC người trong email workflow không?">
+    **Chưa.** Trường CC và BCC cho hành động Gửi email nằm trong lộ trình.
+
+    **Giải pháp hiện tại**: Thêm nhiều hành động Gửi email để gửi cho người nhận bổ sung, hoặc sử dụng HTTP Request để gửi qua dịch vụ email bên ngoài hỗ trợ CC.
+  </Accordion>
+
+  <Accordion title="Làm cách nào sử dụng đầu ra từ bước trước?">
+    Mọi hành động tạo dữ liệu đầu ra có thể sử dụng trong các bước tiếp theo.
+
+    **Để tham chiếu dữ liệu bước trước**:
+    - Sử dụng bộ chọn biến khi cấu hình trường
+    - Hoặc gõ trực tiếp `{{stepName.fieldName}}`
+
+    **Ví dụ**:
+    - Dữ liệu trigger: `{{trigger.object.email}}`
+    - Kết quả tìm kiếm: `{{searchRecords[0].name}}`
+    - Đầu ra mã nguồn: `{{code.calculatedValue}}`
+
+    Di chuột qua bất kỳ trường nào trong cấu hình hành động để xem biến khả dụng từ bước trước.
+  </Accordion>
+
+  <Accordion title="Tại sao Iterator thất bại?">
+    **Iterator yêu cầu đầu vào mảng.** Các vấn đề phổ biến:
+
+    1. **Đầu vào không phải mảng**: Đảm bảo bạn đang truyền kết quả từ Tìm kiếm bản ghi hoặc hành động khác trả về mảng
+    2. **Mảng rỗng**: Thêm bộ lọc trước Iterator để kiểm tra `{{searchRecords.length}} > 0`
+    3. **Biến sai được chọn**: Đảm bảo bạn chọn mảng, không phải bản ghi đơn
+
+    **Thiết lập đúng**:
+    1. Tìm kiếm bản ghi (trả về mảng)
+    2. Bộ lọc: length > 0
+    3. Iterator: chọn `{{searchRecords}}`
+    4. Hành động bên trong iterator sử dụng `{{iterator.currentItem.fieldName}}`
+  </Accordion>
+
+  <Accordion title="Thời gian thực thi tối đa cho hành động Mã nguồn là bao lâu?">
+    Hành động Mã nguồn (logic function) có **thời gian chờ mặc định 5 phút** (300 giây).
+
+    Thời gian chờ tối đa có thể cấu hình là **15 phút** (900 giây).
+
+    Nếu mã vượt quá giới hạn, hành động sẽ thất bại với lỗi hết thời gian.
+
+    **Mẹo tránh hết thời gian**:
+    - Chia thao tác lớn thành phần nhỏ hơn bằng Iterator
+    - Tránh tính toán nặng; sử dụng dịch vụ bên ngoài qua HTTP Request cho xử lý chuyên sâu
+    - Tối ưu mã để giảm thời gian thực thi
+    - Nếu cần xử lý lâu hơn, xem xét sử dụng workflow theo lịch trình xử lý dữ liệu theo lô
+  </Accordion>
+
+  <Accordion title="Làm cách nào đọc lần chạy workflow?">
+    Lần chạy workflow hiển thị lịch sử thực thi và giúp bạn gỡ lỗi.
+
+    **Truy cập lần chạy**:
+    - Trong trình chỉnh sửa workflow → bảng **Lần chạy** ở bên phải
+    - Hoặc vào **Lần chạy Workflow** trong thanh bên
+
+    **Hiểu lần chạy**:
+    - **Trạng thái**: Đang chạy, Hoàn thành, Thất bại, Đang chờ
+    - **Các bước**: Xem bước nào thực thi và đầu ra
+    - **Lỗi**: Nhấp bước thất bại để xem thông báo lỗi
+    - **Dữ liệu**: Xem dữ liệu đầu vào/đầu ra tại mỗi bước
+
+    Xem [Lần chạy Workflow](/l/vi/user-guide/workflows/capabilities/workflow-runs) để biết chi tiết.
+  </Accordion>
+
+  <Accordion title="Tại sao tôi không thấy lần chạy workflow?">
+    Lần chạy workflow có thể thất bại ngay lập tức do giới hạn tốc độ.
+
+    **Giới hạn cứng: 5.000 lần chạy mỗi giờ cho mỗi không gian làm việc.**
+
+    Nếu vượt giới hạn, workflow bị đánh dấu thất bại ngay và không xuất hiện trong danh sách lần chạy như mong đợi.
+
+    **Kịch bản phổ biến đạt giới hạn**:
+    - Chọn hơn 5.000 bản ghi với trigger thủ công Đơn
+    - Nhiều workflow chạy đồng thời trong không gian làm việc
+    - Trigger tự động tần suất cao (ví dụ: Bản ghi được cập nhật trên đối tượng bận)
+
+    **Giải pháp**:
+    - Sử dụng trigger **Hàng loạt** thay vì Đơn để xử lý nhiều bản ghi trong một lần chạy
+    - Giãn cách thao tác lô lớn
+    - Sử dụng bộ lọc để giảm tần suất trigger
+    - Lên lịch workflow nặng ngoài giờ cao điểm
+  </Accordion>
+
+  <Accordion title="Giới hạn tốc độ workflow là gì?">
+    Twenty có hai giới hạn tốc độ để đảm bảo ổn định hệ thống:
+
+    | Giới hạn | Giá trị | Hành vi |
+    |-------|-------|----------|
+    | **Giới hạn mềm** | 100 lần chạy/phút | Lần chạy xếp hàng trạng thái "Chưa bắt đầu", xử lý dần |
+    | **Giới hạn cứng** | 5.000 lần chạy/giờ | Lần chạy thất bại ngay lập tức |
+
+    **Giới hạn mềm (100/phút)**: Workflow không thất bại — chúng chỉ chờ trong hàng đợi và được xử lý theo thời gian. Bạn có thể kích hoạt hơn 100 bản ghi; thực thi chỉ chậm hơn.
+
+    **Giới hạn cứng (5.000/giờ)**: Áp dụng cho toàn bộ không gian làm việc. Nếu tất cả workflow kết hợp vượt 5.000 lần chạy trong một giờ, lần chạy bổ sung sẽ thất bại ngay.
+
+    **Mẹo giữ trong giới hạn**:
+    - Sử dụng trigger Hàng loạt với Iterator thay vì trigger Đơn cho lô lớn
+    - Kết hợp tự động hóa liên quan vào ít workflow hơn
+    - Sử dụng workflow theo lịch trình để phân bổ tải theo thời gian
+  </Accordion>
+
+  <Accordion title="Tôi có thể thử lại lần chạy workflow thất bại không?">
+    **Không, hiện không có chức năng thử lại tự động.**
+
+    Nếu lần chạy workflow thất bại, bạn cần:
+    1. Xem lại lỗi trong **Cài đặt → Workflow → [Workflow của bạn] → Lần chạy**
+    2. Sửa vấn đề (dữ liệu, cấu hình hoặc dịch vụ bên ngoài)
+    3. Kích hoạt thủ công workflow trên bản ghi bị ảnh hưởng
+
+    **Mẹo giảm thất bại**:
+    - Thêm nút **Bộ lọc** để xác thực dữ liệu trước hành động
+    - Sử dụng **Tìm kiếm bản ghi** để kiểm tra bản ghi liên quan tồn tại
+    - Kiểm tra kỹ với vài bản ghi trước thao tác hàng loạt
+
+    Chức năng thử lại tự động nằm trong lộ trình cho bản phát hành tương lai.
+  </Accordion>
+
+  <Accordion title="Tôi có nên tắt workflow trước khi nhập CSV không?">
+    **Có, nếu workflow được kích hoạt bởi tạo hoặc cập nhật bản ghi.**
+
+    Khi bạn nhập dữ liệu qua CSV, mỗi bản ghi tạo hoặc cập nhật có thể kích hoạt workflow. Nhập lớn (hàng nghìn bản ghi) có thể:
+    - Đạt giới hạn 5.000 lần chạy/giờ
+    - Tiêu thụ đáng kể credit workflow
+    - Gửi email hoặc thông báo không mong đợi
+    - Tạo tác vụ hoặc bản ghi trùng lặp
+
+    **Trước khi nhập hàng loạt**:
+    1. Vào **Cài đặt → Workflow**
+    2. Xác định workflow được kích hoạt bởi đối tượng bạn đang nhập
+    3. **Tắt** tạm thời
+    4. Chạy nhập CSV
+    5. **Kích hoạt lại** workflow khi hoàn thành
+
+    **Thay thế**: Nếu bạn cần workflow chạy trên dữ liệu nhập, nhập theo lô nhỏ hơn để giữ trong giới hạn tốc độ.
+  </Accordion>
+
+  <Accordion title="Làm cách nào dọn dẹp bố cục workflow?">
+    Nếu canvas workflow trông lộn xộn với nút nằm rải rác, bạn có thể tự động sắp xếp:
+
+    1. Nhấp chuột phải bất đâu trên canvas workflow
+    2. Nhấp **Sắp xếp workflow**
+
+    Điều này sẽ tự động sắp xếp tất cả nút thành bố cục sạch, có tổ chức.
+  </Accordion>
+
+</AccordionGroup>

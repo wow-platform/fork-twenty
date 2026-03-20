@@ -1,0 +1,113 @@
+---
+title: Webhook
+description: Nhận thông báo theo thời gian thực khi các sự kiện xảy ra trong CRM của bạn.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+
+Webhook đẩy dữ liệu đến hệ thống của bạn theo thời gian thực khi các sự kiện xảy ra trong Twenty -- không cần polling. Sử dụng chúng để đồng bộ hệ thống bên ngoài, kích hoạt tự động hóa hoặc gửi cảnh báo.
+
+## Tạo Webhook
+
+1. Vào **Settings -> APIs & Webhooks -> Webhooks**
+2. Nhấn **+ Create webhook**
+3. Nhập URL webhook của bạn (phải truy cập công khai được)
+4. Nhấn **Save**
+
+Webhook sẽ kích hoạt ngay lập tức và bắt đầu gửi thông báo.
+
+<VimeoEmbed videoId="928786708" title="Creating a webhook" />
+
+### Quản lý Webhook
+
+**Chỉnh sửa**: Nhấn vào webhook -> Cập nhật URL -> **Save**
+
+**Xóa**: Nhấn vào webhook -> **Delete** -> Xác nhận
+
+## Sự kiện
+
+Twenty gửi webhook cho các loại sự kiện sau:
+
+| Sự kiện | Ví dụ |
+|-------|---------|
+| **Bản ghi được tạo** | `person.created`, `company.created`, `note.created` |
+| **Bản ghi được cập nhật** | `person.updated`, `company.updated`, `opportunity.updated` |
+| **Bản ghi bị xóa** | `person.deleted`, `company.deleted` |
+
+Tất cả các loại sự kiện đều được gửi đến URL webhook của bạn. Tính năng lọc sự kiện có thể được thêm trong các bản phát hành tương lai.
+
+## Định dạng Payload
+
+Mỗi webhook gửi một HTTP POST với body JSON:
+
+```json
+{
+  "event": "person.created",
+  "data": {
+    "id": "abc12345",
+    "firstName": "Alice",
+    "lastName": "Doe",
+    "email": "alice@example.com",
+    "createdAt": "2025-02-10T15:30:45Z",
+    "createdBy": "user_123"
+  },
+  "timestamp": "2025-02-10T15:30:50Z"
+}
+```
+
+| Trường | Mô tả |
+|-------|-------------|
+| `event` | Điều gì đã xảy ra (ví dụ: `person.created`) |
+| `data` | Bản ghi đầy đủ đã được tạo/cập nhật/xóa |
+| `timestamp` | Thời điểm sự kiện xảy ra (UTC) |
+
+<Note>
+Phản hồi với **HTTP status 2xx** (200-299) để xác nhận đã nhận. Phản hồi không phải 2xx được ghi nhận là lỗi giao hàng.
+</Note>
+
+## Xác thực Webhook
+
+Twenty ký mỗi yêu cầu webhook để bảo mật. Xác thực chữ ký để đảm bảo yêu cầu là xác thực.
+
+### Header
+
+| Header | Mô tả |
+|--------|-------------|
+| `X-Twenty-Webhook-Signature` | Chữ ký HMAC SHA256 |
+| `X-Twenty-Webhook-Timestamp` | Timestamp của yêu cầu |
+
+### Các bước xác thực
+
+1. Lấy timestamp từ `X-Twenty-Webhook-Timestamp`
+2. Tạo chuỗi: `{timestamp}:{JSON payload}`
+3. Tính HMAC SHA256 bằng webhook secret của bạn
+4. So sánh với `X-Twenty-Webhook-Signature`
+
+### Ví dụ (Node.js)
+
+```javascript
+const crypto = require("crypto");
+
+const timestamp = req.headers["x-twenty-webhook-timestamp"];
+const payload = JSON.stringify(req.body);
+const secret = "your-webhook-secret";
+
+const stringToSign = `${timestamp}:${payload}`;
+const expectedSignature = crypto
+  .createHmac("sha256", secret)
+  .update(stringToSign)
+  .digest("hex");
+
+const isValid = expectedSignature === req.headers["x-twenty-webhook-signature"];
+```
+
+## Webhook vs Workflow
+
+| Phương pháp | Hướng | Trường hợp sử dụng |
+|--------|-----------|----------|
+| **Webhook** | RA | Tự động thông báo hệ thống bên ngoài về mọi thay đổi bản ghi |
+| **Workflow + HTTP Request** | RA | Gửi dữ liệu ra với logic tùy chỉnh (bộ lọc, chuyển đổi) |
+| **Workflow Webhook Trigger** | VÀO | Nhận dữ liệu vào Twenty từ hệ thống bên ngoài |
+
+Để nhận dữ liệu từ bên ngoài, xem [Set Up a Webhook Trigger](/l/vi/user-guide/workflows/how-tos/connect-to-other-tools/set-up-a-webhook-trigger).

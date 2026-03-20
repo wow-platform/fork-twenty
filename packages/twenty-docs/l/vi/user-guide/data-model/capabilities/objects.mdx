@@ -1,0 +1,86 @@
+---
+title: Đối tượng
+description: Tìm hiểu về đối tượng tiêu chuẩn và tùy chỉnh trong Twenty.
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+
+## Đối tượng tiêu chuẩn
+
+Đối tượng tiêu chuẩn là các thực thể được định nghĩa sẵn trong không gian làm việc để giúp bạn bắt đầu. Chúng là một phần của mô hình dữ liệu chung, có thể truy cập bởi tất cả người dùng Twenty. Bạn có thể sử dụng chúng nguyên trạng, tùy chỉnh hoặc vô hiệu hóa.
+
+<img src="/images/user-guide/objects/standard-objects.png" style={{width:'100%'}}/>
+
+### People
+
+Đối tượng `People` lưu trữ các liên hệ của bạn. Nó bao gồm chi tiết liên hệ và lịch sử tương tác, để bạn có thể xem tất cả các tương tác khách hàng tại một nơi.
+
+### Company
+
+Đối tượng `Companies` lưu trữ tài khoản doanh nghiệp. Nó bao gồm chi tiết như ngành, quy mô và vị trí. Companies kết nối với cả đối tượng `People` và `Opportunities`.
+
+### Opportunities
+
+Đối tượng `Opportunities` lưu trữ dữ liệu liên quan đến giao dịch. Nó theo dõi tiến trình của các bán hàng tiềm năng, từ tìm kiếm đến kết thúc, ghi lại các giai đoạn, quy mô giao dịch, tài khoản liên quan và ngày kết thúc dự kiến. Bạn có thể xem pipeline bán hàng ở bố cục kanban.
+
+### Notes
+
+Đối tượng `Notes` lưu trữ ghi chú tự do có thể đính kèm vào People, Companies, Opportunities và các bản ghi khác. Sử dụng ghi chú để ghi lại tóm tắt cuộc họp, chi tiết quan trọng hoặc bất kỳ thông tin ngữ cảnh nào.
+
+### Tasks
+
+Đối tượng `Tasks` lưu trữ tác vụ và mục hành động. Tasks có thể liên kết với People, Companies, Opportunities và các bản ghi khác. Theo dõi ngày đến hạn, người được giao và trạng thái hoàn thành để kiểm soát các công việc theo dõi.
+
+## Đối tượng tùy chỉnh
+
+Đối tượng tùy chỉnh cho phép bạn lưu trữ thông tin riêng biệt cho tổ chức mà đối tượng tiêu chuẩn không thể xử lý. Ví dụ, nếu bạn là SpaceX, bạn có thể muốn tạo đối tượng tùy chỉnh cho Rockets và Launches.
+
+<img src="/images/user-guide/objects/custom-objects.png" style={{width:'100%'}}/>
+
+### Tạo đối tượng tùy chỉnh mới
+
+Để tạo đối tượng tùy chỉnh mới:
+
+1. Vào Settings ở thanh bên trái.
+2. Trong Workspace, vào Data model. Tại đây bạn có thể xem tổng quan về tất cả đối tượng Standard và Custom hiện có (cả đang hoạt động và đã vô hiệu hóa).
+
+<VimeoEmbed videoId="926288174" title="Video minh họa" />
+
+3. Nhấp vào `+ New object` ở phía trên. Nhập tên (cả số ít và số nhiều), chọn biểu tượng và thêm mô tả cho đối tượng tùy chỉnh rồi nhấn Save (ở phía trên bên phải). Sử dụng Listing làm ví dụ đối tượng tùy chỉnh, số ít sẽ là "listing" và số nhiều sẽ là "listings" cùng với mô tả như "Listings that hosts created to showcase their property."
+
+
+4. Đối tượng tùy chỉnh của bạn đã được tạo và sẽ xuất hiện trong thanh bên. Bạn có thể bắt đầu thêm bản ghi ngay lập tức.
+
+## Quản lý đối tượng
+
+### Vô hiệu hóa đối tượng
+Nếu bạn không cần đối tượng tiêu chuẩn hoặc tùy chỉnh:
+1. Vào Settings → Data Model
+2. Tìm đối tượng bạn muốn vô hiệu hóa
+3. Nhấp vào nút chuyển để vô hiệu hóa
+4. Đối tượng sẽ bị ẩn khỏi không gian làm việc nhưng dữ liệu được bảo toàn
+
+### Kích hoạt lại đối tượng
+Để khôi phục đối tượng đã vô hiệu hóa:
+1. Vào Settings → Data Model
+2. Tìm đối tượng đã vô hiệu hóa (chúng sẽ bị mờ)
+3. Nhấp vào nút chuyển để kích hoạt lại
+4. Đối tượng và tất cả dữ liệu sẽ được khôi phục
+
+## Phương pháp tốt nhất
+
+### Khi nào tạo đối tượng tùy chỉnh
+- **Thực thể kinh doanh riêng biệt**: Những thứ cụ thể cho ngành hoặc quy trình của bạn
+- **Mối quan hệ phức tạp**: Khi bạn cần theo dõi kết nối giữa nhiều thực thể
+- **Dữ liệu có khả năng mở rộng**: Khi bạn có thể có nhiều phiên bản của một thứ
+
+### Khi nào sử dụng trường thay thế
+- **Thuộc tính đơn giản**: Đặc tính mô tả đối tượng hiện có
+- **Danh mục hoặc nhãn**: Cách phân loại bản ghi hiện có
+- **Giá trị đơn**: Thông tin không cần vòng đời riêng
+
+### Đặt tên đối tượng
+- **Sử dụng tên rõ ràng, mô tả**: Làm cho rõ ràng đối tượng đại diện cho gì
+- **Tuân theo quy ước**: Sử dụng số ít cho tên đối tượng, số nhiều cho tập hợp
+- **Cân nhắc nhóm của bạn**: Chọn tên mọi người đều hiểu

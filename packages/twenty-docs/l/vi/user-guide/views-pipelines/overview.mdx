@@ -1,0 +1,120 @@
+---
+title: Chế độ xem & Pipeline
+description: Tìm hiểu cách tạo và quản lý các chế độ xem trong Twenty.
+image: /images/user-guide/table-views/table.png
+---
+
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+<Frame>
+  <img src="/images/user-guide/table-views/table.png" alt="Chế độ xem & Pipeline" />
+</Frame>
+
+## Hiểu về chế độ xem
+
+Chế độ xem là các cấu hình đã lưu, xác định cách dữ liệu của bạn được hiển thị. Mỗi chế độ xem có thể có:
+- **Bố cục**: Bảng, Kanban hoặc Lịch
+- **Bộ lọc**: Bản ghi nào được hiển thị
+- **Sắp xếp**: Thứ tự sắp xếp bản ghi
+- **Trường**: Cột nào hiển thị
+
+## Các loại chế độ xem
+
+### Chế độ xem bảng
+Chế độ xem mặc định dạng bảng tính, hiển thị bản ghi theo hàng với các cột tùy chỉnh.
+
+### Chế độ xem Kanban
+Chế độ xem dạng bảng trực quan, nơi bản ghi xuất hiện dưới dạng thẻ được sắp xếp theo giai đoạn. Phù hợp cho:
+- Pipeline bán hàng
+- Theo dõi dự án
+- Bất kỳ quy trình nào có các giai đoạn xác định
+
+### Chế độ xem lịch
+Hiển thị bản ghi có trường ngày trên lịch. Hoàn hảo cho:
+- Cuộc họp và sự kiện
+- Hạn chót và ngày đến hạn
+- Lập kế hoạch theo thời gian
+
+## Tạo chế độ xem
+Có hai cách để tạo chế độ xem mới.
+### Sử dụng menu thả xuống chế độ xem
+1. Điều hướng đến bất kỳ đối tượng nào (Người, Công ty, v.v.)
+2. Nhấp vào tên chế độ xem ở góc trên bên trái (hiển thị chế độ xem hiện tại với mũi tên thả xuống)
+3. Nhấp **+ Thêm chế độ xem**
+4. Đặt tên cho chế độ xem và nhấp **Tạo**
+5. Chọn bố cục (Bảng, Kanban hoặc Lịch) trong phần **Tùy chọn**
+6. Thêm bộ lọc và sắp xếp theo nhu cầu
+7. Chọn trường nào hiển thị và sắp xếp lại chúng
+8. Nhấp **Lưu**
+
+<VimeoEmbed videoId="1145648745" title="Video demonstration" />
+
+### Bắt đầu bằng cách chỉnh sửa chế độ xem hiện có
+1. Điều hướng đến bất kỳ đối tượng nào (Người, Công ty, v.v.)
+2. Chọn bố cục (Bảng, Kanban hoặc Lịch) trong phần **Tùy chọn** hoặc thêm bộ lọc và sắp xếp theo nhu cầu
+3. Nhấp vào **Lưu dưới dạng chế độ xem mới**
+4. Đặt tên cho chế độ xem và nhấp **Tạo**
+5. Tiếp tục chỉnh sửa chế độ xem mới
+6. Nhấp vào **Cập nhật chế độ xem** để lưu các cấu hình bổ sung
+
+<VimeoEmbed videoId="1145654005" title="Video demonstration" />
+
+## Quản lý chế độ xem
+
+### Chỉnh sửa chế độ xem
+1. Chọn chế độ xem từ menu thả xuống
+2. Thực hiện thay đổi (bộ lọc, sắp xếp, cột)
+3. Nhấp **Lưu** để cập nhật chế độ xem
+
+### Đổi tên chế độ xem hoặc thay đổi biểu tượng
+1. Mở menu thả xuống chế độ xem
+2. Nhấp vào menu **⋮** bên cạnh tên chế độ xem
+3. Chọn **Chỉnh sửa**
+4. Thay đổi tên hoặc biểu tượng
+5. Nhấp **Lưu**
+
+### Sắp xếp lại chế độ xem
+1. Mở menu thả xuống chế độ xem
+2. Nhấp và kéo chế độ xem bằng tay cầm
+3. Thả vào vị trí mong muốn
+4. Thứ tự mới được lưu tự động
+
+### Thêm vào mục yêu thích
+Ghim các chế độ xem thường dùng để truy cập nhanh:
+1. Mở menu thả xuống chế độ xem
+2. Nhấp vào menu **⋮** bên cạnh chế độ xem
+3. Chọn **Thêm vào mục yêu thích**
+4. Chế độ xem xuất hiện trong phần mục yêu thích
+
+### Xóa chế độ xem
+1. Chọn chế độ xem cần xóa
+2. Nhấp vào menu thả xuống chế độ xem
+3. Nhấp vào menu **⋮** bên cạnh chế độ xem
+4. Chọn **Xóa**
+5. Xác nhận xóa
+
+<Warning>
+Các chế độ xem đã xóa không thể khôi phục. Hãy chắc chắn bạn muốn xóa trước khi xác nhận.
+</Warning>
+
+## Hiển thị chế độ xem
+
+Mỗi chế độ xem (ngoại trừ chế độ xem mặc định "Tất cả [Tên đối tượng]") có cài đặt hiển thị riêng.
+
+Để thay đổi hiển thị:
+1. Mở chế độ xem
+2. Nhấp **Tùy chọn → Hiển thị**
+3. Chọn:
+   - **Workspace**: Hiển thị cho tất cả thành viên workspace
+   - **Không công khai**: Chỉ hiển thị cho bạn
+
+<Note>
+Các chế độ xem mặc định "Tất cả [Tên đối tượng]" không thể thay đổi hiển thị.
+</Note>
+
+## Bước tiếp theo
+
+- [Chế độ xem bảng](/l/vi/user-guide/views-pipelines/capabilities/table-views)
+- [Chế độ xem Kanban](/l/vi/user-guide/views-pipelines/capabilities/kanban-views)
+- [Bộ lọc và sắp xếp](/l/vi/user-guide/views-pipelines/capabilities/filters-and-sorting)
+- [Cài đặt chế độ xem](/l/vi/user-guide/views-pipelines/capabilities/view-settings)

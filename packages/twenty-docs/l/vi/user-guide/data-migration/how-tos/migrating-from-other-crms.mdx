@@ -1,0 +1,276 @@
+---
+title: Di chuyển từ CRM khác
+description: Hướng dẫn từng bước để di chuyển dữ liệu từ bất kỳ CRM nào sang Twenty.
+---
+
+## Tổng quan
+
+Hướng dẫn này hướng dẫn bạn di chuyển dữ liệu từ bất kỳ CRM nào sang Twenty. Quy trình bao gồm kiểm tra dữ liệu, chuẩn bị không gian làm việc Twenty, xuất từ hệ thống hiện tại và nhập vào Twenty.
+
+<Note>Views, workflows và permissions phải được tạo lại thủ công sau khi di chuyển. Hãy dành thời gian cho công việc cấu hình này.</Note>
+
+## Bước 1: Kiểm tra dữ liệu hiện tại
+
+Di chuyển là cơ hội để bắt đầu mới. Đừng mang theo thứ không cần thiết.
+
+**Nên giữ:**
+- Liên hệ và công ty đang hoạt động
+- Cơ hội và giao dịch đang mở
+- Ghi chú và hoạt động quan trọng
+- Trường tùy chỉnh bạn thực sự sử dụng
+
+**Nên bỏ lại:**
+- Liên hệ lỗi thời (không có hoạt động 2+ năm)
+- Bản ghi trùng lặp
+- Dữ liệu test
+- Trường tùy chỉnh không sử dụng
+
+## Bước 2: Ánh xạ mô hình dữ liệu
+
+Tạo tài liệu ánh xạ giữa CRM hiện tại và Twenty:
+
+| CRM của bạn | Twenty |
+|----------|--------|
+| Account / Organization | **Company** |
+| Contact / Person | **People** |
+| Deal / Opportunity | **Opportunity** |
+| Activity | **Task** hoặc **Note** |
+| Custom Object | **Custom Object** |
+
+**Cho mỗi trường, ghi chú:**
+- Tên trường nguồn
+- Trường Twenty đích
+- Các chuyển đổi định dạng cần thiết (ngày, số điện thoại, v.v.)
+
+<Note>Giữ tài liệu ánh xạ này trong tay khi nhập — bạn sẽ tham khảo khi ánh xạ cột.</Note>
+
+## Bước 3: Thiết lập không gian làm việc Twenty
+
+Trước khi nhập dữ liệu, chuẩn bị không gian làm việc Twenty:
+
+### Tạo đối tượng và trường tùy chỉnh
+
+1. Vào **Settings → Data Model**
+2. Tạo đối tượng tùy chỉnh bạn cần
+3. Thêm trường tùy chỉnh vào đối tượng tiêu chuẩn và tùy chỉnh
+4. Cấu hình cài đặt trường (duy nhất, bắt buộc, tùy chọn select, v.v.)
+
+<Warning>
+**Trường phải tồn tại trước khi nhập.**
+
+Nhập CSV tạo bản ghi, không tạo trường. Tạo tất cả trường tùy chỉnh trong Settings → Data Model trước khi nhập.
+</Warning>
+
+### Mời nhóm
+
+<Warning>
+**Mời người dùng TRƯỚC khi nhập dữ liệu.**
+
+Nếu dữ liệu bao gồm tham chiếu người dùng (Account Owner, Assignee, v.v.), người dùng đó phải tồn tại trong Twenty trước khi nhập. Nếu không, các quan hệ đó không thể ánh xạ.
+</Warning>
+
+1. Vào **Settings → Members**
+2. Mời tất cả thành viên nhóm
+3. **Đợi mọi người chấp nhận** lời mời
+4. Xác minh tất cả người dùng xuất hiện trong danh sách Members
+
+## Bước 4: Xuất từ CRM hiện tại
+
+Xuất dữ liệu từ CRM hiện tại:
+
+1. Tìm chức năng **Export** (thường trong Settings, Data Management hoặc Admin)
+2. Xuất sang **định dạng CSV** khi có thể
+3. Xuất từng loại đối tượng riêng biệt (Companies, Contacts, Deals, v.v.)
+4. Bao gồm tất cả trường bạn muốn di chuyển
+
+**Xuất các đối tượng này (theo thứ tự tham khảo khi nhập):**
+1. Companies / Accounts / Organizations
+2. Contacts / People
+3. Deals / Opportunities
+4. Notes và Activities
+5. Đối tượng tùy chỉnh
+
+## Bước 5: Dọn dẹp và định dạng dữ liệu
+
+Mở mỗi CSV đã xuất trong ứng dụng bảng tính và chuẩn bị cho Twenty.
+
+### Xóa trùng lặp
+
+1. Sắp xếp theo trường duy nhất (email cho People, domain cho Companies)
+2. Xóa hoặc gộp hàng trùng lặp
+3. Xác minh không có trùng lặp trong Twenty
+
+### Định dạng trường đúng
+
+| Loại trường | Định dạng yêu cầu |
+|------------|-----------------|
+| **Domain** | `https://domain.com` |
+| **Email** | `name@domain.com` (phải duy nhất) |
+| **Date** | `YYYY-MM-DD` |
+| **Phone** | Ba cột: Number, Country Code, Calling Code |
+| **Boolean** | `TRUE` hoặc `FALSE` (viết hoa) |
+| **Trường Select** | Sử dụng tên API, không phải nhãn hiển thị |
+
+<Warning>
+**Định dạng domain rất quan trọng.**
+
+Sử dụng `https://domain.com` (không phải `domain.com` hay `www.domain.com`). Điều này khớp định dạng Twenty và ngăn trùng lặp khi bạn kết nối đồng bộ email/lịch.
+</Warning>
+
+Xem [Cách chuẩn bị tệp CSV](/l/vi/user-guide/data-migration/how-tos/prepare-your-csv-files) để biết yêu cầu định dạng đầy đủ cho tất cả loại trường.
+
+### Thêm cột quan hệ
+
+Để liên kết bản ghi (ví dụ: People với Companies), thêm cột với định danh duy nhất của cha.
+
+**Ví dụ: CSV People với liên kết Company**
+```csv
+firstName,lastName,email,companyDomain
+John,Smith,john@acme.com,https://acme.com
+Jane,Doe,jane@widgets.co,https://widgets.co
+```
+
+Xem [Cách nhập quan hệ](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv) để biết hướng dẫn chi tiết liên kết bản ghi.
+
+### Cập nhật tham chiếu người dùng
+
+Nếu dữ liệu bao gồm phân công người dùng (Owner, Assignee):
+
+1. Thêm cột với **email người dùng** (không chỉ ID từ hệ thống cũ)
+2. Sử dụng cùng địa chỉ email mà người dùng dùng để tham gia không gian làm việc Twenty
+
+Xem [Cách chuẩn bị tệp CSV](/l/vi/user-guide/data-migration/how-tos/prepare-your-csv-files) để biết hướng dẫn định dạng đầy đủ.
+
+## Bước 6: Nhập vào Twenty
+
+<Warning>
+**Thứ tự nhập quan trọng!**
+
+Luôn nhập theo thứ tự:
+1. **Companies** trước (không phụ thuộc)
+2. **People** sau (liên kết với Companies)
+3. **Opportunities** thứ ba (liên kết với Companies/People)
+4. **Notes và Tasks** (liên kết với bản ghi)
+5. **Đối tượng tùy chỉnh** theo thứ tự phụ thuộc
+
+Bản ghi cha phải tồn tại trước khi bạn có thể tham chiếu.
+</Warning>
+
+### Nhập từng đối tượng
+
+Cho mỗi tệp CSV, theo thứ tự:
+
+1. Điều hướng đến đối tượng trong Twenty
+2. Nhấp **⋮ → Import records**
+3. Tải tệp CSV lên
+4. Ánh xạ cột với trường:
+   - Ánh xạ cột email người dùng với trường quan hệ phù hợp
+   - Ánh xạ cột quan hệ (như `companyDomain`) với trường quan hệ
+5. Xem lại và sửa lỗi trong giao diện
+6. Xác nhận nhập
+7. Xác minh vài bản ghi trước khi tiếp tục tệp tiếp theo
+
+**Hướng dẫn chi tiết:**
+- [Cách nhập Companies](/l/vi/user-guide/data-migration/how-tos/import-companies-via-csv)
+- [Cách nhập Contacts](/l/vi/user-guide/data-migration/how-tos/import-contacts-via-csv)
+- [Cách nhập quan hệ](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv)
+
+## Bước 7: Di chuyển lớn (50.000+ bản ghi)
+
+Cho di chuyển lớn:
+
+| Khối lượng | Cách tiếp cận khuyến nghị |
+|--------|---------------------|
+| Dưới 10.000 bản ghi | Nhập CSV đơn lẻ |
+| 10.000 - 50.000 bản ghi | Chia thành nhiều tệp CSV |
+| 50.000+ bản ghi | Sử dụng API |
+
+**Cho nhập API:**
+- Nhanh hơn và đáng tin cậy hơn cho tập dữ liệu lớn
+- Hỗ trợ thao tác batch (đến 60 bản ghi mỗi lần gọi)
+- Xem [Cách nhập dữ liệu qua API](/l/vi/user-guide/data-migration/how-tos/import-data-via-api)
+
+## Bước 8: Thiết lập sau di chuyển
+
+Sau khi nhập dữ liệu, hoàn tất cấu hình không gian làm việc:
+
+### Tạo lại Views
+- Thiết lập chế độ xem đã lưu với bộ lọc, sắp xếp và cấu hình cột
+- Tạo chế độ xem kanban hoặc lịch nếu cần
+
+### Tạo lại Workflows
+- Xây dựng lại tự động hóa trong **Settings → Workflows**
+- Bắt đầu với workflows quan trọng nhất
+- Kiểm tra từng cái trước khi dựa vào
+
+### Cấu hình vai trò và quyền
+- Thiết lập vai trò trong **Settings → Roles**
+- Gán người dùng vào vai trò phù hợp
+
+### Kết nối email và lịch
+- Mỗi người dùng kết nối tài khoản riêng trong **Settings → Accounts**
+- Twenty sẽ bắt đầu đồng bộ email vào bản ghi liên hệ
+- Xem [Email & Calendar](/l/vi/user-guide/calendar-emails/overview)
+
+### Đào tạo nhóm
+- Hướng dẫn giao diện mới cùng nhau
+- Ghi chú các quy trình cụ thể của nhóm
+
+## Vấn đề phổ biến và giải pháp
+
+| Vấn đề | Nguyên nhân | Giải pháp |
+|-------|-------|----------|
+| **Lỗi trùng lặp** | Email/domain đã tồn tại | Xóa trùng lặp khỏi tệp, hoặc bao gồm định danh duy nhất để cập nhật bản ghi hiện có |
+| **Không tìm thấy quan hệ** | Bản ghi cha không tồn tại | Nhập đối tượng cha trước (Companies trước People) |
+| **Thiếu trường** | Trường tùy chỉnh không tồn tại | Tạo trường trong Settings → Data Model trước khi nhập |
+| **Lỗi trường Select** | Sử dụng nhãn hiển thị | Sử dụng tên API (bật Advanced mode trong Settings để tìm) |
+| **Quan hệ người dùng trống** | Người dùng chưa chấp nhận lời mời | Đảm bảo tất cả người dùng chấp nhận lời mời trước khi nhập |
+
+Xem [Cách sửa lỗi nhập](/l/vi/user-guide/data-migration/how-tos/fix-import-errors) để biết các bước xử lý sự cố chi tiết.
+
+## Danh sách kiểm tra sau di chuyển
+
+### Tính toàn vẹn dữ liệu
+<Check>Tất cả bản ghi đã nhập (so sánh số lượng với hệ thống nguồn)</Check>
+<Check>Quan hệ hoạt động đúng (People liên kết với Companies)</Check>
+<Check>Phân công người dùng ánh xạ đúng (Owner, Assignee)</Check>
+<Check>Trường tùy chỉnh đã được điền</Check>
+<Check>Không có trùng lặp bất ngờ</Check>
+
+### Cấu hình
+<Check>Views đã được tạo lại</Check>
+<Check>Workflows đã được tạo lại và kiểm tra</Check>
+<Check>Vai trò và quyền đã cấu hình</Check>
+<Check>Đồng bộ email/lịch đã kết nối</Check>
+
+### Sẵn sàng nhóm
+<Check>Nhóm đã được đào tạo hệ thống mới</Check>
+<Check>Kế hoạch truy cập CRM cũ đã quyết định (giữ tham khảo? Khi nào vô hiệu hóa?)</Check>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Tôi có thể di chuyển workflows tự động không?">
+    Hiện chưa được. Workflows phải được tạo lại thủ công trong Twenty.
+  </Accordion>
+
+  <Accordion title="Còn tệp đính kèm thì sao?">
+    Tệp đính kèm không được bao gồm trong xuất CSV. Bạn cần tải lại thủ công, di chuyển qua API hoặc liên hệ đội ngũ của chúng tôi để hỗ trợ.
+  </Accordion>
+
+  <Accordion title="Tôi có thể chạy cả hai hệ thống trong quá trình di chuyển không?">
+    Có, chúng tôi khuyến nghị giữ CRM cũ hoạt động cho đến khi bạn xác minh di chuyển hoàn tất. Chỉ cẩn thận không tạo dữ liệu mới ở cả hai nơi.
+  </Accordion>
+
+  <Accordion title="Di chuyển thường mất bao lâu?">
+    Phụ thuộc vào khối lượng và độ phức tạp dữ liệu. Di chuyển nhỏ (dưới 10.000 bản ghi) có thể hoàn thành trong vài giờ. Di chuyển lớn có thể mất vài ngày bao gồm dọn dẹp dữ liệu và kiểm tra.
+  </Accordion>
+</AccordionGroup>
+
+## Cần trợ giúp?
+
+Cho di chuyển phức tạp hoặc tập dữ liệu lớn:
+- **Thiết lập có hướng dẫn:** Đặt gói hỗ trợ khởi đầu 4 giờ
+- **Dịch vụ di chuyển đầy đủ:** Đối tác của chúng tôi có thể xử lý toàn bộ quá trình di chuyển
+
+Liên hệ [contact@twenty.com](mailto:contact@twenty.com) hoặc khám phá [Dịch vụ triển khai](/l/vi/user-guide/getting-started/capabilities/implementation-services).

@@ -1,0 +1,231 @@
+---
+title: Bắt đầu
+description: Tạo ứng dụng Twenty đầu tiên của bạn trong vài phút.
+---
+
+<Warning>
+Ứng dụng hiện đang trong giai đoạn thử nghiệm alpha. Tính năng đã hoạt động nhưng vẫn đang phát triển.
+</Warning>
+
+Ứng dụng cho phép bạn mở rộng Twenty với các đối tượng tùy chỉnh, trường, hàm logic, kỹ năng AI và thành phần giao diện -- tất cả được quản lý bằng code.
+
+**Những gì bạn có thể làm hôm nay:**
+- Định nghĩa đối tượng và trường tùy chỉnh bằng code (mô hình dữ liệu được quản lý)
+- Xây dựng hàm logic với trigger tùy chỉnh (HTTP route, cron, sự kiện database)
+- Định nghĩa kỹ năng cho AI agent
+- Xây dựng thành phần giao diện hiển thị trong UI của Twenty
+- Triển khai cùng một ứng dụng trên nhiều workspace
+
+## Điều kiện tiên quyết
+
+- Node.js 24+ và Yarn 4
+- Một workspace Twenty và API key (tạo tại https://app.twenty.com/settings/api-webhooks)
+
+## Bắt đầu
+
+Tạo ứng dụng mới bằng công cụ scaffolder chính thức, sau đó xác thực và bắt đầu phát triển:
+
+```bash filename="Terminal"
+# Tạo khung ứng dụng mới (bao gồm tất cả ví dụ mặc định)
+npx create-twenty-app@latest my-twenty-app
+cd my-twenty-app
+
+# Bắt đầu chế độ phát triển: tự động đồng bộ thay đổi cục bộ với workspace
+yarn twenty app:dev
+```
+
+Scaffolder hỗ trợ hai chế độ để kiểm soát các file ví dụ được bao gồm:
+
+```bash filename="Terminal"
+# Mặc định (đầy đủ): tất cả ví dụ (object, field, logic function, front component, view, navigation menu item, skill)
+npx create-twenty-app@latest my-app
+
+# Tối giản: chỉ các file cốt lõi (application-config.ts và default-role.ts)
+npx create-twenty-app@latest my-app --minimal
+```
+
+Từ đây bạn có thể:
+
+```bash filename="Terminal"
+# Thêm entity mới vào ứng dụng (có hướng dẫn)
+yarn twenty entity:add
+
+# Xem log của các hàm trong ứng dụng
+yarn twenty function:logs
+
+# Thực thi hàm theo tên
+yarn twenty function:execute -n my-function -p '{"name": "test"}'
+
+# Thực thi hàm pre-install
+yarn twenty function:execute --preInstall
+
+# Thực thi hàm post-install
+yarn twenty function:execute --postInstall
+
+# Gỡ cài đặt ứng dụng khỏi workspace hiện tại
+yarn twenty app:uninstall
+
+# Hiển thị trợ giúp các lệnh
+yarn twenty help
+```
+
+Xem thêm: trang tham khảo CLI cho [create-twenty-app](https://www.npmjs.com/package/create-twenty-app) và [twenty-sdk CLI](https://www.npmjs.com/package/twenty-sdk).
+
+## Cấu trúc dự án (scaffolded)
+
+Khi bạn chạy `npx create-twenty-app@latest my-twenty-app`, scaffolder:
+
+- Sao chép ứng dụng cơ sở tối thiểu vào `my-twenty-app/`
+- Thêm dependency `twenty-sdk` cục bộ và cấu hình Yarn 4
+- Tạo các file cấu hình và script kết nối với CLI `twenty`
+- Tạo các file cốt lõi (cấu hình ứng dụng, role hàm mặc định, hàm pre-install và post-install) cùng các file ví dụ dựa trên chế độ scaffolding
+
+Ứng dụng vừa tạo với chế độ `--exhaustive` mặc định trông như sau:
+
+```text filename="my-twenty-app/"
+my-twenty-app/
+  package.json
+  yarn.lock
+  .gitignore
+  .nvmrc
+  .yarnrc.yml
+  .yarn/
+    install-state.gz
+  .oxlintrc.json
+  tsconfig.json
+  README.md
+  public/                           # Thư mục tài sản công khai (hình ảnh, font, v.v.)
+  src/
+  ├── application-config.ts           # Bắt buộc - cấu hình ứng dụng chính
+  ├── roles/
+  │   └── default-role.ts               # Role mặc định cho hàm logic
+  ├── objects/
+  │   └── example-object.ts             # Ví dụ định nghĩa đối tượng tùy chỉnh
+  ├── fields/
+  │   └── example-field.ts              # Ví dụ định nghĩa trường độc lập
+  ├── logic-functions/
+  │   ├── hello-world.ts                # Ví dụ hàm logic
+  │   ├── pre-install.ts                # Hàm logic pre-install
+  │   └── post-install.ts               # Hàm logic post-install
+  ├── front-components/
+  │   └── hello-world.tsx               # Ví dụ thành phần giao diện
+  ├── views/
+  │   └── example-view.ts                # Ví dụ định nghĩa view đã lưu
+  ├── navigation-menu-items/
+  │   └── example-navigation-menu-item.ts # Ví dụ liên kết điều hướng sidebar
+  └── skills/
+      └── example-skill.ts                # Ví dụ định nghĩa kỹ năng AI agent
+```
+
+Với `--minimal`, chỉ các file cốt lõi được tạo (`application-config.ts`, `roles/default-role.ts`, `logic-functions/pre-install.ts` và `logic-functions/post-install.ts`).
+
+Ở mức cao:
+
+- **package.json**: Khai báo tên ứng dụng, phiên bản, engine (Node 24+, Yarn 4) và thêm `twenty-sdk` cùng script `twenty` ủy quyền cho CLI `twenty` cục bộ. Chạy `yarn twenty help` để liệt kê tất cả lệnh có sẵn.
+- **.gitignore**: Bỏ qua các artifact phổ biến như `node_modules`, `.yarn`, `generated/` (typed client), `dist/`, `build/`, thư mục coverage, file log và file `.env*`.
+- **yarn.lock**, **.yarnrc.yml**, **.yarn/**: Khóa và cấu hình chuỗi công cụ Yarn 4 dự án sử dụng.
+- **.nvmrc**: Ghim phiên bản Node.js dự án yêu cầu.
+- **.oxlintrc.json** và **tsconfig.json**: Cung cấp cấu hình linting và TypeScript cho mã nguồn TypeScript của ứng dụng.
+- **README.md**: README ngắn gọn trong thư mục gốc ứng dụng với hướng dẫn cơ bản.
+- **public/**: Thư mục lưu trữ tài sản công khai (hình ảnh, font, file tĩnh) sẽ được phục vụ cùng ứng dụng. File đặt ở đây được tải lên trong quá trình đồng bộ và có thể truy cập lúc chạy.
+- **src/**: Nơi chính để định nghĩa ứng-dụng-bằng-code
+
+### Phát hiện entity
+
+SDK phát hiện entity bằng cách phân tích các file TypeScript tìm kiếm các lời gọi **`export default define<Entity>({...})`**. Mỗi loại entity có hàm trợ giúp tương ứng được export từ `twenty-sdk`:
+
+| Hàm trợ giúp | Loại entity |
+|-----------------|-------------|
+| `defineObject` | Định nghĩa đối tượng tùy chỉnh |
+| `defineLogicFunction` | Định nghĩa hàm logic |
+| `definePreInstallLogicFunction` | Hàm logic pre-install (chạy trước khi cài đặt) |
+| `definePostInstallLogicFunction` | Hàm logic post-install (chạy sau khi cài đặt) |
+| `defineFrontComponent` | Định nghĩa thành phần giao diện |
+| `defineRole` | Định nghĩa role |
+| `defineField` | Mở rộng trường cho đối tượng hiện có |
+| `defineView` | Định nghĩa view đã lưu |
+| `defineNavigationMenuItem` | Định nghĩa mục menu điều hướng |
+| `defineSkill` | Định nghĩa kỹ năng AI agent |
+
+<Note>
+**Tên file linh hoạt.** Phát hiện entity dựa trên AST -- SDK quét các file nguồn tìm mẫu `export default define<Entity>({...})`. Bạn có thể tổ chức file và thư mục theo bất kỳ cách nào. Nhóm theo loại entity (ví dụ: `logic-functions/`, `roles/`) chỉ là quy ước tổ chức code, không phải yêu cầu.
+</Note>
+
+Ví dụ về entity được phát hiện:
+```typescript
+// File này có thể đặt tên bất kỳ và đặt bất kỳ đâu trong src/
+import { defineObject, FieldType } from 'twenty-sdk';
+
+export default defineObject({
+  universalIdentifier: '...',
+  nameSingular: 'postCard',
+  // ... phần cấu hình còn lại
+});
+```
+
+Các lệnh sau sẽ thêm nhiều file và thư mục hơn:
+
+- `yarn twenty app:dev` sẽ tự động tạo hai typed API client trong `node_modules/twenty-sdk/generated`: `CoreApiClient` (cho dữ liệu workspace qua `/graphql`) và `MetadataApiClient` (cho cấu hình workspace và tải file lên qua `/metadata`).
+- `yarn twenty entity:add` sẽ thêm các file định nghĩa entity trong `src/` cho đối tượng tùy chỉnh, hàm, thành phần giao diện, role, kỹ năng và nhiều hơn.
+
+## Xác thực
+
+Lần đầu chạy `yarn twenty auth:login`, bạn sẽ được yêu cầu nhập:
+
+- URL API (mặc định là http://localhost:3000 hoặc profile workspace hiện tại)
+- API key
+
+Thông tin xác thực được lưu theo người dùng tại `~/.twenty/config.json`. Bạn có thể duy trì nhiều profile và chuyển đổi giữa chúng.
+
+### Quản lý workspace
+
+```bash filename="Terminal"
+# Đăng nhập tương tác (khuyến nghị)
+yarn twenty auth:login
+
+# Đăng nhập vào profile workspace cụ thể
+yarn twenty auth:login --workspace my-custom-workspace
+
+# Liệt kê tất cả workspace đã cấu hình
+yarn twenty auth:list
+
+# Chuyển workspace mặc định (tương tác)
+yarn twenty auth:switch
+
+# Chuyển sang workspace cụ thể
+yarn twenty auth:switch production
+
+# Kiểm tra trạng thái xác thực hiện tại
+yarn twenty auth:status
+```
+
+Sau khi chuyển workspace bằng `yarn twenty auth:switch`, tất cả các lệnh tiếp theo sẽ sử dụng workspace đó mặc định. Bạn vẫn có thể ghi đè tạm thời bằng `--workspace <tên>`.
+
+## Thiết lập thủ công (không dùng scaffolder)
+
+Mặc dù chúng tôi khuyến nghị sử dụng `create-twenty-app` để có trải nghiệm bắt đầu tốt nhất, bạn cũng có thể thiết lập dự án thủ công. Không cài đặt CLI toàn cục. Thay vào đó, thêm `twenty-sdk` làm dependency cục bộ và thêm một script duy nhất trong package.json:
+
+```bash filename="Terminal"
+yarn add -D twenty-sdk
+```
+
+Sau đó thêm script `twenty`:
+
+```json filename="package.json"
+{
+  "scripts": {
+    "twenty": "twenty"
+  }
+}
+```
+
+Bây giờ bạn có thể chạy tất cả lệnh qua `yarn twenty <lệnh>`, ví dụ `yarn twenty app:dev`, `yarn twenty help`, v.v.
+
+## Xử lý sự cố
+
+- Lỗi xác thực: chạy `yarn twenty auth:login` và đảm bảo API key có quyền cần thiết.
+- Không thể kết nối máy chủ: kiểm tra URL API và máy chủ Twenty có thể truy cập được.
+- Type hoặc client thiếu/lỗi thời: khởi động lại `yarn twenty app:dev` -- nó tự động tạo typed client.
+- Chế độ phát triển không đồng bộ: đảm bảo `yarn twenty app:dev` đang chạy và các thay đổi không bị môi trường bỏ qua.
+
+Kênh hỗ trợ Discord: https://discord.com/channels/1130383047699738754/1130386664812982322

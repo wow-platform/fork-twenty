@@ -1,0 +1,105 @@
+---
+title: Gửi cảnh báo email với tác vụ đến hạn
+description: Tự động thông báo thành viên nhóm về tác vụ sắp đến hạn hoặc quá hạn.
+---
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+<img src="/images/user-guide/workflows/email_tasks_due.png" style={{width:'100%'}}/>
+
+Gửi nhắc nhở email hàng ngày cho mỗi thành viên nhóm về tác vụ đến hạn hôm nay.
+
+## Tổng quan
+
+Workflow này chạy theo lịch trình và:
+1. Lấy tất cả thành viên không gian làm việc
+2. Lặp qua mỗi thành viên
+3. Tìm tác vụ đến hạn hôm nay
+4. Định dạng và gửi email cá nhân hóa
+
+## Thiết lập từng bước
+
+<VimeoEmbed videoId="1147463514" title="Video minh họa" />
+
+### Bước 1: Cấu hình Trigger
+
+1. Vào **Cài đặt → Workflow** và tạo workflow mới
+2. Chọn **Theo lịch trình** làm trigger
+3. Sử dụng biểu thức cron cho hàng ngày lúc 8:00 sáng: `0 8 * * *`
+
+
+### Bước 2: Tìm tất cả thành viên không gian làm việc
+
+1. Thêm hành động **Tìm kiếm bản ghi**
+2. Chọn **Thành viên không gian làm việc** (trong đối tượng nâng cao)
+3. Không cần bộ lọc — trả về tất cả thành viên
+
+### Bước 3: Thêm Iterator
+
+1. Thêm hành động **Iterator**
+2. Đặt mảng đầu vào là thành viên không gian làm việc từ bước trước
+3. Tất cả hành động bên trong iterator sẽ chạy một lần cho mỗi thành viên
+
+### Bước 4: Tìm tác vụ đến hạn hôm nay (Bên trong Iterator)
+
+1. Bên trong iterator, thêm hành động **Tìm kiếm bản ghi**
+2. Chọn **Tác vụ** làm đối tượng
+3. Thêm bộ lọc:
+   - **Người được giao** = thành viên không gian làm việc hiện tại (từ iterator)
+   - **Ngày hạn** = hôm nay
+
+### Bước 5: Định dạng tác vụ thành nội dung email (Bên trong Iterator)
+
+Thêm hành động **Mã nguồn** để định dạng tác vụ thành danh sách có liên kết:
+
+```javascript
+export const main = async (params: {
+  tasksDue?: Array<{ id: string; title: string }> | null | string;
+}) => {
+  const tasksDue =
+    typeof params.tasksDue === "string"
+      ? JSON.parse(params.tasksDue)
+      : params.tasksDue;
+
+  if (!Array.isArray(tasksDue) || tasksDue.length === 0) {
+    return {
+      formattedTasks: "Không có tác vụ đến hạn hôm nay."
+    };
+  }
+
+  const formattedTasks = tasksDue
+    .map(
+      t =>
+        `${t.title}\nhttps://yourSubDomain.twenty.com/object/task/${t.id}`
+    )
+    .join("\n\n");
+
+  return { formattedTasks };
+};
+```
+
+<Note>
+Thay `yourSubDomain` bằng subdomain không gian làm việc Twenty thực tế của bạn.
+</Note>
+
+### Bước 6: Gửi email (Bên trong Iterator)
+
+1. Thêm hành động **Gửi email** (vẫn bên trong iterator)
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đến** | `{{iterator.currentItem.userEmail}}` (email thành viên không gian làm việc) |
+| **Chủ đề** | Tác vụ đến hạn hôm nay của bạn |
+| **Nội dung** | `{{code.formattedTasks}}` |
+
+### Bước 7: Kiểm tra và kích hoạt
+
+1. Nhấp **Kiểm tra** để chạy workflow thủ công
+2. Kiểm tra hộp thư để xem email
+3. Kích hoạt workflow
+
+## Liên quan
+
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Gửi email từ Workflow](/l/vi/user-guide/workflows/capabilities/send-emails-from-workflows)
+- [Xử lý mảng trong hành động Mã nguồn](/l/vi/user-guide/workflows/how-tos/advanced-configurations/handle-arrays-in-code-actions)

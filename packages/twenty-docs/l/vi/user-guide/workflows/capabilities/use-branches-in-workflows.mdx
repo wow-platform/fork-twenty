@@ -1,0 +1,90 @@
+---
+title: Sử dụng nhánh trong Workflow
+description: Hiểu cách nhánh hoạt động và cách kiểm soát đường dẫn nào được thực thi.
+---
+
+## Cách nhánh hoạt động
+
+Trong trình chỉnh sửa workflow, bạn có thể tạo nhiều đường dẫn (nhánh) đi ra từ một nút duy nhất. Điều này cho phép bạn xây dựng tự động hóa phức tạp với các kết quả khác nhau.
+
+**Quan trọng**: Khi workflow chạy, **tất cả các nhánh thực thi song song theo mặc định**. Không có logic "if/else" tích hợp để chọn một nhánh thay vì nhánh khác — mọi đường dẫn sẽ chạy đồng thời.
+
+## Kiểm soát nhánh nào chạy
+
+Để chỉ thực thi một nhánh dựa trên điều kiện cụ thể, **thêm nút Bộ lọc ở đầu mỗi nhánh**.
+
+### Ví dụ thiết lập
+
+1. Tạo workflow với nhiều nhánh từ một nút duy nhất
+2. Thêm nút **Bộ lọc** làm bước đầu tiên trong mỗi nhánh
+3. Đặt điều kiện trên mỗi Bộ lọc để xác định khi nào nhánh đó nên tiếp tục
+4. Chỉ nhánh có điều kiện Bộ lọc được đáp ứng mới tiếp tục
+
+<img src="/images/user-guide/workflows/branches-with-filters.png" style={{width:'100%'}}/>
+
+### Cách Bộ lọc hoạt động
+
+- Nếu điều kiện Bộ lọc **được đáp ứng**: Nhánh tiếp tục thực thi
+- Nếu điều kiện Bộ lọc **không được đáp ứng**: Nhánh dừng tại nút Bộ lọc
+
+Điều này tạo ra logic có điều kiện hiệu quả, nơi chỉ nhánh phù hợp chạy dựa trên dữ liệu của bạn.
+
+## Ví dụ: Phân luồng theo quy mô giao dịch
+
+**Kịch bản**: Khi giao dịch hoàn tất, gửi thông báo khác nhau dựa trên quy mô giao dịch.
+
+1. **Trigger**: Cơ hội được cập nhật (Giai đoạn = Closed Won)
+2. **Nhánh 1**: Bộ lọc cho Số tiền > $10.000 → Gửi tin nhắn Slack đến #big-deals
+3. **Nhánh 2**: Bộ lọc cho Số tiền ≤ $10.000 → Gửi email cho quản lý bán hàng
+
+Cả hai nhánh bắt đầu, nhưng chỉ nhánh khớp với số tiền giao dịch sẽ tiếp tục qua Bộ lọc.
+
+## Tạo nhánh
+
+<Note>
+Để tạo nhánh mới từ bước hiện có, nhấp nút **+** trên bước và thêm hành động. Bạn có thể thêm nhiều nhánh bằng cách nhấp **+** nhiều lần.
+</Note>
+
+1. Trong trình chỉnh sửa workflow, chọn bước bạn muốn phân nhánh
+2. Nhấp nút **+** để thêm hành động
+3. Điều này tạo một nhánh
+4. Nhấp **+** lần nữa trên cùng bước để tạo nhánh bổ sung
+5. Mỗi nhánh có thể có chuỗi hành động riêng
+
+## Hợp nhất nhánh
+
+Sau khi các nhánh song song hoàn thành công việc, bạn có thể hợp nhất chúng trở lại thành một đường dẫn duy nhất:
+
+1. Hoàn thành các hành động nhánh
+2. Thêm bước mới sẽ chạy sau tất cả các nhánh
+3. Kéo kết nối từ bước cuối cùng của mỗi nhánh đến bước mới này
+4. Bước hợp nhất chờ tất cả các nhánh kết nối hoàn thành trước khi thực thi
+
+### Ví dụ: Xử lý rồi thông báo
+
+```
+Trigger
+   │
+   ├── Nhánh A: Cập nhật bản ghi khách hàng
+   │
+   └── Nhánh B: Tạo phiếu hỗ trợ
+
+       ↘  ↙
+
+   Bước hợp nhất: Gửi email xác nhận
+```
+
+Email xác nhận chỉ gửi sau khi cả cập nhật khách hàng và tạo phiếu hỗ trợ hoàn thành.
+
+## Thực hành tốt nhất
+
+- Luôn sử dụng **nút Bộ lọc** ở đầu nhánh khi bạn muốn thực thi có điều kiện
+- Giữ điều kiện nhánh **loại trừ lẫn nhau** để tránh hành động trùng lặp
+- Kiểm tra workflow với dữ liệu khác nhau để đảm bảo nhánh đúng chạy
+- **Đổi tên bước nhánh** mô tả rõ ràng để biết mỗi đường dẫn làm gì
+- **Hợp nhất nhánh** khi bạn cần hành động cuối cùng sau xử lý song song
+
+## Liên quan
+
+- [FAQ Workflow](/l/vi/user-guide/workflows/how-tos/need-more-help/workflows-faq) — câu trả lời về thực thi song song
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions) — hành động khả dụng cho nhánh

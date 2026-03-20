@@ -1,0 +1,265 @@
+---
+title: Hành động Workflow
+description: Tìm hiểu về các hành động khả dụng trong workflow Twenty.
+---
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+## Về hành động
+
+Hành động xác định điều gì xảy ra sau khi trigger kích hoạt. Bạn có thể nối nhiều hành động với nhau để xây dựng tự động hóa phức tạp.
+
+<Tip>
+- Sử dụng bộ chọn biến (nhấp biểu tượng `(x+)`) để duyệt dữ liệu khả dụng từ các bước trước
+- Di chuột qua bất kỳ trường đầu vào nào để xem biến đến từ bước nào — hữu ích khi cùng một trường (ví dụ: ID) tồn tại trong nhiều bước trước
+- Đặt tên mô tả cho mỗi hành động để dễ bảo trì
+</Tip>
+
+## Hành động bản ghi
+<img src="/images/user-guide/workflows/workflow_actions.png" style={{width:'100%'}}/>
+
+### Tạo bản ghi
+Thêm bản ghi mới vào đối tượng đã chọn.
+
+**Cấu hình**:
+- Chọn đối tượng đích
+- Điền các trường bắt buộc và tùy chọn
+- Sử dụng dữ liệu từ bước trước hoặc nhập giá trị thủ công để điền trường
+
+**Đầu ra**: Dữ liệu bản ghi mới tạo khả dụng để sử dụng trong các bước tiếp theo.
+
+### Cập nhật bản ghi
+Sửa đổi bản ghi hiện có trong đối tượng đã chọn.
+<img src="/images/user-guide/workflows/update_record.png" style={{width:'100%'}}/>
+
+**Cấu hình**:
+- Chọn đối tượng đích
+- Chọn bản ghi cụ thể để cập nhật.
+  - Bạn có thể chọn bản ghi cố định, sử dụng menu thả xuống hiển thị tất cả bản ghi khả dụng.
+  - Hoặc bạn có thể chọn bản ghi động, bằng cách chỉ định bản ghi tìm thấy trong bước trước, sử dụng `(x+)`. Bạn không thể tìm kiếm bản ghi dựa trên tiêu chí khác tại giai đoạn này. Nếu bạn chưa xác định bản ghi, hãy thêm bước `Tìm kiếm bản ghi` trước bước `Cập nhật bản ghi` này.
+- Chọn trường cần sửa đổi và nhập giá trị mới
+
+**Đầu ra**: Dữ liệu bản ghi đã cập nhật khả dụng để sử dụng trong các bước tiếp theo.
+
+
+### Xóa bản ghi
+Xóa bản ghi khỏi đối tượng đã chọn.
+
+**Cấu hình**:
+- Chọn đối tượng đích
+- Chọn bản ghi cụ thể để xóa
+
+**Đầu ra**: Dữ liệu bản ghi đã xóa vẫn khả dụng để sử dụng trong các bước tiếp theo.
+
+### Tìm kiếm bản ghi
+Tìm bản ghi trong đối tượng đã chọn sử dụng điều kiện lọc.
+
+**Cấu hình**:
+- Chọn đối tượng để tìm kiếm
+- Đặt tiêu chí lọc để thu hẹp kết quả
+- Cấu hình sắp xếp và giới hạn
+
+**Đầu ra**: Trả về bản ghi phù hợp có thể sử dụng trong các bước tiếp theo.
+
+<Note>
+**Giới hạn**: Tìm kiếm bản ghi trả về tối đa **200 bản ghi**. Nếu bạn cần xử lý nhiều hơn, thêm bộ lọc cụ thể để giảm kết quả hoặc sử dụng workflow theo lịch trình để xử lý theo lô.
+</Note>
+
+**Thực hành tốt nhất**: Sử dụng [nhánh](/l/vi/user-guide/workflows/capabilities/workflow-branches) sau Tìm kiếm bản ghi để xử lý trường hợp "tìm thấy" so với "không tìm thấy".
+### Upsert bản ghi
+Tạo bản ghi mới hoặc cập nhật bản ghi hiện có dựa trên tiêu chí khớp. Điều này hữu ích khi bạn không chắc bản ghi đã tồn tại hay chưa.
+
+<img src="/images/user-guide/workflows/upsert_double_identifier.png" style={{width:'100%'}}/>
+
+**Cấu hình**:
+- Chọn đối tượng đích
+- Lưu ý các trường có thể dùng để khớp: email cho Người, tên miền cho Công ty, ID cho bất kỳ đối tượng nào, hoặc bất kỳ trường nào được đánh dấu là Duy nhất. Bạn cần điền ít nhất một trong số này bên dưới.
+- Điền giá trị trường. Đừng quên điền ít nhất một trong các định danh duy nhất.
+<Note>
+**Khớp thường hoạt động tốt hơn khi chỉ thêm một định danh duy nhất.** Ví dụ, ảnh chụp màn hình bên dưới sẽ khớp công ty dựa trên tên miền. ID không nhất thiết cần thiết.
+</Note>
+<img src="/images/user-guide/workflows/upsert_simple_identifier.png" style={{width:'100%'}}/>
+- Sử dụng dữ liệu từ bước trước để điền trường
+
+**Cách hoạt động**:
+1. Tìm kiếm bản ghi khớp tiêu chí
+2. Nếu tìm thấy → cập nhật bản ghi hiện có
+3. Nếu không tìm thấy → tạo bản ghi mới
+
+**Đầu ra**: Dữ liệu bản ghi đã tạo hoặc cập nhật khả dụng để sử dụng trong các bước tiếp theo.
+
+## Hành động luồng
+
+### Iterator
+**Lặp qua mảng bản ghi** trả về từ bước trước, cho phép bạn thực hiện hành động trên mỗi bản ghi riêng lẻ.
+
+**Cấu hình**:
+- Chọn mảng bản ghi từ bước trước (ví dụ: kết quả từ Tìm kiếm bản ghi, từ trigger Thủ công với khả dụng Hàng loạt, từ nút mã nguồn)
+- Xác định hành động thực hiện trên mỗi bản ghi trong vòng lặp.
+<Note>
+- Bạn có thể thêm nhiều hành động trong một iterator.
+- Khi sử dụng nhánh bên trong iterator, đảm bảo bước cuối cùng của mỗi nhánh kết nối trở lại iterator để đóng vòng lặp.
+</Note>
+
+- Truy cập trường `Phần tử hiện tại`: để sử dụng trường từ bản ghi đang được xử lý, nhấp vào bước **Iterator**, sau đó chọn **Phần tử hiện tại**. Danh sách trường khả dụng từ bản ghi đó sẽ được hiển thị và có thể chọn để sử dụng trong các hành động tiếp theo.
+
+<VimeoEmbed videoId="1146577247" title="Video minh họa" />
+
+
+### Bộ lọc
+Lọc bản ghi dựa trên điều kiện được chỉ định, chỉ cho phép bản ghi đáp ứng tiêu chí đi qua.
+
+**Cấu hình**:
+- Chọn bản ghi để lọc
+- Xác định điều kiện và tiêu chí lọc
+- Cấu hình bản ghi nào nên đi qua các bước tiếp theo
+<Note>
+1. **Đầu ra**: Nút Bộ lọc không trả về dữ liệu — chúng hoạt động như cổng. Nếu điều kiện được đáp ứng, workflow tiếp tục. Nếu không, workflow dừng tại nhánh đó.
+2. Toán tử `IS` có thể sử dụng với trường số. Nó hoạt động như `EQUAL`.
+</Note>
+
+### Trì hoãn
+Tạm dừng thực thi workflow trong khoảng thời gian xác định hoặc cho đến ngày/giờ cụ thể.
+
+**Loại trì hoãn**:
+
+| Loại | Mô tả |
+|------|-------------|
+| **Thời lượng** | Chờ một khoảng thời gian cụ thể (ngày, giờ, phút, giây) |
+| **Ngày đã lên lịch** | Chờ đến ngày và giờ cụ thể |
+
+**Cấu hình cho Thời lượng**:
+- Đặt ngày, giờ, phút và/hoặc giây
+- Kết hợp nhiều đơn vị (ví dụ: 2 ngày và 4 giờ)
+
+**Cấu hình cho Ngày đã lên lịch**:
+- Chọn ngày và giờ
+- Có thể tham chiếu trường ngày từ bước trước (ví dụ: theo dõi 3 ngày sau cuộc họp)
+
+**Trường hợp sử dụng**:
+- Chờ 24 giờ trước khi gửi email theo dõi
+- Tạm dừng cho đến ngày đóng cơ hội
+- Lên lịch hành động vào giờ làm việc
+
+<Note>
+Ngày đã lên lịch không thể trong quá khứ. Nếu trường ngày từ bước trước được sử dụng và ngày đã qua, workflow sẽ thất bại.
+</Note>
+
+**Giới hạn & Credit**:
+- **Không giới hạn thời lượng tối đa** — bạn có thể đặt trì hoãn phút, ngày, tuần hoặc lâu hơn
+- **1 credit được tiêu thụ** khi nút Trì hoãn thực thi, bất kể thời lượng
+- **Không tiêu thụ credit** trong khi chờ — trì hoãn 5 phút tốn tương đương trì hoãn 5 ngày
+
+## Hành động giao tiếp
+
+### Gửi email
+Gửi email từ workflow. Tuyệt vời cho email nhóm theo mẫu. Email sẽ trông giống như email bạn gửi từ hộp thư.
+Không phù hợp cho bản tin (cần định dạng phong phú hơn) hoặc chuỗi email tự động.
+
+**Điều kiện tiên quyết**: Thêm tài khoản email trong Cài đặt → Tài khoản
+
+**Cấu hình**:
+- Chọn tài khoản email người gửi
+<Note>
+Bạn chỉ có thể gửi email từ hộp thư đồng bộ với tài khoản Twenty của mình. Gửi từ hộp thư thành viên nhóm khác (ví dụ: email chủ tài khoản) đang nằm trong lộ trình.
+</Note>
+
+Đối với tất cả các bước sau, bạn có thể tham chiếu biến từ bước trước để cá nhân hóa.
+
+- Nhập địa chỉ email người nhận.
+<Note>
+Hiện tại chỉ hỗ trợ một người nhận.
+</Note>
+- Đặt dòng chủ đề.
+- Soạn nội dung tin nhắn. Bạn có thể định dạng liên kết, tạo danh sách đánh số, danh sách gạch đầu dòng, thêm tệp đính kèm.
+<Note>
+Hiện không thể thêm chữ ký HTML.
+</Note>
+
+### Biểu mẫu
+Hiển thị biểu mẫu trong quá trình thực thi workflow để thu thập đầu vào người dùng. Các phản hồi có thể được sử dụng trong các bước tiếp theo để tạo bản ghi, gửi email hoặc thực thi bất kỳ hành động nào khác dựa trên đầu vào.
+<Warning>
+**Biểu mẫu được thiết kế chỉ cho trigger thủ công**. Đối với workflow có trigger khác (Bản ghi được tạo, Cập nhật, v.v.), biểu mẫu chỉ truy cập được qua giao diện chạy workflow, không phải trải nghiệm người dùng mong đợi. Trung tâm thông báo sẽ được phát hành vào năm 2026 để hỗ trợ biểu mẫu trong workflow tự động đúng cách.
+</Warning>
+**Cấu hình**:
+- Cấu hình các trường người dùng sẽ được yêu cầu điền. Cho mỗi trường, chọn
+  - loại trong số văn bản, số, ngày, bản ghi cụ thể, trường chọn. Trường chọn từ tất cả đối tượng đều khả dụng.
+  - nhãn
+  - giá trị mặc định trong `Placeholder` (tùy chọn)
+- Chỉnh sửa tiêu đề biểu mẫu
+
+**Đầu ra**: Phản hồi biểu mẫu khả dụng để sử dụng trong các bước tiếp theo.
+
+**Ví dụ**: Workflow "Quick Lead" khả dụng mặc định trong tất cả không gian làm việc, truy cập ở bất đâu trong Menu lệnh `Cmd + K`.
+
+**Cách điền biểu mẫu**:
+- Kích hoạt workflow thủ công từ menu lệnh `Cmd K`
+- Điền biểu mẫu hiển thị trong bảng bên và nhấp `Gửi`.
+<Note>
+Các trường không thể đặt thành bắt buộc.
+</Note>
+
+<VimeoEmbed videoId="1147277989" title="Video minh họa" />
+
+
+
+## Hành động tích hợp
+
+### Mã nguồn
+Chạy JavaScript tùy chỉnh trong workflow.
+
+**Cấu hình**:
+- Truy cập biến từ bước trước. Bạn có thể chỉnh sửa tên biến động.
+<VimeoEmbed videoId="1147281795" title="Video minh họa" />
+- Viết mã JavaScript trong trình soạn thảo
+- Trả về biến để sử dụng trong các bước tiếp theo
+- Kiểm tra mã trực tiếp trong bước
+
+<Note>
+Nếu bạn cần sử dụng API key bên ngoài trong mã, bạn phải nhập trực tiếp trong thân hàm. Bạn không thể cấu hình API key ở nơi khác và tham chiếu trong logic function.
+</Note>
+
+<Tip>
+**Làm việc với mảng?** Mảng từ hệ thống bên ngoài hoặc bước trước có thể đến dạng chuỗi. Xem [Cách xử lý mảng trong hành động Mã nguồn](/l/vi/user-guide/workflows/how-tos/advanced-configurations/handle-arrays-in-code-actions) để biết giải pháp.
+</Tip>
+
+<Tip>
+Nhấp biểu tượng vuông ở góc trên bên phải trình soạn thảo mã để hiển thị toàn màn hình — hữu ích vì chiều rộng trình soạn thảo mặc định bị hạn chế.
+</Tip>
+
+### HTTP Request
+Gửi yêu cầu đến API bên ngoài như một phần của workflow.
+<img src="/images/user-guide/workflows/http_action.png" style={{width:'100%'}}/>
+
+
+**Cấu hình**:
+- Nhập URL endpoint API. Có thể sử dụng tham số từ bước trước.
+- Chọn phương thức HTTP (GET, POST, PUT, PATCH, DELETE)
+- Thêm header và giá trị cần thiết
+- Cung cấp phản hồi mẫu để xem trước cấu trúc
+
+## Hành động AI
+
+### AI Agent - Sắp ra mắt
+Chạy AI agent trong workflow để thực hiện các tác vụ thông minh.
+
+**Cấu hình**:
+- **Agent**: Chọn AI agent hiện có hoặc sử dụng agent mặc định
+- **Prompt**: Viết hướng dẫn cho AI agent
+- Tham chiếu biến từ bước trước trong prompt
+
+**AI Agent có thể làm gì**:
+- Phân tích và tóm tắt dữ liệu
+- Phân loại hoặc phân nhóm bản ghi
+- Tạo nội dung văn bản
+- Ra quyết định dựa trên dữ liệu
+- Tương tác với dữ liệu CRM bằng công cụ
+
+**Đầu ra**: Phản hồi AI agent khả dụng để sử dụng trong các bước tiếp theo. Nếu agent có schema đầu ra có cấu trúc, phản hồi sẽ theo định dạng đó.
+
+<Note>
+Hành động AI Agent tiêu thụ credit workflow dựa trên mô hình AI được sử dụng. Xem [Credit Workflow](/l/vi/user-guide/workflows/capabilities/workflow-credits) để biết chi tiết.
+</Note>
+
+<Note>
+AI agent tuân thủ quyền theo vai trò. Bạn có thể gán vai trò cụ thể cho agent trong **Cài đặt → Vai trò** để kiểm soát dữ liệu nào chúng có thể truy cập. Xem [Quyền](/l/vi/user-guide/permissions-access/capabilities/permissions) để biết chi tiết.
+</Note>

@@ -1,0 +1,55 @@
+---
+title: Navigation Bar
+image: /images/user-guide/table-views/table.png
+---
+<Frame>
+  <img src="/images/user-guide/table-views/table.png" alt="Header" />
+</Frame>
+
+Hiển thị thanh điều hướng chứa nhiều component `NavigationBarItem`.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { IconHome, IconUser, IconSettings } from '@tabler/icons-react';
+import { NavigationBar } from "@/ui/navigation/navigation-bar/components/NavigationBar";
+
+export const MyComponent = () => {
+
+   const navigationItems = [
+     {
+       name: "Home",
+       Icon: IconHome,
+       onClick: () => console.log("Home clicked"),
+     },
+     {
+       name: "Profile",
+       Icon: IconUser,
+       onClick: () => console.log("Profile clicked"),
+     },
+     {
+       name: "Settings",
+       Icon: IconSettings,
+       onClick: () => console.log("Settings clicked"),
+     },
+   ];
+
+  return <NavigationBar activeItemName="Home" items={navigationItems}/>;
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| activeItemName | string | Tên của mục điều hướng hiện đang active |
+| items | array | Một mảng các đối tượng đại diện cho từng mục điều hướng. Mỗi đối tượng chứa `name` của mục, component `Icon` để hiển thị, và hàm `onClick` được gọi khi mục được nhấp |
+
+
+
+
+</Tab>
+</Tabs>

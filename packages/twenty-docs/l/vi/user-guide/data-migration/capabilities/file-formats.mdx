@@ -1,0 +1,46 @@
+---
+title: Định dạng tệp được hỗ trợ
+description: Các định dạng tệp được hỗ trợ để nhập dữ liệu trong Twenty.
+---
+
+## Định dạng được hỗ trợ
+
+Twenty hỗ trợ ba định dạng tệp để nhập:
+
+| Định dạng | Phần mở rộng | Ghi chú |
+|--------|-----------|-------|
+| **CSV** | .csv | Khuyến nghị, tương thích nhất |
+| **Excel** | .xlsx | Định dạng Excel hiện đại |
+| **Excel (Cũ)** | .xls | Định dạng Excel cũ |
+
+## Yêu cầu tệp
+
+| Yêu cầu | Giá trị |
+|-------------|-------|
+| **Mã hóa** | Khuyến nghị UTF-8 |
+| **Giới hạn bản ghi** | 10.000 bản ghi mỗi tệp |
+| **Cấu trúc** | Hàng đầu tiên phải chứa tiêu đề cột |
+| **Nội dung** | Một loại đối tượng mỗi tệp |
+
+## Phương pháp tốt nhất cho CSV
+
+- **Dấu phân cách**: Sử dụng dấu phẩy (`,`) hoặc dấu chấm phẩy (`;`)
+- **Dấu ngoặc văn bản**: Sử dụng dấu ngoặc kép (`"`) cho văn bản chứa dấu phẩy
+- **Kết thúc dòng**: Hỗ trợ cả Windows (CRLF) và Unix (LF)
+- **Giá trị trống**: Để ô trống, không sử dụng "NULL" hoặc "N/A"
+
+## Phương pháp tốt nhất cho Excel
+
+Khi xuất từ Excel:
+- Xóa công thức (chỉ xuất giá trị)
+- Xóa hàng trống ở cuối
+- Đảm bảo không có ô được gộp
+- Chỉ sử dụng sheet đầu tiên
+
+## Tập dữ liệu lớn
+
+Với tập dữ liệu lớn hơn 10.000 bản ghi:
+- Chia thành nhiều tệp
+- Hoặc sử dụng [nhập API](/l/vi/user-guide/data-migration/how-tos/import-data-via-api) cho bản ghi không giới hạn
+
+<Note>Với di chuyển rất lớn (100.000+ bản ghi), API nhanh hơn và đáng tin cậy hơn đáng kể so với nhập CSV.</Note>

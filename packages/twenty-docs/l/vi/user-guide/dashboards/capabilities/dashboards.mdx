@@ -1,0 +1,85 @@
+---
+title: Dashboard
+description: Tạo và tổ chức dashboard với các tab để trực quan hóa dữ liệu CRM.
+---
+
+## Tổng quan
+
+Dashboard trong Twenty được tổ chức theo cấu trúc phân cấp: **Dashboard → Tab → Widget**. Mỗi dashboard có thể chứa nhiều tab, và mỗi tab chứa các widget (biểu đồ, số liệu, iFrame).
+
+## Tạo dashboard
+
+1. Đi tới **Dashboard** trong thanh điều hướng
+2. Nhấp **+ Bản ghi mới**
+
+<img src="/images/user-guide/dashboard/dashboard-create-new.png" alt="Tạo dashboard mới" />
+
+
+3. Đặt tên cho dashboard
+4. Bắt đầu thêm tab và widget
+
+## Làm việc với tab
+
+Tab giúp bạn tổ chức dashboard thành các phần logic.
+
+### Tạo tab
+1. Trong chế độ chỉnh sửa, nhấp **+** trên thanh tab, bảng bên sẽ mở ở phía phải
+2. Đặt tên cho tab (ví dụ: "Tổng quan Pipeline", "Hiệu suất nhóm")
+3. Thêm widget vào tab
+
+### Sắp xếp lại tab
+1. Trong chế độ chỉnh sửa, nhấp và giữ tab bạn muốn di chuyển
+2. Kéo và thả vào vị trí mới
+3. Bạn cũng có thể nhấp vào tab và sử dụng menu lệnh để di chuyển tab sang trái hoặc phải
+
+### Xóa tab
+1. Trong chế độ chỉnh sửa, nhấp vào tab bạn muốn xóa
+2. Nhấp nút **Xóa** trong menu lệnh
+
+### Nhân bản tab
+1. Nhấp vào tab bạn muốn nhân bản
+2. Nhấp nút **Nhân bản** trong bảng bên
+
+<img src="/images/user-guide/dashboard/dashboard-tabs.png" alt="Tab dashboard" />
+
+## Bố cục dashboard
+
+### Sắp xếp widget
+- Kéo và thả để định vị
+- Thay đổi kích thước để nhấn mạnh
+- Nhóm các biểu đồ liên quan lại với nhau
+
+### Nhân bản dashboard
+1. Chọn dashboard bạn muốn nhân bản
+2. Mở thanh lệnh bằng **Cmd + K** (hoặc **Ctrl + K** trên Windows)
+3. Chọn **Nhân bản dashboard**
+
+<img src="/images/user-guide/dashboard/dashboard-duplicate.png" alt="Nhân bản dashboard" />
+
+### Thực hành tốt nhất
+- **Luồng logic**: Sắp xếp từ tổng quan đến chi tiết
+- **Phân cấp trực quan**: Biểu đồ lớn hơn cho chỉ số chính
+- **Kiểu nhất quán**: Sử dụng màu sắc và phông chữ phù hợp
+
+## Hiển thị & Quyền truy cập
+
+### Hiển thị dashboard
+Dashboard hiển thị cho tất cả người có quyền truy cập workspace Twenty. Hiện chưa có tùy chọn dashboard riêng tư.
+
+### Mục yêu thích
+Bạn có thể thêm dashboard vào mục yêu thích để truy cập nhanh. Đây là cài đặt cá nhân — mục yêu thích của bạn không hiển thị cho người dùng khác.
+
+Để thêm dashboard vào mục yêu thích, mở dashboard và nhấp biểu tượng ngôi sao.
+
+### Hành vi múi giờ
+
+Dashboard hiện hiển thị dữ liệu dựa trên múi giờ của người xem. Điều này có nghĩa là cùng một dashboard có thể hiển thị chỉ số khác nhau cho các thành viên ở các khu vực khác nhau (ví dụ: châu Á so với Mỹ).
+
+<Note>
+**Sắp ra mắt**: Chúng tôi sẽ thêm khả năng đặt múi giờ cụ thể cho dashboard, để tất cả người dùng xem dữ liệu nhất quán bất kể vị trí.
+</Note>
+
+<Note>
+**Sắp ra mắt**: Bộ lọc cấp dashboard sẽ cho phép bạn áp dụng bộ lọc trên tất cả widget cùng lúc, giúp khám phá dữ liệu nhanh hơn.
+</Note>
+

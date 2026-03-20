@@ -1,0 +1,50 @@
+---
+title: Feature Flag
+---
+
+
+Feature flag được sử dụng để ẩn tính năng thử nghiệm. Với Twenty, chúng được đặt ở cấp workspace chứ không phải cấp người dùng.
+
+## Thêm feature flag mới
+
+Trong `FeatureFlagKey.ts` thêm feature flag:
+
+```ts
+type FeatureFlagKey =
+  | 'IS_FEATURENAME_ENABLED'
+  | ...;
+```
+
+Cũng thêm vào enum trong `feature-flag.entity.ts`:
+
+```ts
+enum FeatureFlagKeys {
+    IsFeatureNameEnabled = 'IS_FEATURENAME_ENABLED',
+    ...
+}
+```
+
+
+
+Để áp dụng feature flag cho tính năng **backend** sử dụng:
+
+```ts
+@Gate({
+  featureFlag: 'IS_FEATURENAME_ENABLED',
+})
+```
+
+Để áp dụng feature flag cho tính năng **frontend** sử dụng:
+
+```ts
+const isFeatureNameEnabled = useIsFeatureEnabled('IS_FEATURENAME_ENABLED');
+```
+
+
+## Cấu hình feature flag cho việc triển khai
+
+Thay đổi bản ghi tương ứng trong Bảng `core.featureFlag`:
+
+| id       | key                      | workspaceId   | value  |
+|----------|--------------------------|---------------|--------|
+|  Random  | `IS_FEATURENAME_ENABLED` |  WorkspaceID  | `true` |

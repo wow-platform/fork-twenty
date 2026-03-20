@@ -1,0 +1,164 @@
+---
+title: Di chuyển từ tự triển khai sang Cloud
+description: Hướng dẫn từng bước để di chuyển phiên bản Twenty tự triển khai sang Twenty Cloud.
+---
+
+## Tổng quan
+
+Hướng dẫn này hướng dẫn bạn di chuyển dữ liệu từ phiên bản Twenty tự triển khai sang Twenty Cloud. Quy trình bao gồm thiết lập không gian làm việc cloud, xuất dữ liệu và nhập lại.
+
+<Note>Views, workflows và roles phải được tạo lại thủ công sau khi di chuyển. Hãy dành thời gian cho công việc cấu hình này.</Note>
+
+## Bước 1: Tạo không gian làm việc Cloud
+
+1. Vào [app.twenty.com](https://app.twenty.com) và tạo không gian làm việc mới
+2. Hoàn tất trình hướng dẫn thiết lập ban đầu
+3. Ghi lại URL không gian làm việc mới
+
+## Bước 2: Tạo lại mô hình dữ liệu
+
+Trước khi nhập dữ liệu, tạo lại đối tượng và trường tùy chỉnh:
+
+1. Vào **Settings → Data Model** trong phiên bản cloud
+2. Tạo đối tượng tùy chỉnh khớp với thiết lập tự triển khai
+3. Thêm trường tùy chỉnh vào đối tượng tiêu chuẩn và tùy chỉnh
+4. Cấu hình cài đặt trường (duy nhất, bắt buộc, v.v.)
+
+<Note>Chụp ảnh màn hình mô hình dữ liệu tự triển khai để tham khảo, hoặc mở cả hai phiên bản cạnh nhau.</Note>
+
+## Bước 3: Mời tất cả người dùng
+
+<Warning>
+**Quan trọng: Mời người dùng TRƯỚC khi nhập dữ liệu.**
+
+Người dùng phải chấp nhận lời mời trước khi bạn nhập bất kỳ bản ghi nào tham chiếu đến họ (như trường Account Owner). Nếu người dùng chưa tồn tại, các quan hệ đó không thể ánh xạ.
+</Warning>
+
+1. Vào **Settings → Members** trong phiên bản cloud
+2. Mời tất cả thành viên nhóm có tài khoản trên tự triển khai
+3. **Đợi mọi người chấp nhận** lời mời
+4. Xác minh tất cả người dùng xuất hiện trong danh sách Members
+
+## Bước 4: Xuất dữ liệu từ tự triển khai
+
+Xuất từng đối tượng từ phiên bản tự triển khai:
+
+1. Điều hướng đến từng đối tượng (Companies, People, Opportunities, v.v.)
+2. Cấu hình chế độ xem hiển thị **tất cả cột** bạn muốn di chuyển
+3. Nhấp **⋮ → Export view**
+4. Lưu mỗi tệp CSV với tên rõ ràng (ví dụ: `companies-export.csv`)
+
+**Xuất theo thứ tự này** (để tham khảo khi nhập):
+1. Companies
+2. People
+3. Opportunities
+4. Đối tượng tùy chỉnh (theo thứ tự phụ thuộc)
+5. Tasks, Notes
+
+## Bước 5: Cập nhật tham chiếu Workspace Member
+
+CSV đã xuất chứa ID người dùng từ phiên bản tự triển khai. Các ID này không khớp phiên bản cloud, nên bạn cần thay thế bằng email.
+
+**Cho mỗi tệp CSV có tham chiếu người dùng (Owner, Assignee, v.v.):**
+
+1. Mở CSV trong ứng dụng bảng tính
+2. Thêm cột mới bên cạnh mỗi cột ID người dùng (ví dụ: `accountOwnerEmail` bên cạnh `accountOwnerId`)
+3. Điền **địa chỉ email** của mỗi người dùng
+4. Bạn có thể xóa cột ID cũ hoặc để (nó sẽ bị bỏ qua khi nhập)
+
+**Ví dụ:**
+
+Trước:
+```csv
+name,domain,accountOwnerId
+Acme Corp,https://acme.com,old-uuid-123
+```
+
+Sau:
+```csv
+name,domain,accountOwnerEmail
+Acme Corp,https://acme.com,john@yourcompany.com
+```
+
+<Note>Sử dụng cùng địa chỉ email mà người dùng dùng để chấp nhận lời mời không gian làm việc cloud.</Note>
+
+## Bước 6: Lên kế hoạch thứ tự nhập
+
+Nhập tệp theo thứ tự đúng để duy trì quan hệ:
+
+1. **Companies** trước (không phụ thuộc)
+2. **People** sau (liên kết với Companies)
+3. **Opportunities** thứ ba (liên kết với Companies và People)
+4. **Đối tượng tùy chỉnh** (theo thứ tự phụ thuộc)
+5. **Tasks và Notes** cuối cùng (liên kết với bản ghi khác)
+
+Xem [Cách nhập quan hệ](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv) để biết chi tiết duy trì quan hệ.
+
+## Bước 7: Nhập vào Cloud
+
+Cho mỗi tệp CSV, theo thứ tự:
+
+1. Điều hướng đến đối tượng trong phiên bản cloud
+2. Nhấp **⋮ → Import records**
+3. Tải tệp CSV lên
+4. Ánh xạ cột với trường:
+   - Ánh xạ cột email người dùng với trường quan hệ phù hợp
+   - Ánh xạ cột khác như bình thường
+5. Xem lại và sửa lỗi
+6. Xác nhận nhập
+7. Xác minh vài bản ghi trước khi tiếp tục tệp tiếp theo
+
+## Bước 8: Tạo lại cấu hình
+
+Sau khi nhập dữ liệu, tạo lại thủ công:
+
+### Views
+- Tạo lại chế độ xem đã lưu với bộ lọc, sắp xếp và cấu hình cột
+- Thiết lập chế độ xem kanban hoặc lịch
+
+### Workflows
+- Tạo lại tự động hóa trong **Settings → Workflows**
+- Kiểm tra mỗi workflow trước khi dựa vào
+
+### Vai trò và quyền
+- Cấu hình vai trò trong **Settings → Roles**
+- Gán người dùng vào vai trò phù hợp
+
+### Tích hợp
+- Kết nối lại đồng bộ email và lịch cho mỗi người dùng
+- Cấu hình lại tích hợp API với API key mới
+
+## Danh sách kiểm tra sau di chuyển
+
+<Check>Tất cả dữ liệu đã nhập thành công</Check>
+<Check>Quan hệ giữa đối tượng hoạt động đúng</Check>
+<Check>Phân công người dùng (Owner, Assignee) ánh xạ đúng</Check>
+<Check>Views đã được tạo lại</Check>
+<Check>Workflows đã được tạo lại và kiểm tra</Check>
+<Check>Vai trò và quyền đã cấu hình</Check>
+<Check>Đồng bộ email/lịch đã kết nối lại</Check>
+<Check>Tích hợp API đã cập nhật key mới</Check>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Tôi có thể di chuyển workflows tự động không?">
+    Hiện chưa được. Workflows phải được tạo lại thủ công trong phiên bản cloud.
+  </Accordion>
+
+  <Accordion title="Còn tệp đính kèm và hình ảnh thì sao?">
+    Tệp đính kèm không được bao gồm trong xuất CSV. Bạn cần tải lại thủ công, di chuyển qua API hoặc liên hệ đội ngũ của chúng tôi để hỗ trợ di chuyển lớn.
+  </Accordion>
+
+  <Accordion title="Tôi có thể chạy cả hai phiên bản trong quá trình di chuyển không?">
+    Có, chúng tôi khuyến nghị giữ phiên bản tự triển khai hoạt động cho đến khi bạn xác minh di chuyển cloud hoàn tất. Chỉ cẩn thận không tạo dữ liệu mới ở cả hai nơi.
+  </Accordion>
+
+  <Accordion title="Nếu người dùng chưa chấp nhận lời mời thì sao?">
+    Bản ghi tham chiếu người dùng đó sẽ thất bại khi nhập hoặc quan hệ sẽ trống. Đảm bảo tất cả người dùng chấp nhận lời mời trước khi nhập dữ liệu.
+  </Accordion>
+</AccordionGroup>
+
+## Cần trợ giúp?
+
+Cho di chuyển phức tạp hoặc tập dữ liệu lớn, liên hệ chúng tôi tại [contact@twenty.com](mailto:contact@twenty.com) hoặc khám phá [Dịch vụ triển khai](/l/vi/user-guide/getting-started/capabilities/implementation-services).

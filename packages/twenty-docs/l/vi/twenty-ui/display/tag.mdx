@@ -1,0 +1,46 @@
+---
+title: Tag
+image: /images/user-guide/table-views/table.png
+---
+<Frame>
+  <img src="/images/user-guide/table-views/table.png" alt="Header" />
+</Frame>
+
+Component để phân loại hoặc gắn nhãn nội dung một cách trực quan.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import { Tag } from "@/ui/display/tag/components/Tag";
+
+export const MyComponent = () => {
+  return (
+    <Tag
+      className
+      color="red"
+      text="Urgent"
+      onClick={() => console.log("click")}
+    />
+  );
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| className | string | Tên tùy chọn để tùy chỉnh thêm kiểu dáng |
+| color | string | Màu của tag. Các tùy chọn bao gồm: `green`, `turquoise`, `sky`, `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `gray` |
+| text | string | Nội dung của tag |
+| onClick | function | Hàm tùy chọn được gọi khi người dùng nhấp vào tag |
+
+
+
+</Tab>
+
+</Tabs>

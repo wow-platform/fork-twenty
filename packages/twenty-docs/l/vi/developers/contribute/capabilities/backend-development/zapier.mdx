@@ -1,0 +1,74 @@
+---
+title: Ứng dụng Zapier
+---
+
+
+Dễ dàng đồng bộ Twenty với 3000+ ứng dụng sử dụng [Zapier](https://zapier.com/). Tự động hóa tác vụ, tăng năng suất và nâng cao quan hệ khách hàng!
+
+## Về Zapier
+
+Zapier là công cụ cho phép bạn tự động hóa workflow bằng cách kết nối các ứng dụng đội của bạn sử dụng hàng ngày. Khái niệm cơ bản của Zapier là workflow tự động hóa, gọi là Zap, và bao gồm trigger và action.
+
+Bạn có thể tìm hiểu thêm về cách Zapier hoạt động [tại đây](https://zapier.com/how-it-works).
+
+## Thiết lập
+
+### Bước 1: Cài đặt các package Zapier
+
+```bash
+cd packages/twenty-zapier
+
+yarn
+```
+
+### Bước 2: Đăng nhập với CLI
+
+Sử dụng thông tin Zapier của bạn để đăng nhập bằng CLI:
+
+```bash
+zapier login
+```
+
+### Bước 3: Đặt biến môi trường
+
+Từ thư mục `packages/twenty-zapier`, chạy:
+
+```bash
+cp .env.example .env
+```
+Chạy ứng dụng cục bộ, vào [http://localhost:3000/settings/api-webhooks](http://localhost:3000/settings/api-webhooks) và tạo API key.
+
+Thay thế giá trị **YOUR_API_KEY** trong file `.env` bằng API key bạn vừa tạo.
+
+## Phát triển
+
+<Warning>
+
+Đảm bảo chạy `yarn build` trước bất kỳ lệnh `zapier` nào.
+
+</Warning>
+
+### Test
+```bash
+yarn test
+```
+### Lint
+```bash
+yarn format
+```
+### Theo dõi và biên dịch khi chỉnh sửa code
+```bash
+yarn watch
+```
+### Xác thực ứng dụng Zapier
+```bash
+yarn validate
+```
+### Triển khai ứng dụng Zapier
+```bash
+yarn deploy
+```
+### Liệt kê tất cả lệnh Zapier CLI
+```bash
+zapier
+```

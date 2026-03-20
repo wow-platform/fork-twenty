@@ -14,6 +14,7 @@ export const DOCUMENTATION_SUPPORTED_LANGUAGES = [
   'ro',
   'ru',
   'tr',
+  'vi',
   'zh',
 ] as const;
 

@@ -1,0 +1,156 @@
+---
+title: Khắc phục sự cố Workflow
+description: Các vấn đề workflow phổ biến và cách giải quyết.
+---
+
+
+## Vấn đề phổ biến và giải pháp
+
+### Workflow không kích hoạt
+
+**Triệu chứng**: Workflow không chạy khi bạn mong đợi.
+
+**Nguyên nhân có thể**:
+1. **Workflow chưa kích hoạt**: Đảm bảo workflow ở trạng thái "Hoạt động" không phải "Nháp"
+2. **Điều kiện trigger không đáp ứng**: Xác minh trigger khớp với sự kiện mong đợi
+3. **Trường không được giám sát**: Đối với trigger "Bản ghi được cập nhật", đảm bảo trường cụ thể đang được theo dõi
+4. **Quyền**: Kiểm tra bạn có quyền chạy workflow
+
+**Giải pháp**:
+- Xác minh trạng thái workflow trong danh sách workflow
+- Kiểm tra với hành động cụ thể bạn mong đợi kích hoạt
+- Xem lại cấu hình trigger
+- Liên hệ quản trị viên về quyền
+
+### Workflow kích hoạt quá sớm (Trường rỗng)
+
+**Triệu chứng**: Khi tạo bản ghi thủ công trong giao diện, workflow kích hoạt trước khi bạn có thời gian điền tất cả trường. Workflow chạy với giá trị trường hầu hết rỗng.
+
+**Tại sao xảy ra**: Twenty lưu mọi thứ theo thời gian thực — không có chế độ "chỉnh sửa" vs "đọc" riêng biệt. Khi bạn tạo bản ghi, nó được lưu ngay lập tức, kích hoạt sự kiện "Bản ghi được tạo" trước khi bạn có thể điền trường bổ sung.
+
+**Khi "Bản ghi được tạo" hoạt động tốt**:
+- Bản ghi tạo qua API call (trường được điền trong một yêu cầu)
+- Bản ghi tạo qua nhập
+- Bản ghi tạo tự động từ workflow khác
+
+**Giải pháp**: Đối với bản ghi tạo thủ công trong giao diện, sử dụng **"Bản ghi được tạo hoặc cập nhật"** làm trigger thay thế. Bằng cách này:
+- Workflow kích hoạt sau khi người dùng điền xong và lưu các trường
+- Bạn nhận dữ liệu đầy đủ thay vì giá trị rỗng
+
+<Tip>
+Nếu bạn chỉ muốn workflow chạy một lần cho mỗi bản ghi, thêm hành động Bộ lọc để kiểm tra trường như `createdAt bằng updatedAt` (lần lưu đầu tiên) hoặc sử dụng trường checkbox tùy chỉnh để theo dõi workflow đã chạy chưa.
+</Tip>
+
+### Hành động thất bại
+
+**Triệu chứng**: Workflow chạy nhưng một số hành động thất bại.
+
+**Nguyên nhân có thể**:
+1. **Thiếu dữ liệu**: Trường bắt buộc rỗng
+2. **Tham chiếu không hợp lệ**: Biến từ bước trước không tồn tại
+3. **Lỗi API**: Dịch vụ bên ngoài trả về lỗi
+4. **Vấn đề quyền**: Hành động yêu cầu quyền bạn không có
+
+**Giải pháp**:
+- Kiểm tra chi tiết lần chạy workflow để tìm thông báo lỗi
+- Xác minh tất cả trường bắt buộc có giá trị
+- Kiểm tra kết nối API độc lập
+- Xem lại quyền vai trò
+
+### Lỗi HTTP Request
+
+**Triệu chứng**: Hành động HTTP Request thất bại hoặc trả về kết quả không mong đợi.
+
+**Mã lỗi phổ biến**:
+- **400**: Yêu cầu sai — kiểm tra định dạng body yêu cầu
+- **401**: Chưa xác thực — xác minh API key
+- **403**: Bị cấm — kiểm tra quyền API
+- **404**: Không tìm thấy — xác minh URL endpoint
+- **429**: Quá nhiều yêu cầu — áp dụng giới hạn tốc độ
+- **500**: Lỗi server — vấn đề dịch vụ bên ngoài
+
+**Giải pháp**:
+- Xác minh URL endpoint API
+- Kiểm tra header xác thực
+- Kiểm tra gọi API bên ngoài Twenty trước
+- Thêm xử lý lỗi trong hành động Mã nguồn
+
+### Lỗi hành động Mã nguồn
+
+**Triệu chứng**: Mã JavaScript thất bại khi thực thi.
+
+**Vấn đề phổ biến**:
+1. **Lỗi cú pháp**: Lỗi đánh máy hoặc JavaScript không hợp lệ
+2. **Biến undefined**: Tham chiếu biến không tồn tại
+3. **Lỗi kiểu**: Thao tác trên kiểu dữ liệu sai
+4. **Hết thời gian**: Mã thực thi quá lâu
+
+**Giải pháp**:
+- Sử dụng xác thực trình soạn thảo mã tích hợp
+- Kiểm tra logic mã trong console JavaScript trước
+- Thêm câu lệnh console.log để gỡ lỗi
+- Đơn giản hóa thao tác phức tạp
+
+### Email không gửi
+
+**Triệu chứng**: Hành động Gửi email không giao email.
+
+**Nguyên nhân có thể**:
+1. **Chưa kết nối tài khoản email**: Kiểm tra Cài đặt → Tài khoản
+2. **Địa chỉ email không hợp lệ**: Email người nhận sai định dạng
+3. **Giới hạn gửi**: Đạt giới hạn tốc độ nhà cung cấp email
+4. **Bộ lọc spam**: Email bị chặn
+
+**Giải pháp**:
+- Xác minh kết nối tài khoản email
+- Xác thực địa chỉ email người nhận
+- Kiểm tra giới hạn nhà cung cấp email
+- Xem lại nội dung email tìm yếu tố kích hoạt spam
+
+## Gỡ lỗi Workflow
+
+### Sử dụng lần chạy Workflow
+
+1. Vào trình chỉnh sửa workflow
+2. Mở bảng **Lần chạy**
+3. Tìm lần chạy thất bại
+4. Nhấp để xem chi tiết từng bước
+5. Xem lại thông báo lỗi và dữ liệu đầu ra
+
+### Kiểm tra từng bước
+
+1. Đối với hành động Mã nguồn, sử dụng nút **Kiểm tra**
+2. Đối với HTTP request, kiểm tra endpoint riêng biệt
+3. Tạo bản ghi thử để kích hoạt workflow
+4. Sử dụng trigger thủ công để kiểm tra có kiểm soát
+
+### Mẫu gỡ lỗi phổ biến
+
+**Thêm ghi nhật ký**:
+Sử dụng hành động Mã nguồn để ghi nhật ký giá trị trung gian để gỡ lỗi.
+
+**Cô lập bước**:
+Kiểm tra mỗi bước độc lập để xác định thất bại.
+
+**Kiểm tra luồng dữ liệu**:
+Xác minh mỗi bước nhận dữ liệu đầu vào mong đợi.
+
+## Thực hành tốt nhất để tránh vấn đề
+
+### Trước khi kích hoạt
+- Kiểm tra kỹ ở chế độ nháp
+- Xác thực tất cả kết nối API
+- Xem lại điều kiện trigger cẩn thận
+- Ghi chú hành vi mong đợi
+
+### Trong quá trình phát triển
+- Sử dụng tên bước mô tả
+- Thêm ghi chú trong hành động Mã nguồn
+- Kiểm tra với dữ liệu thực tế
+- Lập kế hoạch cho trường hợp biên
+
+### Sau khi kích hoạt
+- Giám sát lần chạy ban đầu chặt chẽ
+- Thiết lập cảnh báo cho thất bại
+- Xem lại lịch sử lần chạy thường xuyên
+- Giữ workflow đơn giản khi có thể

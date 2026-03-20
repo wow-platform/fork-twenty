@@ -1,0 +1,199 @@
+---
+title: Trường công thức
+description: Tạo trường công thức bằng workflow cho đến khi có hỗ trợ gốc.
+---
+
+Twenty chưa hỗ trợ trường công thức gốc (sẽ có trong năm 2026), nhưng bạn có thể đạt được kết quả tương tự bằng workflow. Giải pháp này cho phép bạn tự động tính toán và điền giá trị trường — từ nối chuỗi đơn giản đến logic nghiệp vụ phức tạp.
+
+## Trường hợp sử dụng phổ biến
+
+| Trường hợp | Ví dụ công thức |
+|----------|-----------------|
+| **Họ tên đầy đủ** | Tên + " " + Họ |
+| **Số tiền kỳ vọng** | Số tiền × Xác suất |
+| **Số ngày đến hạn** | Ngày hạn - Hôm nay |
+| **Số ngày trong giai đoạn** | Hôm nay - Ngày vào giai đoạn |
+| **Điểm lead** | Điểm dựa trên nhiều tiêu chí |
+
+<Tip>
+Để xem ví dụ đầy đủ theo dõi thời gian trong giai đoạn pipeline, xem [Theo dõi thời gian cơ hội ở mỗi giai đoạn](/l/vi/user-guide/views-pipelines/how-tos/track-time-in-stage).
+</Tip>
+
+## Công thức cơ bản: Nối chuỗi
+
+### Ví dụ: Tự động điền họ tên đầy đủ
+
+**Mục tiêu**: Tự động kết hợp tên và họ thành trường họ tên đầy đủ.
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được cập nhật hoặc tạo (Người)
+
+2. **Bộ lọc**: Kiểm tra tên hoặc họ thay đổi
+
+3. **Hành động mã nguồn**:
+
+```javascript
+export const main = async (params) => {
+  const { firstName, lastName } = params;
+
+  const fullName = [firstName, lastName]
+    .filter(Boolean)
+    .join(' ');
+
+  return { fullName };
+};
+```
+
+4. **Cập nhật bản ghi**: Đặt Họ tên đầy đủ thành `{{code.fullName}}`
+
+## Công thức số: Số tiền kỳ vọng
+
+### Ví dụ: Tính doanh thu kỳ vọng
+
+**Mục tiêu**: Nhân số tiền cơ hội với xác suất để có số tiền kỳ vọng.
+
+Xem [Cách hiển thị số tiền kỳ vọng trong Pipeline](/l/vi/user-guide/views-pipelines/how-tos/show-expected-amount-in-pipeline) để biết workflow đầy đủ.
+
+### Thiết lập nhanh
+
+1. **Trigger**: Bản ghi được cập nhật (Cơ hội, trường Số tiền HOẶC Xác suất)
+
+2. **Hành động mã nguồn**:
+
+```javascript
+export const main = async (params) => {
+  const { amount, probability } = params;
+
+  const expectedAmount = (amount || 0) * (probability || 0) / 100;
+
+  return { expectedAmount };
+};
+```
+
+3. **Cập nhật bản ghi**: Đặt Số tiền kỳ vọng thành `{{code.expectedAmount}}`
+
+## Công thức ngày: Tính số ngày
+
+### Ví dụ: Số ngày đến hạn tác vụ
+
+**Mục tiêu**: Tính số ngày còn lại đến hạn tác vụ.
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được cập nhật hoặc tạo (Tác vụ, trường Ngày hạn)
+
+2. **Hành động mã nguồn**:
+
+```javascript
+export const main = async (params) => {
+  const { dueDate } = params;
+
+  if (!dueDate) {
+    return { daysUntilDue: null };
+  }
+
+  const due = new Date(dueDate);
+  const today = new Date();
+  const diffTime = due - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return { daysUntilDue: diffDays };
+};
+```
+
+3. **Cập nhật bản ghi**: Đặt Số ngày đến hạn thành `{{code.daysUntilDue}}`
+
+<Note>
+Giá trị âm chỉ tác vụ quá hạn. Bạn có thể sử dụng trường này để lọc hoặc sắp xếp tác vụ theo mức độ khẩn cấp.
+</Note>
+
+## Công thức có điều kiện: Điểm Lead
+
+### Ví dụ: Tính điểm Lead dựa trên tiêu chí
+
+**Mục tiêu**: Chấm điểm lead dựa trên quy mô công ty, ngành và mức độ tương tác.
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được cập nhật (Người hoặc Công ty)
+
+2. **Hành động mã nguồn**:
+
+```javascript
+export const main = async (params) => {
+  const { companySize, industry, hasEmail, hasPhone, source } = params;
+
+  let score = 0;
+
+  // Chấm điểm quy mô công ty
+  if (companySize === 'Enterprise') score += 30;
+  else if (companySize === 'Mid-Market') score += 20;
+  else if (companySize === 'SMB') score += 10;
+
+  // Chấm điểm ngành
+  const targetIndustries = ['Technology', 'Finance', 'Healthcare'];
+  if (targetIndustries.includes(industry)) score += 25;
+
+  // Chấm điểm thông tin liên hệ
+  if (hasEmail) score += 10;
+  if (hasPhone) score += 15;
+
+  // Chấm điểm nguồn
+  if (source === 'Referral') score += 20;
+  else if (source === 'Website') score += 10;
+
+  return { leadScore: score };
+};
+```
+
+3. **Cập nhật bản ghi**: Đặt Điểm Lead thành `{{code.leadScore}}`
+
+## Công thức văn bản: Trích xuất tên miền
+
+### Ví dụ: Trích xuất tên miền từ email
+
+**Mục tiêu**: Tự động trích xuất và lưu tên miền email.
+
+### Thiết lập
+
+1. **Trigger**: Bản ghi được cập nhật (Người, trường Email)
+
+2. **Hành động mã nguồn**:
+
+```javascript
+export const main = async (params) => {
+  const { email } = params;
+
+  if (!email) return { domain: null };
+
+  const domain = email.split('@')[1]?.toLowerCase();
+
+  return { domain };
+};
+```
+
+3. **Cập nhật bản ghi**: Đặt trường Tên miền thành `{{code.domain}}`
+
+## Thực hành tốt nhất
+
+### Hiệu suất
+- Chỉ kích hoạt khi trường liên quan thay đổi
+- Sử dụng bộ lọc để bỏ qua bản ghi không cần tính toán
+- Tránh tính toán phức tạp trong workflow tần suất cao
+
+### Xử lý lỗi
+- Kiểm tra giá trị null/undefined trước khi tính toán
+- Sử dụng giá trị mặc định khi thiếu dữ liệu
+- Trả về thông báo lỗi rõ ràng khi tính toán thất bại
+
+### Kiểm tra
+- Kiểm tra với trường hợp biên (trường rỗng, giá trị bằng không)
+- Xác minh tính toán thủ công trước khi kích hoạt
+- Giám sát lần chạy workflow để tìm kết quả bất ngờ
+
+## Liên quan
+
+- [Cách hiển thị số tiền kỳ vọng trong Pipeline](/l/vi/user-guide/views-pipelines/how-tos/show-expected-amount-in-pipeline)
+- [Cách theo dõi thời gian trong giai đoạn](/l/vi/user-guide/views-pipelines/how-tos/track-time-in-stage)
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)

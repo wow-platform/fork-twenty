@@ -1,0 +1,345 @@
+---
+title: Thiết lập
+---
+
+# Quản lý cấu hình
+
+<Warning>
+**Lần đầu cài đặt?** Làm theo [hướng dẫn cài đặt Docker Compose](/l/vi/developers/self-host/capabilities/docker-compose) để chạy Twenty, sau đó quay lại đây để cấu hình.
+</Warning>
+
+Twenty cung cấp **hai chế độ cấu hình** phù hợp với các nhu cầu triển khai khác nhau:
+
+**Truy cập admin panel:** Chỉ người dùng có quyền admin (`canAccessFullAdminPanel: true`) mới có thể truy cập giao diện cấu hình.
+
+## 1. Cấu hình Admin Panel (Mặc định)
+
+```bash
+IS_CONFIG_VARIABLES_IN_DB_ENABLED=true  # mặc định
+```
+
+**Hầu hết cấu hình thực hiện qua giao diện** sau khi cài đặt:
+
+1. Truy cập instance Twenty (thường là `http://localhost:3000`)
+2. Vào **Settings / Admin Panel / Configuration Variables**
+3. Cấu hình tích hợp, email, lưu trữ và nhiều hơn
+4. Thay đổi có hiệu lực ngay (trong vòng 15 giây cho triển khai nhiều container)
+
+<Warning>
+**Triển khai nhiều container:** Khi sử dụng cấu hình database (`IS_CONFIG_VARIABLES_IN_DB_ENABLED=true`), cả container server và worker đọc từ cùng database. Thay đổi admin panel ảnh hưởng cả hai tự động, loại bỏ nhu cầu nhân đôi biến môi trường giữa các container (trừ biến hạ tầng).
+</Warning>
+
+**Những gì bạn có thể cấu hình qua admin panel:**
+- **Xác thực** - Google/Microsoft OAuth, cài đặt mật khẩu
+- **Email** - Cài đặt SMTP, mẫu, xác minh
+- **Lưu trữ** - Cấu hình S3, đường dẫn lưu trữ cục bộ
+- **Tích hợp** - Gmail, Google Calendar, dịch vụ Microsoft
+- **Workflow & giới hạn tốc độ** - Giới hạn thực thi, điều tiết API
+- **Và nhiều hơn...**
+
+![Admin Panel Configuration Variables](/images/user-guide/setup/admin-panel-config-variables.png)
+
+<Warning>
+Mỗi biến được tài liệu với mô tả trong admin panel tại **Settings -> Admin Panel -> Configuration Variables**.
+Một số cài đặt hạ tầng như kết nối database (`PG_DATABASE_URL`), URL máy chủ (`SERVER_URL`) và bí mật ứng dụng (`APP_SECRET`) chỉ có thể cấu hình qua file `.env`.
+
+[Tham khảo kỹ thuật đầy đủ ->](https://github.com/twentyhq/twenty/blob/main/packages/twenty-server/src/engine/core-modules/twenty-config/config-variables.ts)
+</Warning>
+
+## 2. Cấu hình chỉ bằng môi trường
+
+```bash
+IS_CONFIG_VARIABLES_IN_DB_ENABLED=false
+```
+
+**Tất cả cấu hình quản lý qua file `.env`:**
+
+1. Đặt `IS_CONFIG_VARIABLES_IN_DB_ENABLED=false` trong file `.env`
+2. Thêm tất cả biến cấu hình vào file `.env`
+3. Khởi động lại container để thay đổi có hiệu lực
+4. Admin panel sẽ hiển thị giá trị hiện tại nhưng không thể chỉnh sửa
+
+## Chế độ nhiều Workspace
+
+Mặc định, Twenty chạy ở **chế độ một workspace** -- lý tưởng cho hầu hết triển khai tự lưu trữ khi bạn cần một instance CRM cho tổ chức.
+
+### Chế độ một Workspace (Mặc định)
+
+```bash
+IS_MULTIWORKSPACE_ENABLED=false  # mặc định
+```
+
+- Một workspace mỗi instance Twenty
+- Người dùng đầu tiên tự động trở thành admin với đầy đủ quyền (`canImpersonate` và `canAccessFullAdminPanel`)
+- Đăng ký mới bị vô hiệu hóa sau khi workspace đầu tiên được tạo
+- Cấu trúc URL đơn giản: `https://tên-miền-của-bạn.com`
+
+### Bật chế độ nhiều Workspace
+
+```bash
+IS_MULTIWORKSPACE_ENABLED=true
+DEFAULT_SUBDOMAIN=app  # giá trị mặc định
+```
+
+Bật chế độ nhiều workspace cho triển khai kiểu SaaS nơi nhiều đội độc lập cần workspace riêng trên cùng instance Twenty.
+
+**Khác biệt chính so với chế độ một workspace:**
+- Nhiều workspace có thể tạo trên cùng instance
+- Mỗi workspace có subdomain riêng (ví dụ: `sales.tên-miền-của-bạn.com`, `marketing.tên-miền-của-bạn.com`)
+- Người dùng đăng ký và đăng nhập tại `{DEFAULT_SUBDOMAIN}.tên-miền-của-bạn.com` (ví dụ: `app.tên-miền-của-bạn.com`)
+- Không có quyền admin tự động -- người dùng đầu tiên trong mỗi workspace là người dùng thường
+- Cài đặt workspace cụ thể như subdomain và tên miền tùy chỉnh trở nên có sẵn trong cài đặt workspace
+
+<Warning>
+**Cài đặt chỉ qua môi trường:** `IS_MULTIWORKSPACE_ENABLED` chỉ có thể cấu hình qua file `.env` và cần khởi động lại. Không thể thay đổi qua admin panel.
+</Warning>
+
+### Cấu hình DNS cho nhiều Workspace
+
+Khi sử dụng chế độ nhiều workspace, cấu hình DNS với bản ghi wildcard để cho phép tạo subdomain động:
+
+```
+*.tên-miền-của-bạn.com -> ip-máy-chủ-của-bạn
+```
+
+Điều này cho phép định tuyến subdomain tự động cho workspace mới mà không cần cấu hình DNS thủ công.
+
+### Hạn chế tạo Workspace
+
+Trong chế độ nhiều workspace, bạn có thể muốn giới hạn ai có thể tạo workspace mới:
+
+```bash
+IS_WORKSPACE_CREATION_LIMITED_TO_SERVER_ADMINS=true
+```
+
+Khi bật, chỉ người dùng có `canAccessFullAdminPanel` mới có thể tạo workspace bổ sung. Người dùng vẫn có thể tạo workspace đầu tiên khi đăng ký.
+
+## Tích hợp Gmail & Google Calendar
+
+### Tạo dự án Google Cloud
+
+1. Vào [Google Cloud Console](https://console.cloud.google.com/)
+2. Tạo dự án mới hoặc chọn dự án hiện có
+3. Bật các API sau:
+- [Gmail API](https://console.cloud.google.com/apis/library/gmail.googleapis.com)
+- [Google Calendar API](https://console.cloud.google.com/apis/library/calendar-json.googleapis.com)
+- [People API](https://console.cloud.google.com/apis/library/people.googleapis.com)
+
+### Cấu hình OAuth
+
+1. Vào [Credentials](https://console.cloud.google.com/apis/credentials)
+2. Tạo OAuth 2.0 Client ID
+3. Thêm các redirect URI sau:
+   - `https://{tên-miền-của-bạn}/auth/google/redirect` (cho SSO)
+   - `https://{tên-miền-của-bạn}/auth/google-apis/get-access-token` (cho tích hợp)
+
+### Cấu hình trong Twenty
+
+1. Vào **Settings -> Admin Panel -> Configuration Variables**
+2. Tìm mục **Google Auth**
+3. Đặt các biến sau:
+   - `MESSAGING_PROVIDER_GMAIL_ENABLED=true`
+   - `CALENDAR_PROVIDER_GOOGLE_ENABLED=true`
+   - `AUTH_GOOGLE_CLIENT_ID={client-id}`
+   - `AUTH_GOOGLE_CLIENT_SECRET={client-secret}`
+   - `AUTH_GOOGLE_CALLBACK_URL=https://{tên-miền-của-bạn}/auth/google/redirect`
+   - `AUTH_GOOGLE_APIS_CALLBACK_URL=https://{tên-miền-của-bạn}/auth/google-apis/get-access-token`
+
+<Warning>
+**Chế độ chỉ môi trường:** Nếu bạn đặt `IS_CONFIG_VARIABLES_IN_DB_ENABLED=false`, thêm các biến này vào file `.env` thay thế.
+</Warning>
+
+**Scope bắt buộc** (được cấu hình tự động):
+[Xem mã nguồn liên quan](https://github.com/twentyhq/twenty/blob/main/packages/twenty-server/src/engine/core-modules/auth/utils/get-google-apis-oauth-scopes.ts#L4-L10)
+- `https://www.googleapis.com/auth/calendar.events`
+- `https://www.googleapis.com/auth/gmail.readonly`
+- `https://www.googleapis.com/auth/profile.emails.read`
+
+### Nếu ứng dụng đang ở chế độ thử nghiệm
+
+Nếu ứng dụng đang ở chế độ thử nghiệm, bạn cần thêm người dùng thử nghiệm vào dự án.
+
+Tại [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent), thêm người dùng thử nghiệm vào mục "Test users".
+
+## Tích hợp Microsoft 365
+
+<Warning>
+Người dùng phải có [giấy phép Microsoft 365](https://admin.microsoft.com/Adminportal/Home) để có thể sử dụng Calendar và Messaging API. Họ sẽ không thể đồng bộ tài khoản trên Twenty nếu không có.
+</Warning>
+
+### Tạo dự án trong Microsoft Azure
+
+Bạn cần tạo dự án trong [Microsoft Azure](https://portal.azure.com/#view/Microsoft_AAD_IAM/AppGalleryBladeV2) và lấy thông tin xác thực.
+
+### Bật API
+
+Trên Microsoft Azure Console bật các API sau trong "Permissions":
+
+- Microsoft Graph: Mail.ReadWrite
+- Microsoft Graph: Mail.Send
+- Microsoft Graph: Calendars.Read
+- Microsoft Graph: User.Read
+- Microsoft Graph: openid
+- Microsoft Graph: email
+- Microsoft Graph: profile
+- Microsoft Graph: offline_access
+
+Ghi chú: "Mail.ReadWrite" và "Mail.Send" chỉ bắt buộc nếu bạn muốn gửi email bằng workflow action. Bạn có thể sử dụng "Mail.Read" thay thế nếu chỉ muốn nhận email.
+
+### URI chuyển hướng được ủy quyền
+
+Bạn cần thêm các redirect URI sau vào dự án:
+- `https://{tên-miền-của-bạn}/auth/microsoft/redirect` nếu muốn sử dụng Microsoft SSO
+- `https://{tên-miền-của-bạn}/auth/microsoft-apis/get-access-token`
+
+### Cấu hình trong Twenty
+
+1. Vào **Settings -> Admin Panel -> Configuration Variables**
+2. Tìm mục **Microsoft Auth**
+3. Đặt các biến sau:
+   - `MESSAGING_PROVIDER_MICROSOFT_ENABLED=true`
+   - `CALENDAR_PROVIDER_MICROSOFT_ENABLED=true`
+   - `AUTH_MICROSOFT_ENABLED=true`
+   - `AUTH_MICROSOFT_CLIENT_ID={client-id}`
+   - `AUTH_MICROSOFT_CLIENT_SECRET={client-secret}`
+   - `AUTH_MICROSOFT_CALLBACK_URL=https://{tên-miền-của-bạn}/auth/microsoft/redirect`
+   - `AUTH_MICROSOFT_APIS_CALLBACK_URL=https://{tên-miền-của-bạn}/auth/microsoft-apis/get-access-token`
+
+<Warning>
+**Chế độ chỉ môi trường:** Nếu bạn đặt `IS_CONFIG_VARIABLES_IN_DB_ENABLED=false`, thêm các biến này vào file `.env` thay thế.
+</Warning>
+
+### Cấu hình scope
+[Xem mã nguồn liên quan](https://github.com/twentyhq/twenty/blob/main/packages/twenty-server/src/engine/core-modules/auth/utils/get-microsoft-apis-oauth-scopes.ts#L2-L9)
+- 'openid'
+- 'email'
+- 'profile'
+- 'offline_access'
+- 'Mail.ReadWrite'
+- 'Mail.Send'
+- 'Calendars.Read'
+
+### Nếu ứng dụng đang ở chế độ thử nghiệm
+
+Nếu ứng dụng đang ở chế độ thử nghiệm, bạn cần thêm người dùng thử nghiệm vào dự án.
+
+Thêm người dùng thử nghiệm vào mục "Users and groups".
+
+## Công việc nền cho Calendar & Messaging
+
+Sau khi cấu hình tích hợp Gmail, Google Calendar hoặc Microsoft 365, bạn cần khởi động các công việc nền đồng bộ dữ liệu.
+
+Đăng ký các công việc định kỳ sau trong container worker:
+```bash
+# từ container worker
+yarn command:prod cron:messaging:messages-import
+yarn command:prod cron:messaging:message-list-fetch
+yarn command:prod cron:calendar:calendar-event-list-fetch
+yarn command:prod cron:calendar:calendar-events-import
+yarn command:prod cron:messaging:ongoing-stale
+yarn command:prod cron:calendar:ongoing-stale
+yarn command:prod cron:workflow:automated-cron-trigger
+```
+
+## Cấu hình Email
+
+1. Vào **Settings -> Admin Panel -> Configuration Variables**
+2. Tìm mục **Email**
+3. Cấu hình cài đặt SMTP:
+
+<ArticleTabs label1="Gmail" label2="Office365" label3="Smtp4dev">
+
+  <ArticleTab>
+
+  Bạn cần tạo [App Password](https://support.google.com/accounts/answer/185833).
+  - EMAIL_DRIVER=smtp
+  - EMAIL_SMTP_HOST=smtp.gmail.com
+  - EMAIL_SMTP_PORT=465
+  - EMAIL_SMTP_USER=địa_chỉ_email_gmail
+  - EMAIL_SMTP_PASSWORD='mật_khẩu_ứng_dụng_gmail'
+
+  </ArticleTab>
+
+  <ArticleTab>
+
+  Lưu ý nếu bạn bật 2FA, bạn cần tạo [App Password](https://support.microsoft.com/en-us/account-billing/manage-app-passwords-for-two-step-verification-d6dc8c6d-4bf7-4851-ad95-6d07799387e9).
+  - EMAIL_DRIVER=smtp
+  - EMAIL_SMTP_HOST=smtp.office365.com
+  - EMAIL_SMTP_PORT=587
+  - EMAIL_SMTP_USER=địa_chỉ_email_office365
+  - EMAIL_SMTP_PASSWORD='mật_khẩu_office365'
+
+  </ArticleTab>
+
+  <ArticleTab>
+
+  **smtp4dev** là máy chủ email SMTP giả cho phát triển và kiểm thử.
+  - Chạy image smtp4dev: `docker run --rm -it -p 8090:80 -p 2525:25 rnwood/smtp4dev`
+  - Truy cập giao diện smtp4dev tại: [http://localhost:8090](http://localhost:8090)
+  - Đặt các biến sau:
+    - EMAIL_DRIVER=smtp
+    - EMAIL_SMTP_HOST=localhost
+    - EMAIL_SMTP_PORT=2525
+
+  </ArticleTab>
+
+</ArticleTabs>
+
+<Warning>
+**Chế độ chỉ môi trường:** Nếu bạn đặt `IS_CONFIG_VARIABLES_IN_DB_ENABLED=false`, thêm các biến này vào file `.env` thay thế.
+</Warning>
+
+## Hàm Logic & Trình thông dịch Code
+
+Twenty hỗ trợ hàm logic cho workflow và trình thông dịch code cho phân tích dữ liệu AI. Cả hai chạy code do người dùng cung cấp và yêu cầu cấu hình rõ ràng để bảo mật.
+
+### Mặc định bảo mật
+
+**Trong sản xuất (NODE_ENV=production):** Cả hàm logic và trình thông dịch code mặc định là **Vô hiệu hóa**. Bạn phải bật rõ ràng với `LOGIC_FUNCTION_TYPE` và `CODE_INTERPRETER_TYPE` nếu cần các tính năng này.
+
+**Trong phát triển (NODE_ENV=development):** Cả hai mặc định là **LOCAL** để thuận tiện khi chạy cục bộ.
+
+<Warning>
+**Thông báo bảo mật:** Driver cục bộ (`LOGIC_FUNCTION_TYPE=LOCAL` hoặc `CODE_INTERPRETER_TYPE=LOCAL`) chạy code trực tiếp trên máy chủ trong tiến trình Node.js không có sandbox. Chỉ nên sử dụng cho code đáng tin cậy trong phát triển. Cho triển khai sản xuất xử lý code không đáng tin cậy, sử dụng `LOGIC_FUNCTION_TYPE=LAMBDA` hoặc `CODE_INTERPRETER_TYPE=E2B` (với sandbox), hoặc giữ chúng vô hiệu hóa.
+</Warning>
+
+### Hàm Logic - Driver có sẵn
+
+| Driver | Biến môi trường | Trường hợp sử dụng | Mức bảo mật |
+|--------|---------------------|----------|----------------|
+| Vô hiệu hóa | `LOGIC_FUNCTION_TYPE=DISABLED` | Vô hiệu hóa hàm logic hoàn toàn | N/A |
+| Cục bộ | `LOGIC_FUNCTION_TYPE=LOCAL` | Phát triển và môi trường đáng tin cậy | Thấp (không sandbox) |
+| Lambda | `LOGIC_FUNCTION_TYPE=LAMBDA` | Sản xuất với code không đáng tin cậy | Cao (cách ly cấp phần cứng) |
+
+### Hàm Logic - Cấu hình khuyến nghị
+
+**Cho phát triển:**
+```bash
+LOGIC_FUNCTION_TYPE=LOCAL  # mặc định khi NODE_ENV=development
+```
+
+**Cho sản xuất (AWS):**
+```bash
+LOGIC_FUNCTION_TYPE=LAMBDA
+LOGIC_FUNCTION_LAMBDA_REGION=us-east-1
+LOGIC_FUNCTION_LAMBDA_ROLE=arn:aws:iam::123456789:role/your-lambda-role
+LOGIC_FUNCTION_LAMBDA_ACCESS_KEY_ID=your-access-key
+LOGIC_FUNCTION_LAMBDA_SECRET_ACCESS_KEY=your-secret-key
+```
+
+**Để vô hiệu hóa hàm logic:**
+```bash
+LOGIC_FUNCTION_TYPE=DISABLED  # mặc định khi NODE_ENV=production
+```
+
+### Trình thông dịch Code - Driver có sẵn
+
+| Driver | Biến môi trường | Trường hợp sử dụng | Mức bảo mật |
+|--------|---------------------|----------|----------------|
+| Vô hiệu hóa | `CODE_INTERPRETER_TYPE=DISABLED` | Vô hiệu hóa thực thi code AI | N/A |
+| Cục bộ | `CODE_INTERPRETER_TYPE=LOCAL` | Chỉ phát triển | Thấp (không sandbox) |
+| E2B | `CODE_INTERPRETER_TYPE=E_2_B` | Sản xuất với thực thi sandbox | Cao (sandbox cách ly) |
+
+<Note>
+Khi sử dụng `LOGIC_FUNCTION_TYPE=DISABLED` hoặc `CODE_INTERPRETER_TYPE=DISABLED`, bất kỳ nỗ lực thực thi nào sẽ trả về lỗi. Điều này hữu ích nếu bạn muốn chạy Twenty mà không có các khả năng này.
+</Note>

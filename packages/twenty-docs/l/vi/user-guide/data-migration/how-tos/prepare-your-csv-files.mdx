@@ -1,0 +1,239 @@
+---
+title: Chuẩn bị tệp CSV
+description: Hướng dẫn từng bước đầy đủ để định dạng dữ liệu cho nhập vào Twenty.
+---
+
+## Tổng quan
+
+Hướng dẫn này hướng dẫn bạn chuẩn bị tệp CSV để nhập thành công. Làm theo các bước theo thứ tự để tránh lỗi.
+
+## Bước 1: Kiểm tra yêu cầu tệp
+
+Trước khi bắt đầu, đảm bảo tệp đáp ứng các yêu cầu:
+
+| Yêu cầu | Chi tiết |
+|-------------|---------|
+| **Định dạng** | CSV, XLSX hoặc XLS |
+| **Giới hạn kích thước** | 10.000 bản ghi mỗi tệp |
+| **Mã hóa** | Khuyến nghị UTF-8 |
+| **Cấu trúc** | Một loại đối tượng mỗi tệp |
+
+<Note>Với tập dữ liệu lớn hơn 10.000 bản ghi, chia thành nhiều tệp hoặc sử dụng [nhập API](/l/vi/user-guide/data-migration/how-tos/import-data-via-api).</Note>
+
+## Bước 2: Tải tệp mẫu
+
+**Đây là bước quan trọng nhất.** Tệp mẫu cho bạn thấy tên cột và định dạng chính xác Twenty mong đợi.
+
+1. Vào chế độ xem đối tượng (People, Companies, v.v.)
+2. Nhấp **⋮** → **Import records**
+3. Nhấp **Download sample file**
+4. Sử dụng tệp này làm mẫu
+
+<Note>**Mẹo chuyên nghiệp:** Xuất vài bản ghi hiện có thay thế. Điều này cho bạn ví dụ thực về cách dữ liệu nên được định dạng, và tên cột sẽ ánh xạ tự động khi nhập.</Note>
+
+## Bước 3: Xóa giá trị trùng lặp
+
+Twenty thực thi tính duy nhất trên một số trường. Trùng lặp sẽ gây lỗi nhập.
+
+| Đối tượng | Trường duy nhất |
+|--------|---------------|
+| **People** | `id`, `email` |
+| **Companies** | `id`, `domain` |
+| **Đối tượng tùy chỉnh** | `id`, cộng bất kỳ trường bạn đánh dấu duy nhất |
+
+**Trước khi nhập:**
+1. Sắp xếp bảng tính theo trường duy nhất (email hoặc domain)
+2. Xóa hoặc gộp hàng trùng lặp
+3. Kiểm tra trùng lặp đã tồn tại trong Twenty
+
+<Warning>**Bản ghi xóa mềm được tính vào tính duy nhất.** Bản ghi trong Command Menu → See deleted records sẽ gây lỗi trùng lặp. Xóa vĩnh viễn hoặc khôi phục và cập nhật.</Warning>
+
+## Bước 4: Định dạng đúng mỗi loại trường
+
+Các loại trường khác nhau yêu cầu định dạng cụ thể. Đây là tham khảo đầy đủ:
+
+### Trường văn bản
+- Không cần định dạng đặc biệt
+- Khoảng trắng đầu/cuối được tự động cắt bỏ
+
+### Trường email
+- Phải có định dạng email hợp lệ: `name@domain.com`
+- Phải duy nhất (không trùng lặp trong tệp hoặc trong Twenty)
+- Cho email bổ sung, sử dụng định dạng này trong cột **Emails / Additional Emails**:
+```
+["jane@twenty.com","jane.doe@twenty.com"]
+```
+
+### Trường tên miền
+- **Định dạng khuyến nghị**: `https://domain.com`
+- Điều này khớp với định dạng sử dụng bởi đồng bộ hộp thư/lịch (ngăn trùng lặp)
+- Điền cả hai cột:
+  - **Domain / Domain Label**: `domain.com`
+  - **Domain / Domain URL**: `https://domain.com`
+- Phải duy nhất trong tệp và trong Twenty
+
+### Trường điện thoại
+Điện thoại là **trường lồng nhau** yêu cầu nhiều cột:
+
+| Cột | Ví dụ |
+|--------|---------|
+| **Phones / Primary Phone Number** | `4159095555` |
+| **Phones / Primary Phone Country Code** | `US` |
+| **Phones / Primary Phone Calling Code** | `+1` |
+
+### Trường địa chỉ
+Địa chỉ là **trường lồng nhau** với nhiều cột (một số có thể để trống):
+- **Address / Address 1**: Dòng địa chỉ 1
+- **Address / Address 2**: Dòng địa chỉ 2 (tùy chọn)
+- **Address / City**: Tên thành phố
+- **Address / State**: Bang hoặc tỉnh
+- **Address / Country**: Tên quốc gia
+- **Address / Post Code**: Mã bưu chính
+
+### Trường ngày
+Sử dụng định dạng nhất quán trong toàn tệp:
+- `YYYY-MM-DD` (khuyến nghị): `2024-03-15`
+- `MM/DD/YYYY`: `03/15/2024`
+- `DD/MM/YYYY`: `15/03/2024`
+- ISO 8601: `2024-03-15T10:30:00Z`
+
+### Trường số
+- Chỉ số (không có văn bản)
+- Sử dụng dấu chấm cho thập phân: `1234.56`
+- Không dùng dấu phân cách hàng nghìn (không phải `1,234.56`)
+
+### Trường tiền tệ
+Tiền tệ là **trường lồng nhau** yêu cầu hai cột **đều phải được điền**:
+
+| Cột | Ví dụ |
+|--------|---------|
+| **Amount / Amount** | `1234.56` |
+| **Amount / Currency** | `USD` |
+
+### Trường Boolean
+Sử dụng viết hoa: `TRUE` hoặc `FALSE`
+
+<Warning>Viết thường `true` hoặc `false` sẽ không hoạt động.</Warning>
+
+### Trường Select
+Sử dụng **tên API** của tùy chọn, không phải nhãn hiển thị.
+
+**Cách tìm tên API:**
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng và trường
+3. Bật **Advanced mode** (nút chuyển ở phía dưới bên phải)
+4. Sao chép tên API (ví dụ: `OPTION_1`, không phải "Option 1")
+
+<Note>Tùy chọn select mới không được tạo tự động. Thêm trong **Settings → Data Model** trước khi nhập.</Note>
+
+### Trường Multi-Select
+Sử dụng tên API trong định dạng mảng:
+```
+["VALUE1","VALUE2"]
+```
+
+### Trường Array
+Sử dụng định dạng mảng JSON:
+```
+["value1","value2"]
+```
+
+### Trường đánh giá
+Sử dụng định dạng: `RATING_1`, `RATING_2`, `RATING_3`, `RATING_4` hoặc `RATING_5`
+
+### Trường Links/URL
+Điền cả hai cột:
+- **Links / Link Label**: `Twenty`
+- **Links / Link URL**: `https://twenty.com`
+
+Cho liên kết phụ, sử dụng cột **Links / Secondary Links**:
+```
+[{"url":"https://twenty.com","label":"Twenty"}]
+```
+
+### Trường JSON
+Sử dụng định dạng JSON hợp lệ:
+```
+{"key":"value","key2":"value2"}
+```
+
+### Trường ID
+- **Tùy chọn**: Twenty tự động tạo ID nếu không cung cấp
+- **Định dạng**: UUID (ví dụ: `c776ee49-f608-4a77-8cc8-6fe96ae1e43f`)
+- **Trường hợp sử dụng**: Bao gồm ID để cập nhật bản ghi hiện có thay vì tạo mới
+
+## Bước 5: Thêm cột quan hệ (Nếu liên kết bản ghi)
+
+Để liên kết bản ghi với đối tượng khác (ví dụ: People với Companies), thêm cột với định danh duy nhất của bản ghi liên quan.
+
+**Ví dụ**: Liên kết People với Companies
+
+Thêm cột vào CSV People:
+```
+firstName,lastName,email,companyDomain
+John,Smith,john@acme.com,https://acme.com
+Jane,Doe,jane@widgets.co,https://widgets.co
+```
+
+**Quy tắc quan trọng cho quan hệ:**
+- Bản ghi cha phải đã tồn tại trong Twenty
+- Sử dụng định dạng **Domain URL** (`https://domain.com`), không phải label
+- Chỉ ánh xạ MỘT định danh duy nhất (đừng bao gồm cả `companyId` VÀ `companyDomain`)
+- Cho Workspace Members, sử dụng **email** (không phải tên)
+
+<Warning>
+**Thứ tự nhập quan trọng!**
+
+Nhập phía "một" trước phía "nhiều":
+1. **Companies** trước
+2. **People** sau (với tham chiếu company)
+3. **Opportunities** thứ ba
+
+Bản ghi cha phải tồn tại trước khi bạn có thể tham chiếu.
+</Warning>
+
+Xem [Cách nhập quan hệ](/l/vi/user-guide/data-migration/how-tos/import-relations-between-objects-via-csv) để biết hướng dẫn chi tiết.
+
+## Bước 6: Đảm bảo trường tồn tại trong Twenty
+
+Nhập tạo **bản ghi**, không tạo **trường**. Tất cả trường bạn muốn nhập phải đã tồn tại trong mô hình dữ liệu.
+
+**Trước khi nhập:**
+1. Vào **Settings → Data Model**
+2. Chọn đối tượng
+3. Tạo trường tùy chỉnh bạn cần
+4. Ghi lại tên trường chính xác (chúng phải khớp tiêu đề cột)
+
+## Bước 7: Danh sách kiểm tra cuối cùng
+
+Trước khi tải tệp lên, xác minh:
+
+<Check>Tệp ở định dạng CSV, XLSX hoặc XLS</Check>
+<Check>Tệp có dưới 10.000 bản ghi</Check>
+<Check>Mã hóa là UTF-8</Check>
+<Check>Không có email trùng lặp (cho People) hoặc domain (cho Companies)</Check>
+<Check>Ngày sử dụng định dạng nhất quán</Check>
+<Check>Domain sử dụng định dạng `https://domain.com`</Check>
+<Check>Trường Boolean sử dụng `TRUE` hoặc `FALSE` (viết hoa)</Check>
+<Check>Trường Select sử dụng tên API, không phải nhãn hiển thị</Check>
+<Check>Tất cả trường tùy chỉnh tồn tại trong Settings → Data Model</Check>
+<Check>Bản ghi cha đã nhập trước bản ghi con</Check>
+<Check>Cột quan hệ tham chiếu bản ghi tồn tại</Check>
+
+## Lỗi phổ biến cần tránh
+
+| Lỗi | Giải pháp |
+|---------|----------|
+| Sử dụng `true` thay vì `TRUE` | Giá trị Boolean phải viết hoa |
+| Sử dụng nhãn hiển thị cho trường Select | Tìm và sử dụng tên API trong Settings |
+| Nhập People trước Companies | Luôn nhập đối tượng cha trước |
+| Thiếu mã tiền tệ cho trường Currency | Điền cả cột Amount và Currency |
+| Định dạng domain sai | Sử dụng `https://domain.com` nhất quán |
+| Ánh xạ nhiều trường duy nhất cho quan hệ | Chỉ ánh xạ MỘT (domain HOẶC id, không cả hai) |
+
+## Bước tiếp theo
+
+Tệp đã sẵn sàng! Bây giờ:
+- [Nhập Companies](/l/vi/user-guide/data-migration/how-tos/import-companies-via-csv) (nhập đầu tiên)
+- [Nhập Contacts](/l/vi/user-guide/data-migration/how-tos/import-contacts-via-csv)
+- [Sửa lỗi nhập](/l/vi/user-guide/data-migration/how-tos/fix-import-errors)

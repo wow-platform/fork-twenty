@@ -1,0 +1,216 @@
+---
+title: Xử lý sự cố
+---
+
+
+## Xử lý sự cố
+
+Nếu bạn gặp bất kỳ vấn đề nào khi thiết lập môi trường phát triển, nâng cấp instance hoặc tự lưu trữ,
+đây là một số giải pháp cho các vấn đề phổ biến.
+
+### Tự lưu trữ
+
+#### Cài đặt lần đầu dẫn đến `password authentication failed for user "postgres"`
+
+**QUAN TRỌNG: Giải pháp này CHỈ dành cho cài đặt mới hoàn toàn**
+Nếu bạn có instance Twenty hiện có với dữ liệu sản xuất, **KHÔNG** làm theo các bước này vì chúng sẽ xóa vĩnh viễn database!
+
+Khi cài đặt Twenty lần đầu, bạn có thể muốn thay đổi mật khẩu database mặc định.
+Mật khẩu bạn đặt trong lần cài đặt đầu tiên sẽ được lưu vĩnh viễn trong volume database. Nếu sau đó bạn thử thay đổi mật khẩu này trong cấu hình mà không xóa volume cũ, bạn sẽ gặp lỗi xác thực vì database vẫn sử dụng mật khẩu ban đầu.
+
+CẢNH BÁO: Các bước sau sẽ XÓA VĨNH VIỄN tất cả dữ liệu database!
+Chỉ thực hiện nếu đây là cài đặt mới không có dữ liệu quan trọng.
+
+Để cập nhật `PG_DATABASE_PASSWORD` bạn cần:
+```sh
+# Cập nhật PG_DATABASE_PASSWORD trong .env
+docker compose down --volumes
+docker compose up -d
+```
+
+#### Lỗi ngắt dòng CR [Windows]
+
+Do ký tự ngắt dòng của Windows và cấu hình git. Thử chạy:
+
+```
+git config --global core.autocrlf false
+```
+
+Sau đó xóa repository và clone lại.
+
+#### Thiếu metadata schema
+
+Trong quá trình cài đặt Twenty, bạn cần trang bị database postgres với các schema, extension và user đúng.
+Nếu bạn thành công trong việc chạy trang bị này, bạn nên có schema `default` và `metadata` trong database.
+Nếu không, đảm bảo bạn không có nhiều instance postgres chạy trên máy tính.
+
+#### Không tìm thấy module 'twenty-emails' hoặc khai báo type tương ứng.
+
+Bạn phải build package `twenty-emails` trước khi chạy khởi tạo database với `npx nx run twenty-emails:build`
+
+#### Thiếu package twenty-x
+
+Đảm bảo chạy yarn ở thư mục gốc và sau đó chạy `npx nx server:dev twenty-server`. Nếu vẫn không hoạt động, thử build package thiếu thủ công.
+
+#### Lint on Save không hoạt động
+
+Điều này nên hoạt động ngay với extension Oxc (`oxc.oxc-vscode`) đã cài đặt. Nếu không hoạt động, thử thêm dòng sau vào cài đặt vscode (trong phạm vi dev container):
+
+```
+"editor.codeActionsOnSave": {
+
+  "source.fixAll.oxc": "explicit"
+
+}
+```
+
+#### Khi chạy `npx nx start` hoặc `npx nx start twenty-front`, lỗi hết bộ nhớ xảy ra
+
+Chỉ chạy các dịch vụ bạn cần, thay vì `npx nx start`. Ví dụ, nếu bạn làm việc trên server, chỉ chạy `npx nx worker twenty-server`
+
+**Nếu không hoạt động:**
+Nếu bạn thử chạy chỉ `npx nx run twenty-server:start` trên WSL và bị lỗi bộ nhớ sau:
+
+`FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory`
+
+Cách xử lý là thực thi lệnh sau trong terminal hoặc thêm vào .bashrc profile để thiết lập tự động:
+
+`export NODE_OPTIONS="--max-old-space-size=8192"`
+
+Cờ --max-old-space-size=8192 đặt giới hạn trên 8GB cho heap Node.js; sử dụng cờ dãn theo nhu cầu ứng dụng.
+Tham khảo: https://stackoverflow.com/questions/56982005/where-do-i-set-node-options-max-old-space-size-2048
+
+**Nếu không hoạt động:**
+Điều tra các tiến trình nào đang sử dụng nhiều RAM máy tính nhất. Tại Twenty, chúng tôi nhận thấy một số extension VScode sử dụng rất nhiều RAM nên chúng tôi tạm thời vô hiệu hóa chúng.
+
+**Nếu không hoạt động:**
+Khởi động lại máy tính giúp dọn dẹp các tiến trình ma.
+
+#### Khi chạy `npx nx start` có các ký hiệu [0] và [1] lạ trong log
+
+Điều đó là bình thường vì lệnh `npx nx start` chạy nhiều lệnh phía sau
+
+#### Không gửi được email
+Hầu hết là vì `worker` không chạy nền. Thử chạy
+```
+npx nx worker twenty-server
+```
+
+#### Không thể kết nối tài khoản Microsoft 365
+
+Hầu hết là vì admin chưa bật giấy phép Microsoft 365 cho tài khoản bạn. Kiểm tra [https://admin.microsoft.com/](https://admin.microsoft.com/Adminportal/Home).
+
+Nếu bạn có mã lỗi `AADSTS50020`, có thể bạn đang sử dụng tài khoản Microsoft cá nhân. Điều này chưa được hỗ trợ. Thêm thông tin [tại đây](https://learn.microsoft.com/fr-fr/troubleshoot/entra/entra-id/app-integration/error-code-aadsts50020-user-account-identity-provider-does-not-exist)
+
+#### Khi chạy `yarn` cảnh báo xuất hiện trong console
+
+Cảnh báo thông báo về việc kéo thêm dependency không được khai báo rõ ràng trong `package.json`, nên miễn là không có lỗi nghiêm trọng, mọi thứ nên hoạt động bình thường.
+
+#### Khi người dùng truy cập trang đăng nhập, lỗi về người dùng không được ủy quyền truy cập workspace xuất hiện trong log
+
+Điều đó là bình thường vì người dùng không được ủy quyền khi đã đăng xuất vì danh tính chưa được xác minh.
+
+#### Làm sao kiểm tra worker đang chạy?
+- Vào [webhook-test.com](https://webhook-test.com/) và sao chép **Your Unique Webhook URL**.
+<div style={{textAlign: 'center'}}>
+  <img src="/images/docs/developers/self-hosting/webhook-test.jpg" alt="Webhook test" />
+</div>
+- Mở ứng dụng Twenty, di chuyển đến `/settings` và bật toggle **Advanced** ở góc dưới bên trái màn hình.
+- Tạo webhook mới.
+- Dán **Your Unique Webhook URL** vào trường **Endpoint Url** trong Twenty. Đặt **Filters** là `Companies` và `Created`.
+<div style={{textAlign: 'center'}}>
+  <img src="/images/docs/developers/self-hosting/webhook-settings.jpg" alt="Webhook settings" />
+</div>
+- Vào `/objects/companies` và tạo bản ghi company mới.
+- Quay lại [webhook-test.com](https://webhook-test.com/) và kiểm tra có **POST request** mới nhận được không.
+<div style={{textAlign: 'center'}}>
+  <img src="/images/docs/developers/self-hosting/webhook-test-result.jpg" alt="Webhook test result" />
+</div>
+- Nếu nhận được **POST request**, worker đang chạy thành công. Nếu không, bạn cần xử lý sự cố worker.
+
+#### Frontend không khởi động và trả về lỗi TS5042: Option 'project' cannot be mixed with source files on a command line
+
+Comment plugin checker trong `packages/twenty-ui/vite-config.ts` như ví dụ bên dưới
+```
+plugins: [
+      react({ jsxImportSource: 'react' }),
+      tsconfigPaths(),
+      svgr(),
+      dts(dtsConfig),
+      // checker(checkersConfig),
+      wyw({
+        include: [
+          '**/OverflowingTextWithTooltip.tsx',
+          '**/Chip.tsx',
+          '**/Tag.tsx',
+          '**/Avatar.tsx',
+          '**/AvatarChip.tsx',
+        ],
+        babelOptions: {
+          presets: ['@babel/preset-typescript', '@babel/preset-react'],
+        },
+      }),
+    ],
+```
+
+#### Không truy cập được admin panel
+
+Chạy `UPDATE core."user" SET "canAccessFullAdminPanel" = TRUE WHERE email = 'you@yourdomain.com';` trong container database để có quyền truy cập admin panel.
+
+#### Khi chạy workflow, workflow run thất bại với "Logic function execution is disabled. Set LOGIC_FUNCTION_TYPE to LOCAL or LAMBDA to enable."
+
+Trong sản xuất, hàm logic bị vô hiệu hóa mặc định. Đặt biến môi trường `LOGIC_FUNCTION_TYPE` là `LOCAL` hoặc `LAMBDA` để bật. Có thể cấu hình qua biến môi trường hoặc qua biến database admin panel. Xem [hướng dẫn thiết lập Hàm Logic](/l/vi/developers/self-host/capabilities/setup#logic-functions-available-drivers) để biết chi tiết.
+
+### Docker compose 1 chạm
+
+#### Không thể đăng nhập
+
+Nếu bạn không thể đăng nhập sau thiết lập:
+1. Chạy các lệnh sau:
+    ```bash
+    docker exec -it twenty-server-1 yarn
+    docker exec -it twenty-server-1 npx nx database:reset  --configuration=no-seed
+    ```
+2. Khởi động lại các container Docker:
+    ```bash
+    docker compose down
+    docker compose up -d
+    ```
+
+Lưu ý lệnh database:reset sẽ xóa hoàn toàn database và tạo lại từ đầu.
+
+#### Vấn đề kết nối sau Reverse Proxy
+
+Nếu bạn chạy Twenty sau reverse proxy và gặp vấn đề kết nối:
+
+1. **Kiểm tra SERVER_URL:**
+
+    Đảm bảo `SERVER_URL` trong file `.env` khớp với URL truy cập bên ngoài, bao gồm `https` nếu SSL được bật.
+
+2. **Kiểm tra cài đặt Reverse Proxy:**
+
+    - Xác nhận reverse proxy chuyển tiếp yêu cầu đến máy chủ Twenty đúng.
+    - Đảm bảo các header như `X-Forwarded-For` và `X-Forwarded-Proto` được đặt đúng.
+
+3. **Khởi động lại dịch vụ:**
+
+    Sau khi thay đổi, khởi động lại cả reverse proxy và các container Twenty.
+
+#### Lỗi khi tải hình ảnh lên - quyền bị từ chối
+
+Chuyển quyền sở hữu thư mục dữ liệu trên máy chủ từ root sang người dùng và nhóm khác giải quyết vấn đề này.
+
+## Nhận trợ giúp
+
+Nếu bạn gặp vấn đề không được đề cập trong hướng dẫn này:
+
+- Kiểm tra Log:
+
+    Xem log container để tìm thông báo lỗi:
+    ```bash
+    docker compose logs
+    ```
+
+- Hỗ trợ cộng đồng:
+
+    Liên hệ [cộng đồng Twenty](https://github.com/twentyhq/twenty/issues) hoặc [kênh hỗ trợ](https://discord.gg/cx5n4Jzs57) để được giúp đỡ.

@@ -74,7 +74,7 @@ jobs:
         if: github.event_name != 'pull_request' && (inputs.force_pull == true || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
         run: |
           # Languages supported by Mintlify (see packages/twenty-docs/src/shared/supported-languages.ts)
-          LANGUAGES="fr ar cs de es it ja ko pt ro ru tr zh-CN"
+          LANGUAGES="fr ar cs de es it ja ko pt ro ru tr vi zh-CN"
 
           for lang in $LANGUAGES; do
             echo "=== Pulling translations for $lang ==="

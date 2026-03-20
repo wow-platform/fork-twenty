@@ -1,0 +1,177 @@
+---
+title: Phím tắt
+---
+
+
+## Giới thiệu
+
+Khi bạn cần lắng nghe phím tắt, bạn thường sử dụng sự kiện `onKeyDown`.
+
+Tuy nhiên trong `twenty-front`, bạn có thể gặp xung đột giữa cùng phím tắt được sử dụng ở các component khác nhau, được mount cùng lúc.
+
+Ví dụ, nếu bạn có trang lắng nghe phím Enter, và modal lắng nghe phím Enter, với component Select trong modal đó cũng lắng nghe phím Enter, bạn có thể gặp xung đột khi tất cả được mount cùng lúc.
+
+## Hook `useScopedHotkeys`
+
+Để xử lý vấn đề này, chúng tôi có custom hook giúp lắng nghe phím tắt mà không xung đột.
+
+Bạn đặt nó trong component, và nó sẽ chỉ lắng nghe phím tắt khi component được mount VÀ khi **hotkey scope** được chỉ định đang hoạt động.
+
+## Làm sao lắng nghe phím tắt trong thực tế?
+
+Có hai bước để thiết lập lắng nghe phím tắt:
+1. Đặt [hotkey scope](#what-is-a-hotkey-scope-) sẽ lắng nghe phím tắt
+2. Sử dụng hook `useScopedHotkeys` để lắng nghe phím tắt
+
+Thiết lập hotkey scope là bắt buộc ngay cả trong các trang đơn giản, vì các thành phần UI khác như menu trái hoặc command menu cũng có thể lắng nghe phím tắt.
+
+## Trường hợp sử dụng phím tắt
+
+Nói chung, bạn sẽ có hai trường hợp sử dụng cần phím tắt:
+1. Trong trang hoặc component được mount trong trang
+2. Trong component kiểu modal lấy focus do hành động người dùng
+
+Trường hợp sử dụng thứ hai có thể xảy ra đệ quy: dropdown trong modal chẳng hạn.
+
+### Lắng nghe phím tắt trong trang
+
+Ví dụ:
+
+```tsx
+const PageListeningEnter = () => {
+  const {
+    setHotkeyScopeAndMemorizePreviousScope,
+    goBackToPreviousHotkeyScope,
+  } = usePreviousHotkeyScope();
+
+  // 1. Đặt hotkey scope trong useEffect
+  useEffect(() => {
+    setHotkeyScopeAndMemorizePreviousScope(
+      ExampleHotkeyScopes.ExampleEnterPage,
+    );
+
+    // Trả về hotkey scope trước khi component unmount
+    return () => {
+      goBackToPreviousHotkeyScope();
+    };
+  }, [goBackToPreviousHotkeyScope, setHotkeyScopeAndMemorizePreviousScope]);
+
+  // 2. Sử dụng hook useScopedHotkeys
+  useScopedHotkeys(
+    Key.Enter,
+    () => {
+      // Logic thực thi trên trang này khi người dùng nhấn Enter
+      // ...
+    },
+    ExampleHotkeyScopes.ExampleEnterPage,
+  );
+
+  return <div>Trang lắng nghe Enter</div>;
+};
+```
+
+### Lắng nghe phím tắt trong component kiểu modal
+
+Cho ví dụ này chúng tôi sử dụng component modal lắng nghe phím Escape để báo component cha đóng nó.
+
+Ở đây hành động người dùng thay đổi scope.
+
+```tsx
+const ExamplePageWithModal = () => {
+  const [showModal, setShowModal] = useState(false);
+
+  const {
+    setHotkeyScopeAndMemorizePreviousScope,
+    goBackToPreviousHotkeyScope,
+  } = usePreviousHotkeyScope();
+
+  const handleOpenModalClick = () => {
+    // 1. Đặt hotkey scope khi người dùng mở modal
+    setShowModal(true);
+    setHotkeyScopeAndMemorizePreviousScope(
+      ExampleHotkeyScopes.ExampleModal,
+    );
+  };
+
+  const handleModalClose = () => {
+    // 1. Trả về hotkey scope trước khi modal đóng
+    setShowModal(false);
+    goBackToPreviousHotkeyScope();
+  };
+
+  return <div>
+    <h1>Trang với modal</h1>
+    <button onClick={handleOpenModalClick}>Mở modal</button>
+    {showModal && <MyModalComponent onClose={handleModalClose} />}
+  </div>;
+};
+```
+
+Sau đó trong component modal:
+
+```tsx
+const MyDropdownComponent = ({ onClose }: { onClose: () => void }) => {
+  // 2. Sử dụng hook useScopedHotkeys để lắng nghe Escape.
+  // Lưu ý escape là phím tắt phổ biến có thể được nhiều component khác sử dụng
+  // Nên quan trọng sử dụng hotkey scope để tránh xung đột
+  useScopedHotkeys(
+    Key.Escape,
+    () => {
+      onClose()
+    },
+    ExampleHotkeyScopes.ExampleModal,
+  );
+
+  return <div>Component modal</div>;
+};
+```
+
+Quan trọng là sử dụng mẫu này khi bạn không chắc rằng chỉ dùng useEffect với mount/unmount là đủ để tránh xung đột.
+
+Những xung đột này có thể khó debug, và có thể xảy ra thường xuyên hơn với useEffect.
+
+## Hotkey scope là gì?
+
+Hotkey scope là chuỗi đại diện cho ngữ cảnh trong đó phím tắt được kích hoạt. Nó thường được mã hóa như enum.
+
+Khi bạn thay đổi hotkey scope, các phím tắt lắng nghe scope này sẽ được bật và các phím tắt lắng nghe scope khác sẽ bị vô hiệu hóa.
+
+Bạn chỉ có thể đặt một scope tại một thời điểm.
+
+Ví dụ, hotkey scope cho mỗi trang được định nghĩa trong enum `PageHotkeyScope`:
+
+```tsx
+export enum PageHotkeyScope {
+  Settings = 'settings',
+  CreateWorkspace = 'create-workspace',
+  SignInUp = 'sign-in-up',
+  CreateProfile = 'create-profile',
+  PlanRequired = 'plan-required',
+  ShowPage = 'show-page',
+  PersonShowPage = 'person-show-page',
+  CompanyShowPage = 'company-show-page',
+  CompaniesPage = 'companies-page',
+  PeoplePage = 'people-page',
+  OpportunitiesPage = 'opportunities-page',
+  ProfilePage = 'profile-page',
+  WorkspaceMemberPage = 'workspace-member-page',
+  TaskPage = 'task-page',
+}
+```
+
+Bên trong, scope hiện tại được lưu trong Jotai atom được chia sẻ trên toàn ứng dụng:
+
+```tsx
+export const currentHotkeyScopeState = createState<HotkeyScope>({
+  key: 'currentHotkeyScopeState',
+  defaultValue: INITIAL_HOTKEYS_SCOPE,
+});
+```
+
+Những atom này không nên xử lý thủ công! Chúng tôi sẽ xem cách sử dụng ở phần tiếp theo.
+
+## Nó hoạt động như thế nào bên trong?
+
+Chúng tôi tạo một wrapper mỏng trên [react-hotkeys-hook](https://react-hotkeys-hook.vercel.app/docs/intro) giúp hiệu năng hơn và tránh re-render không cần thiết.
+
+Chúng tôi cũng tạo Jotai atom để xử lý trạng thái hotkey scope và làm nó có sẵn mọi nơi trong ứng dụng.

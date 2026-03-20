@@ -1,0 +1,111 @@
+---
+title: Kiến trúc thư mục
+info: Cái nhìn chi tiết về kiến trúc thư mục của chúng tôi
+---
+
+
+Trong hướng dẫn này, bạn sẽ khám phá chi tiết cấu trúc thư mục dự án và cách nó đóng góp vào tổ chức và khả năng bảo trì của Twenty.
+
+Bằng cách tuân theo quy ước kiến trúc thư mục này, dễ dàng hơn để tìm các file liên quan đến tính năng cụ thể và đảm bảo ứng dụng có thể mở rộng và bảo trì.
+
+```
+front
+└───modules
+│   └───module1
+│   │   └───submodule1
+│   └───module2
+│   └───ui
+│   │   └───display
+│   │   └───inputs
+│   │   │   └───buttons
+│   │   └───...
+└───pages
+└───...
+```
+
+## Pages
+
+Bao gồm các component cấp cao nhất được định nghĩa bởi route của ứng dụng. Chúng import các component cấp thấp hơn từ thư mục module (chi tiết thêm bên dưới).
+
+## Module
+
+Mỗi module đại diện cho một tính năng hoặc nhóm tính năng, bao gồm các component, trạng thái và logic vận hành cụ thể.
+Chúng nên tuân theo cấu trúc bên dưới. Bạn có thể lồng module trong module (gọi là submodule) và cùng quy tắc sẽ áp dụng.
+
+```
+module1
+  └───components
+  │   └───component1
+  │   └───component2
+  └───constants
+  └───contexts
+  └───graphql
+  │   └───fragments
+  │   └───queries
+  │   └───mutations
+  └───hooks
+  │   └───internal
+  └───states
+  │   └───selectors
+  └───types
+  └───utils
+```
+
+### Context
+
+Context là cách truyền dữ liệu qua cây component mà không cần truyền props thủ công ở mỗi cấp.
+
+Xem [React Context](https://react.dev/reference/react#context-hooks) để biết chi tiết.
+
+### GraphQL
+
+Bao gồm fragment, query và mutation.
+
+Xem [GraphQL](https://graphql.org/learn/) để biết chi tiết.
+
+- Fragment
+
+Fragment là phần tái sử dụng của query, bạn có thể sử dụng ở nhiều nơi. Bằng cách sử dụng fragment, dễ dàng tránh trùng lặp code.
+
+Xem [GraphQL Fragments](https://graphql.org/learn/queries/#fragments) để biết chi tiết.
+
+- Query
+
+Xem [GraphQL Queries](https://graphql.org/learn/queries/) để biết chi tiết.
+
+- Mutation
+
+Xem [GraphQL Mutations](https://graphql.org/learn/queries/#mutations) để biết chi tiết.
+
+### Hook
+
+Xem [Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks) để biết chi tiết.
+
+### State
+
+Chứa logic quản lý trạng thái. [Jotai](https://jotai.org) xử lý điều này.
+
+- Selector: Atom phái sinh (sử dụng `createAtomSelector`) tính giá trị từ các atom khác và được tự động ghi nhớ.
+
+Quản lý trạng thái tích hợp của React vẫn xử lý trạng thái trong component.
+
+### Util
+
+Chỉ nên chứa các hàm thuần có thể tái sử dụng. Nếu không, tạo custom hook trong thư mục `hooks`.
+
+
+## UI
+
+Chứa tất cả component UI có thể tái sử dụng trong ứng dụng.
+
+Thư mục này có thể chứa các thư mục con như `data`, `display`, `feedback` và `input` cho các loại component cụ thể. Mỗi component nên tự động và có thể tái sử dụng, để bạn có thể sử dụng ở các phần khác nhau của ứng dụng.
+
+Bằng cách tách component UI khỏi các component khác trong thư mục `modules`, dễ dàng hơn để duy trì thiết kế nhất quán và thay đổi UI mà không ảnh hưởng các phần khác (logic nghiệp vụ) của codebase.
+
+## Giao diện và dependency
+
+Bạn có thể import code module khác từ bất kỳ module nào ngoại trừ thư mục `ui`. Điều này giữ code dễ kiểm thử.
+
+### Internal
+
+Mỗi phần (hook, state, ...) của module có thể có thư mục `internal`, chứa các phần chỉ được sử dụng trong module.

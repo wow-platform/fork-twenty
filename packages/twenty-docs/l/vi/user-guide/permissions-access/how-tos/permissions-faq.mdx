@@ -1,0 +1,121 @@
+---
+title: Câu hỏi thường gặp về quyền
+description: Câu hỏi thường gặp về vai trò và quyền.
+---
+
+## Vai trò
+
+<AccordionGroup>
+<Accordion title="Twenty có những vai trò mặc định nào?">
+Twenty đi kèm với vai trò **Admin** và **Member** theo mặc định. Bạn có thể tạo thêm vai trò tùy chỉnh dựa trên nhu cầu nhóm (ví dụ: Nhân viên bán hàng, Quản lý, Người dùng chỉ đọc).
+</Accordion>
+
+<Accordion title="Tôi có thể xóa vai trò Admin không?">
+Không, vai trò Admin không thể xóa. Luôn phải có ít nhất một thành viên được gán vai trò Admin.
+</Accordion>
+
+<Accordion title="Điều gì xảy ra khi tôi xóa vai trò?">
+Bất kỳ thành viên workspace nào được gán vai trò đó sẽ tự động được chuyển sang vai trò mặc định.
+</Accordion>
+
+<Accordion title="Làm thế nào để đặt vai trò mặc định cho thành viên mới?">
+Đi tới **Cài đặt → Vai trò**, tìm tùy chọn **Vai trò mặc định**, và chọn vai trò nào thành viên mới sẽ tự động nhận khi tham gia.
+</Accordion>
+
+<Accordion title="Tôi có thể gán nhiều vai trò cho một người dùng không?">
+Không, mỗi người dùng chỉ có thể có một vai trò tại một thời điểm. Tạo vai trò tùy chỉnh nếu bạn cần kết hợp quyền.
+</Accordion>
+</AccordionGroup>
+
+## Quyền
+
+<AccordionGroup>
+<Accordion title="Sự khác biệt giữa quyền đối tượng và quyền trường là gì?">
+- **Quyền đối tượng**: Kiểm soát truy cập vào toàn bộ bản ghi (ví dụ: có thể xem/chỉnh sửa/xóa bản ghi Người)
+- **Quyền trường**: Kiểm soát truy cập vào trường cụ thể trong đối tượng (ví dụ: có thể xem nhưng không chỉnh sửa trường Lương)
+
+Quyền trường cho phép kiểm soát chi tiết hơn đối với dữ liệu nhạy cảm.
+</Accordion>
+
+<Accordion title="Ghi đè quyền hoạt động như thế nào?">
+Quyền được truyền từ chung đến cụ thể:
+1. **Tất cả đối tượng** đặt cơ bản cho tất cả đối tượng
+2. **Quyền cấp đối tượng** có thể ghi đè cài đặt chung cho đối tượng cụ thể
+3. **Quyền cấp trường** có thể ghi đè cài đặt đối tượng cho trường cụ thể
+
+Cài đặt cụ thể hơn luôn được ưu tiên.
+</Accordion>
+
+<Accordion title="Các cấp quyền khác nhau có ý nghĩa gì?">
+Cho đối tượng:
+- **Xem bản ghi**: Xem bản ghi trong danh sách và trang chi tiết
+- **Chỉnh sửa bản ghi**: Sửa đổi bản ghi hiện có
+- **Xóa bản ghi**: Xóa mềm bản ghi (có thể khôi phục)
+- **Xóa vĩnh viễn bản ghi**: Xóa vĩnh viễn bản ghi
+
+Cho trường:
+- **Xem trường**: Xem giá trị trường
+- **Chỉnh sửa trường**: Sửa đổi giá trị trường
+- **Không có quyền truy cập**: Trường bị ẩn hoàn toàn
+</Accordion>
+
+<Accordion title="Tôi có thể giới hạn truy cập vào bản ghi cụ thể (quyền cấp hàng) không?">
+Quyền cấp hàng sẽ khả dụng trên gói **Organization** vào Q1 2026. Tính năng này cho phép bạn giới hạn truy cập vào bản ghi cụ thể dựa trên tiêu chí (ví dụ: chỉ xem cơ hội của bạn).
+</Accordion>
+
+<Accordion title="Làm thế nào để đặt trường chỉ đọc cho người dùng nhất định?">
+1. Đi tới **Cài đặt → Vai trò**
+2. Chọn vai trò
+3. Điều hướng đến đối tượng chứa trường
+4. Đặt quyền trường thành **Xem trường** (không có Chỉnh sửa trường)
+</Accordion>
+</AccordionGroup>
+
+## Cài đặt & Hành động
+
+<AccordionGroup>
+<Accordion title="Những quyền cài đặt nào khả dụng?">
+Bạn có thể kiểm soát truy cập vào:
+- Tạo API key
+- Tùy chọn workspace
+- Gán vai trò
+- Cấu hình mô hình dữ liệu
+- Cài đặt bảo mật
+- Quản lý workflow
+
+Sử dụng **Truy cập tất cả cài đặt** để cấp quyền truy cập đầy đủ, hoặc bật quyền cụ thể.
+</Accordion>
+
+<Accordion title="Những quyền hành động nào khả dụng?">
+Bạn có thể kiểm soát:
+- **Gửi email**: Khả năng gửi email từ Twenty
+- **Nhập CSV**: Khả năng nhập dữ liệu qua CSV
+- **Xuất CSV**: Khả năng xuất dữ liệu sang CSV
+
+Sử dụng **Truy cập tất cả ứng dụng** để cấp tất cả hành động, hoặc bật từng hành động cụ thể.
+</Accordion>
+</AccordionGroup>
+
+## SSO
+
+<AccordionGroup>
+<Accordion title="SSO có khả dụng trên tất cả gói không?">
+Không, SSO là tính năng Premium chỉ khả dụng trên gói **Organization**.
+</Accordion>
+
+<Accordion title="Những nhà cung cấp danh tính nào được hỗ trợ?">
+Twenty hỗ trợ:
+- **SAML 2.0** (hoạt động với hầu hết nhà cung cấp danh tính doanh nghiệp)
+- **Google Workspace**
+- **Microsoft Entra ID** (trước đây là Azure AD)
+</Accordion>
+
+<Accordion title="Cung cấp Just-in-Time (JIT) là gì?">
+Với cung cấp JIT, tài khoản người dùng được tự động tạo trong Twenty khi ai đó đăng nhập qua SSO lần đầu tiên. Họ được tự động gán vai trò mặc định.
+</Accordion>
+
+<Accordion title="Tôi có thể yêu cầu SSO cho tất cả người dùng không?">
+Có, sau khi SSO được cấu hình, bạn có thể tắt đăng nhập bằng mật khẩu cho người dùng SSO để thực thi xác thực qua nhà cung cấp danh tính.
+</Accordion>
+</AccordionGroup>
+

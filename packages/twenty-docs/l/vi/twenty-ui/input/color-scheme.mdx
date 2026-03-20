@@ -1,0 +1,78 @@
+---
+title: Color Scheme
+image: /images/user-guide/fields/field.png
+---
+<Frame>
+  <img src="/images/user-guide/fields/field.png" alt="Header" />
+</Frame>
+
+## Color Scheme Card
+
+Đại diện cho các bảng màu khác nhau và được thiết kế đặc biệt cho chủ đề sáng và tối.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { ColorSchemeCard } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  return (
+      <ColorSchemeCard
+      variant="Dark"
+      selected={true}
+      />
+  );
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả | Mặc định |
+|-------|------|-------|----------|
+| variant | string | Biến thể bảng màu. Các tùy chọn bao gồm `Dark`, `Light`, và `System` | light |
+| selected | boolean | Nếu `true`, hiển thị dấu checkmark để chỉ ra bảng màu đã chọn |  |
+| additional props | `React.ComponentPropsWithoutRef<'div'>` | Các props tiêu chuẩn của phần tử HTML `div` |  |
+
+
+
+</Tab>
+
+</Tabs>
+
+## Color Scheme Picker
+
+Cho phép người dùng chọn giữa các bảng màu khác nhau.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { ColorSchemePicker } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  return <ColorSchemePicker
+  value="Dark"
+  onChange
+  />;
+};
+```
+
+</Tab>
+
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| value | `Color Scheme` | Bảng màu hiện đang được chọn |
+| onChange | function | Hàm callback bạn muốn kích hoạt khi người dùng chọn một bảng màu |
+
+
+
+</Tab>
+
+</Tabs>

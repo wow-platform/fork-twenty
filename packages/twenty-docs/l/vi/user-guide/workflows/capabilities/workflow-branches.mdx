@@ -1,0 +1,68 @@
+---
+title: Nhánh Workflow
+description: Tạo đường dẫn song song và logic có điều kiện trong workflow.
+---
+
+Nhánh cho phép bạn chia workflow thành nhiều đường dẫn có thể chạy đồng thời hoặc có điều kiện dựa trên dữ liệu.
+<img src="/images/user-guide/workflows/branches.png" style={{width:'100%'}}/>
+
+## Cách nhánh hoạt động
+
+Khi bạn tạo nhiều kết nối từ một nút duy nhất, mỗi đường dẫn trở thành một nhánh. Theo mặc định, **tất cả nhánh thực thi song song** — chúng không chờ nhau.
+
+
+## Tạo nhánh
+
+### Thêm nhánh mới
+
+1. **Nhấp chuột phải vào canvas chính** của workflow (không phải trên nút hiện có)
+2. Nhấp **Thêm nút**
+3. Chọn loại nút cho nhánh mới
+4. Kéo mũi tên từ đáy bước trước đến đầu hành động mới này
+5. Lặp lại để thêm nhiều nhánh từ cùng nút
+
+<Note>
+Mỗi nhánh là độc lập. Thêm nhánh không ảnh hưởng đến các đường dẫn hiện có từ nút đó.
+</Note>
+
+### Bố cục trực quan
+
+Nhánh xuất hiện dưới dạng đường dẫn song song trong trình chỉnh sửa workflow. Bạn có thể kéo nút để sắp xếp lại bố cục trực quan mà không ảnh hưởng đến thực thi.
+
+## Nhánh có điều kiện
+
+Vì tất cả nhánh chạy theo mặc định, sử dụng nút **Bộ lọc** để kiểm soát đường dẫn nào thực sự thực thi:
+
+| Nhánh | Điều kiện bộ lọc | Hành động |
+|--------|------------------|--------|
+| A | Giai đoạn = "Thắng" | Gửi email chúc mừng |
+| B | Giai đoạn = "Thua" | Tạo tác vụ theo dõi |
+| C | Giai đoạn = "Đàm phán" | Thông báo quản lý |
+
+
+1. Tạo nhánh từ trigger hoặc hành động
+2. Thêm nút **Bộ lọc** làm bước đầu tiên của mỗi nhánh
+3. Cấu hình mỗi bộ lọc với điều kiện loại trừ lẫn nhau
+4. Thêm hành động sau mỗi bộ lọc
+
+Chỉ nhánh có điều kiện bộ lọc được đáp ứng mới tiếp tục thực thi.
+
+## Hợp nhất nhánh
+
+**Nhánh không tự động hợp nhất.** Mỗi nhánh chạy độc lập cho đến khi kết thúc. Bạn có toàn quyền linh hoạt trong cách xử lý:
+
+    - **Tùy chọn 1: Giữ nhánh riêng biệt**
+    Mỗi nhánh xử lý hành động tiếp theo độc lập. Đây là cách đơn giản nhất khi nhánh không cần hội tụ.
+
+    - **Tùy chọn 2: Hợp nhất nhánh thủ công**
+    Khi tạo workflow, bạn có thể kết nối thủ công nhiều nhánh đến cùng hành động xuôi dòng. Chỉ cần kéo mũi tên từ cuối mỗi nhánh đến nút chung.
+
+<Note>
+Mặc dù bạn có thể sử dụng nút [Trì hoãn](/l/vi/user-guide/workflows/capabilities/workflow-actions#delay) để tạm dừng thực thi, hiện không thể cấu hình để chờ "cho đến khi nhánh khác kết thúc."
+</Note>
+
+
+## Liên quan
+
+- [Cách sử dụng nhánh trong Workflow](/l/vi/user-guide/workflows/capabilities/use-branches-in-workflows) - Hướng dẫn từng bước
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions) - Hành động khả dụng bao gồm Bộ lọc

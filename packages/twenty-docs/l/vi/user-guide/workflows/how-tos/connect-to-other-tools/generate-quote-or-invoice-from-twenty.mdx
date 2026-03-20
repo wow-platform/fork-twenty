@@ -1,0 +1,144 @@
+---
+title: Tạo báo giá hoặc hóa đơn từ Twenty
+description: Tự động tạo hóa đơn trong công cụ bên ngoài khi giao dịch hoàn tất.
+---
+
+Tự động gửi dữ liệu giao dịch đến hệ thống lập hóa đơn (Stripe, QuickBooks, Xero, v.v.) khi cơ hội thắng.
+
+## Cấu trúc Workflow
+
+1. **Trigger**: Bản ghi được cập nhật (Cơ hội)
+2. **Bộ lọc**: Giai đoạn = Closed Won
+3. **Tìm kiếm bản ghi**: Lấy chi tiết Công ty
+4. **Mã nguồn** (tùy chọn): Định dạng payload
+5. **HTTP Request**: Gửi đến hệ thống lập hóa đơn
+
+## Bước 1: Thiết lập Trigger
+
+1. Tạo workflow mới
+2. Chọn trigger **Bản ghi được cập nhật**
+3. Chọn **Cơ hội** làm đối tượng
+
+## Bước 2: Lọc Closed Won
+
+Thêm hành động **Bộ lọc** để chỉ tiếp tục khi giao dịch thắng:
+
+| Cài đặt | Giá trị |
+|---------|-------|
+| **Trường** | Giai đoạn |
+| **Điều kiện** | Bằng |
+| **Giá trị** | `CLOSED_WON` (hoặc tên giai đoạn của bạn) |
+
+<Tip>
+Trigger kích hoạt mỗi khi Cơ hội cập nhật. Bộ lọc đảm bảo workflow chỉ tiếp tục khi giai đoạn chuyển sang Closed Won.
+</Tip>
+
+## Bước 3: Lấy chi tiết Công ty
+
+Bản ghi Cơ hội có thể không bao gồm tất cả trường Công ty cần cho hóa đơn. Thêm hành động **Tìm kiếm bản ghi**:
+
+| Cài đặt | Giá trị |
+|---------|-------|
+| **Đối tượng** | Công ty |
+| **Khớp theo** | ID bằng `{{trigger.object.companyId}}` |
+
+Lấy bản ghi Công ty đầy đủ với địa chỉ thanh toán, mã số thuế, v.v.
+
+## Bước 4: Định dạng Payload (Tùy chọn)
+
+Nếu hệ thống lập hóa đơn yêu cầu định dạng cụ thể, thêm hành động **Mã nguồn**:
+
+```javascript
+export const main = async (params: {
+  opportunity: any;
+  company: any;
+}): Promise<object> => {
+  const { opportunity, company } = params;
+
+  return {
+    invoice: {
+      // Thông tin khách hàng từ Công ty
+      customer_name: company.name,
+      customer_email: company.email || "",
+      billing_address: {
+        line1: company.address?.street || "",
+        city: company.address?.city || "",
+        postal_code: company.address?.postalCode || "",
+        country: company.address?.country || ""
+      },
+      tax_id: company.taxId || null,
+
+      // Chi tiết hóa đơn từ Cơ hội
+      amount: opportunity.amount,
+      currency: opportunity.currency || "USD",
+      description: `Hóa đơn cho ${opportunity.name}`,
+      due_days: 30,
+
+      // Tham chiếu về Twenty
+      metadata: {
+        opportunity_id: opportunity.id,
+        company_id: company.id
+      }
+    }
+  };
+};
+```
+
+## Bước 5: Gửi đến hệ thống lập hóa đơn
+
+Thêm hành động **HTTP Request**:
+
+| Cài đặt | Giá trị |
+|---------|-------|
+| **Phương thức** | POST |
+| **URL** | Endpoint API hệ thống lập hóa đơn |
+| **Headers** | `Authorization: Bearer YOUR_API_KEY` |
+| **Body** | `{{code.invoice}}` hoặc ánh xạ trường trực tiếp |
+
+### Ví dụ: Hóa đơn Stripe
+
+```
+POST https://api.stripe.com/v1/invoices
+Headers:
+  Authorization: Bearer sk_live_xxx
+  Content-Type: application/x-www-form-urlencoded
+
+Body:
+  customer: {{company.stripeCustomerId}}
+  collection_method: send_invoice
+  days_until_due: 30
+```
+
+### Ví dụ: Hóa đơn QuickBooks
+
+```
+POST https://quickbooks.api.intuit.com/v3/company/{realmId}/invoice
+Headers:
+  Authorization: Bearer YOUR_ACCESS_TOKEN
+  Content-Type: application/json
+
+Body: {{code.invoice}}
+```
+
+## Tóm tắt Workflow hoàn chỉnh
+
+| Bước | Hành động | Mục đích |
+|------|--------|---------|
+| 1 | Trigger: Bản ghi cập nhật | Kích hoạt khi bất kỳ Cơ hội nào thay đổi |
+| 2 | Bộ lọc | Chỉ tiếp tục nếu Giai đoạn = Closed Won |
+| 3 | Tìm kiếm bản ghi | Lấy chi tiết đầy đủ Công ty cho thanh toán |
+| 4 | Mã nguồn | Định dạng dữ liệu cho API lập hóa đơn |
+| 5 | HTTP Request | Tạo hóa đơn trong hệ thống bên ngoài |
+
+## Mẹo
+
+- **Lưu ID bên ngoài**: Lưu ID hóa đơn trả về bởi API vào Cơ hội bằng hành động **Cập nhật bản ghi**
+- **Xử lý lỗi**: Thêm nhánh để gửi thông báo nếu HTTP request thất bại
+- **Kiểm tra trước**: Sử dụng chế độ sandbox/test của hệ thống lập hóa đơn trước khi chạy thật
+
+## Liên quan
+
+- [Tạo PDF từ Twenty](/l/vi/user-guide/workflows/how-tos/connect-to-other-tools/generate-pdf-from-twenty) — đính kèm PDF đã tạo vào bản ghi
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Tự động hóa khi thắng giao dịch](/l/vi/user-guide/workflows/how-tos/crm-automations/closed-won-automations)

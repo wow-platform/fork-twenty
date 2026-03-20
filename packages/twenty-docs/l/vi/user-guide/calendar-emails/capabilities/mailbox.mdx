@@ -1,0 +1,84 @@
+---
+title: Hộp thư
+description: Tìm hiểu tính năng tích hợp email trong Twenty.
+---
+
+**Lưu ý**: Để kết nối tài khoản email và cấu hình cài đặt đồng bộ, hãy truy cập [Thiết lập Email & Lịch](/l/vi/user-guide/calendar-emails/overview).
+
+## Cách tích hợp email hoạt động
+
+Twenty tự động liên kết email từ hộp thư đã kết nối của bạn với các bản ghi CRM liên quan, giữ toàn bộ lịch sử giao tiếp tại một nơi.
+
+### Đối tượng nơi có thể tìm thấy email
+
+Cuộc hội thoại email xuất hiện trong ba đối tượng chính:
+
+- **Người**: Xem tất cả email trao đổi với một liên hệ cụ thể
+- **Công ty**: Xem tất cả email liên quan đến một công ty và nhân viên của họ
+- **Cơ hội**: Truy cập chuỗi email liên quan đến công ty được liên kết với cơ hội này. Chuỗi email từ người cụ thể trong cơ hội chưa được hiển thị.
+
+### Xem chuỗi email
+
+1. **Điều hướng đến bản ghi**: Đi đến bất kỳ bản ghi Người, Công ty hoặc Cơ hội nào
+2. **Chọn tab Email**: Nhấp vào tab `Email` để xem email đã đồng bộ
+3. **Mở chuỗi email**: Nhấp vào bất kỳ email nào để mở và đọc toàn bộ cuộc hội thoại
+4. **Duyệt lịch sử**: Cuộn qua toàn bộ lịch sử email với liên hệ đó
+
+<img src="/images/user-guide/emails/show-inbox.png" style={{width:'100%'}}/>
+
+## Những gì bạn sẽ thấy
+
+### Xem chuỗi email
+Khi bạn mở một chuỗi email, bạn có thể:
+- **Đọc toàn bộ cuộc hội thoại**: Xem toàn bộ trao đổi email
+- **Xem người tham gia**: Xem tất cả người tham gia trong chuỗi email
+- **Kiểm tra thời gian**: Biết chính xác khi nào mỗi email được gửi
+- **Truy cập ngữ cảnh**: Hiểu toàn bộ lịch sử giao tiếp
+
+### Hiển thị email
+Tùy thuộc vào cài đặt hộp thư, bạn có thể thấy:
+- **Nội dung đầy đủ**: Toàn bộ văn bản email và chi tiết
+- **Chủ đề + Metadata**: Dòng chủ đề, người gửi, người nhận và thời gian
+- **Chỉ metadata**: Thông tin cơ bản không có nội dung email
+
+## Hành vi đồng bộ email
+
+### Tốc độ đồng bộ
+Twenty nhập email với tốc độ khoảng **400 tin nhắn mỗi phút**. Tốc độ này hiện bị giới hạn bởi tốc độ API Gmail (và áp dụng tương tự cho các nhà cung cấp khác).
+
+Để tham khảo:
+- 1.000 email → ~2,5 phút
+- 10.000 email → ~25 phút
+- 50.000 email → ~2 giờ
+
+### Những gì được đồng bộ
+- **Email bên ngoài**: Tất cả email với liên hệ ngoài tổ chức của bạn
+- **Liên kết tự động**: Email kết nối với bản ghi Người và Công ty hiện có
+- **Nhiều địa chỉ**: Email từ bất kỳ địa chỉ nào liên kết đến cùng bản ghi liên hệ
+- **Cập nhật**: Email mới xuất hiện trong vòng 5 phút
+
+### Những gì không được đồng bộ
+- **Email nội bộ**: Email giữa đồng nghiệp (cùng tên miền) vẫn riêng tư
+- **Email nhóm**: Danh sách phân phối và email nhóm bị loại trừ
+- **Thư mục bị loại trừ**: Các thư mục bạn đã chọn không đồng bộ (cấu hình trong Cài đặt → Tài khoản → Email)
+
+### Đồng bộ thư mục có chọn lọc
+Kiểm soát thư mục email nào đồng bộ với Twenty:
+1. Vào **Cài đặt → Tài khoản** và chọn tài khoản email đã kết nối
+2. Cấu hình thư mục trong phần Email
+3. Chọn thư mục cụ thể để bao gồm hoặc loại trừ (Hộp thư đến, Đã gửi, Lưu trữ, thư mục tùy chỉnh)
+
+
+## Khắc phục sự cố đồng bộ email
+
+### Các vấn đề đồng bộ thường gặp
+- **Chậm đồng bộ**: Email xuất hiện trong vòng 5 phút, nhưng lần nhập ban đầu mất nhiều thời gian hơn
+- **Email bị thiếu**: Kiểm tra xem:
+  - Thư mục có bị loại trừ trong cài đặt Thư mục tin nhắn không
+  - Tự động tạo liên hệ có bị tắt không (email cần bản ghi Twenty hiện có)
+  - Email có phải từ đồng nghiệp (cùng tên miền) hoặc danh sách nhóm không
+  - Hộp thư vẫn đang hoàn thành đồng bộ ban đầu
+
+### Giới hạn email
+- **Thư mục hệ thống**: Một số thư mục email có thể không khả dụng để đồng bộ
+- **Bí danh**: Chỉ hộp thư thực mới có thể kết nối (không phải bí danh email)

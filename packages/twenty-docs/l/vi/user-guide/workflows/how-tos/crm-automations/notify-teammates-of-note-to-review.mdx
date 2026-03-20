@@ -1,0 +1,125 @@
+---
+title: Thông báo đồng nghiệp về ghi chú cần xem xét
+description: Gửi thông báo email tự động khi giao cho đồng nghiệp xem xét ghi chú.
+---
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+<Note>
+**Gắn thẻ đồng nghiệp trực tiếp trong ghi chú chưa được hỗ trợ.** Tính năng này dự kiến nửa cuối năm 2026. Trong thời gian chờ đợi, workflow này cung cấp giải pháp thực tế.
+</Note>
+
+## Thách thức
+
+Bạn muốn gắn thẻ đồng nghiệp trong ghi chú để họ nhận thông báo xem xét. Hiện tại, Twenty không hỗ trợ @mentions trong ghi chú hoặc tác vụ.
+
+## Giải pháp
+
+Thay vì gắn thẻ trong văn bản ghi chú, bạn có thể:
+1. Tạo trường quan hệ **Người xem xét** trên đối tượng Ghi chú
+2. Giao người xem xét khi tạo hoặc chỉnh sửa ghi chú
+3. Workflow tự động gửi email cho người xem xét với liên kết đến ghi chú
+
+<Warning>
+**Hạn chế**: Cách tiếp cận này cho phép giao một người xem xét cho mỗi trường. Nếu bạn cần thông báo nhiều người, tạo thêm trường quan hệ (ví dụ: Người xem xét 1, Người xem xét 2). Điều này không phù hợp nếu bạn cần gắn thẻ nhiều cộng tác viên cùng lúc.
+</Warning>
+
+
+## Thiết lập từng bước
+
+### Bước 1: Tạo trường Người xem xét
+<img src="/images/user-guide/workflows/reviewer-field-for-note.png" style={{width:'100%'}}/>
+
+1. Vào **Cài đặt → Mô hình dữ liệu → Ghi chú**
+2. Nhấp **Thêm trường**
+3. Cấu hình:
+
+| Cài đặt | Giá trị |
+|---------|-------|
+| **Tên** | Người xem xét |
+| **Loại** | Quan hệ |
+| **Đối tượng liên quan** | Thành viên không gian làm việc |
+| **Loại quan hệ** | Nhiều Ghi chú → Một Thành viên không gian làm việc |
+
+4. Lưu trường
+
+### Bước 2: Tạo Workflow
+<VimeoEmbed videoId="1151897168" title="Video minh họa" />
+
+
+
+#### Tạo Trigger Workflow
+
+1. Vào chế độ xem chính và tạo workflow mới
+2. Chọn **Bản ghi được cập nhật** làm trigger
+3. Chọn **Ghi chú** làm đối tượng và chỉ định trường Người xem xét.
+4. Trigger sẽ kích hoạt mỗi khi người xem xét của ghi chú được cập nhật.
+
+#### Thêm Bộ lọc kiểm tra Người xem xét vừa được giao
+
+Thêm hành động **Bộ lọc** để đảm bảo workflow chỉ tiếp tục khi người xem xét được giao:
+
+| Điều kiện | Giá trị |
+|-----------|-------|
+| **Người xem xét** | không rỗng |
+
+#### Tìm kiếm Thành viên không gian làm việc
+
+1. Thêm hành động **Tìm kiếm bản ghi**
+2. Chọn **Thành viên không gian làm việc** (trong Đối tượng nâng cao)
+3. Thêm bộ lọc:
+
+| Điều kiện | Giá trị |
+|-----------|-------|
+| **ID** | bằng `{{note.reviewerId}}` |
+
+Lấy bản ghi đầy đủ thành viên không gian làm việc, bao gồm địa chỉ email và tên.
+
+#### Gửi email thông báo
+
+1. Thêm hành động **Gửi email**
+2. Cấu hình:
+
+| Trường | Giá trị |
+|-------|-------|
+| **Đến** | Tìm kiếm bản ghi → Thành viên không gian làm việc đầu tiên → Email người dùng |
+| **Chủ đề** | Một ghi chú cần bạn xem xét |
+| **Nội dung** | Xem ví dụ bên dưới |
+
+**Ví dụ nội dung email:**
+
+```text
+Xin chào {{searchRecord.firstWorkspaceMember.name.firstName}},
+
+Bạn được giao xem xét một ghi chú.
+
+Xem ghi chú tại đây:
+https://yourSubDomain.twenty.com/object/note/{{recordIsUpdated.id}}
+
+Trân trọng,
+Twenty
+```
+
+<Note>
+Thay `yourSubDomain` bằng subdomain không gian làm việc Twenty thực tế của bạn.
+</Note>
+
+#### Kiểm tra và kích hoạt
+
+1. Nhấp **Kiểm tra** để chạy workflow thủ công
+2. Tạo hoặc chỉnh sửa ghi chú và giao người xem xét
+3. Kiểm tra hộp thư người xem xét để xem email thông báo
+4. Kích hoạt workflow
+
+## Cách sử dụng
+
+Sau khi thiết lập, nhóm có thể sử dụng workflow bằng cách:
+1. Tạo ghi chú mới (hoặc chỉnh sửa ghi chú hiện có)
+2. Chọn đồng nghiệp trong trường **Người xem xét**
+3. Đồng nghiệp tự động nhận email với liên kết trực tiếp đến ghi chú
+
+## Liên quan
+
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Gửi email từ Workflow](/l/vi/user-guide/workflows/capabilities/send-emails-from-workflows)
+- [Tạo trường tùy chỉnh](/l/vi/user-guide/data-model/how-tos/create-custom-fields)
+- [Tạo trường quan hệ](/l/vi/user-guide/data-model/how-tos/create-relation-fields)

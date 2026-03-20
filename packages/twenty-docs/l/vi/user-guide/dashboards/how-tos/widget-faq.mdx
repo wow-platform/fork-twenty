@@ -1,0 +1,68 @@
+---
+title: Câu hỏi thường gặp về widget
+description: Các câu hỏi phổ biến và thông báo lỗi được giải thích.
+---
+
+<AccordionGroup>
+  <Accordion title="Làm thế nào để hiển thị phần trăm thay vì số đếm?">
+    Ba tùy chọn:
+
+    - **Phần trăm trống/không trống**: Trong Dữ liệu hiển thị, chọn Phần trăm trống hoặc Phần trăm không trống
+    - **Tỷ lệ**: Cho trường Lựa chọn hoặc Hộp kiểm, bật Tỷ lệ để hiển thị tùy chọn cụ thể dưới dạng phần trăm của tất cả bản ghi
+    - **Hậu tố**: Cho biểu đồ tổng hợp, thêm `%` làm Hậu tố trong cài đặt Kiểu
+  </Accordion>
+
+  <Accordion title="Sự khác biệt giữa cột nhóm và cột xếp chồng là gì?">
+    Khi sử dụng **Nhóm theo**, bạn có thể hiển thị chuỗi theo hai cách:
+
+    - **Nhóm**: Cột cạnh nhau — tốt nhất để so sánh giá trị chính xác
+    - **Xếp chồng**: Cột chồng lên nhau — tốt nhất để hiển thị thành phần
+
+    Bật/tắt **Xếp chồng** trong cài đặt Kiểu để chuyển đổi.
+  </Accordion>
+
+  <Accordion title="Tại sao tôi không thể thấy tùy chọn Tổng hoặc Trung bình?">
+    Các phép toán khả dụng phụ thuộc vào **loại trường**:
+
+    - **Trường số**: Tổng, Trung bình, Nhỏ nhất, Lớn nhất
+    - **Trường ngày**: Sớm nhất, Muộn nhất (chỉ biểu đồ tổng hợp)
+    - **Trường hộp kiểm**: Đếm đúng, Đếm sai
+
+    Nếu bạn không thấy tùy chọn, hãy kiểm tra bạn đã chọn loại trường tương thích.
+  </Accordion>
+
+  <Accordion title="Tại sao một số cài đặt bị xám hoặc bị thiếu?">
+    Nhiều cài đặt chỉ xuất hiện khi điều kiện tiên quyết được đáp ứng:
+
+    - **Độ chi tiết ngày**: Chọn trường ngày trước
+    - **Nhóm theo, Chú thích, Xếp chồng**: Đặt Nguồn trước
+    - **Công tắc Chú thích, Xếp chồng**: Đặt Nhóm theo trước
+
+    Nếu cài đặt bị thiếu, hãy cấu hình điều kiện tiên quyết trước.
+  </Accordion>
+
+  <Accordion title="'Không có dữ liệu' nghĩa là gì?">
+    Biểu đồ không tìm thấy bản ghi phù hợp với cấu hình.
+
+    **Để khắc phục:** Xóa hoặc điều chỉnh bộ lọc, xác minh bạn đã chọn đúng đối tượng Nguồn, hoặc kiểm tra bản ghi tồn tại cho phạm vi ngày.
+  </Accordion>
+
+  <Accordion title="'Cấu hình không hợp lệ' nghĩa là gì?">
+    Một cài đặt bắt buộc bị thiếu hoặc không tương thích.
+
+    **Để khắc phục:** Đảm bảo Nguồn được đặt, Dữ liệu hiển thị đã cấu hình, và bất kỳ trường nhóm bắt buộc nào đã được chọn.
+  </Accordion>
+
+  <Accordion title="'Dữ liệu không hiển thị' nghĩa là gì?">
+    Dữ liệu vượt quá giới hạn hiển thị (100 cột, 100 điểm dữ liệu hoặc 100 lát).
+
+    **Để khắc phục:** Thêm bộ lọc để thu hẹp dữ liệu, hoặc thay đổi độ chi tiết ngày từ Ngày sang Tuần hoặc Tháng.
+  </Accordion>
+
+  <Accordion title="Tại sao một trục không hiển thị dữ liệu?">
+    Trường được chọn không có giá trị cho các bản ghi trong bộ lọc, hoặc loại trường không khớp với dữ liệu mong đợi.
+
+    **Để khắc phục:** Thử trường khác, hoặc kiểm tra bản ghi có giá trị cho trường đã chọn.
+  </Accordion>
+</AccordionGroup>
+

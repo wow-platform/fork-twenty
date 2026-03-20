@@ -1,0 +1,98 @@
+---
+title: Các lệnh Backend
+---
+
+
+## Các lệnh hữu ích
+
+Các lệnh này nên được thực thi từ thư mục packages/twenty-server.
+Từ bất kỳ thư mục nào khác bạn có thể chạy `npx nx {lệnh} twenty-server` (hoặc `npx nx run twenty-server:{lệnh}`).
+
+### Thiết lập lần đầu
+
+```
+npx nx database:reset twenty-server # thiết lập database với dữ liệu phát triển
+```
+
+### Khởi động server
+
+```
+npx nx run twenty-server:start
+```
+
+### Lint
+
+```
+npx nx run twenty-server:lint # thêm --fix để sửa lỗi lint
+```
+
+### Test
+
+```
+npx nx run twenty-server:test:unit          # chạy unit test
+npx nx run twenty-server:test:integration   # chạy integration test
+```
+Ghi chú: bạn có thể chạy `npx nx run twenty-server:test:integration:with-db-reset` trong trường hợp cần reset database trước khi chạy integration test.
+
+### Reset database
+
+Nếu bạn muốn reset và gieo dữ liệu cho database, bạn có thể chạy lệnh sau:
+
+```bash
+npx nx run twenty-server:database:reset
+```
+
+### Migration
+
+#### Cho đối tượng trong schema Core/Metadata (TypeORM)
+
+```bash
+npx nx run twenty-server:typeorm migration:generate src/database/typeorm/core/migrations/nameOfYourMigration -d src/database/typeorm/core/core.datasource.ts
+```
+
+#### Cho đối tượng Workspace
+
+Không có file migration, migration được tạo tự động cho mỗi workspace,
+lưu trong database và áp dụng với lệnh này
+
+```bash
+npx nx run twenty-server:command workspace:sync-metadata -f
+```
+
+<Warning>
+
+Điều này sẽ xóa database và chạy lại migration và gieo dữ liệu.
+
+Đảm bảo sao lưu dữ liệu bạn muốn giữ trước khi chạy lệnh này.
+
+</Warning>
+
+## Công nghệ sử dụng
+
+Twenty chủ yếu sử dụng NestJS cho backend.
+
+Prisma là ORM đầu tiên chúng tôi sử dụng. Nhưng để cho phép người dùng tạo trường và đối tượng tùy chỉnh, cấp thấp hơn có ý nghĩa hơn vì chúng tôi cần kiểm soát chi tiết. Dự án hiện sử dụng TypeORM.
+
+Đây là công nghệ sử dụng hiện tại.
+
+
+**Core**
+- [NestJS](https://nestjs.com/)
+- [TypeORM](https://typeorm.io/)
+- [GraphQL Yoga](https://the-guild.dev/graphql/yoga-server)
+
+**Database**
+- [Postgres](https://www.postgresql.org/)
+
+**Tích hợp bên thứ ba**
+- [Sentry](https://sentry.io/welcome/) để theo dõi lỗi
+
+**Kiểm thử**
+- [Jest](https://jestjs.io/)
+
+**Công cụ**
+- [Yarn](https://yarnpkg.com/)
+- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html)
+
+**Phát triển**
+- [AWS EKS](https://aws.amazon.com/eks/)

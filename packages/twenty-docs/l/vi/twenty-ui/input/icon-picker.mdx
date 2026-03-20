@@ -1,0 +1,57 @@
+---
+title: Icon Picker
+image: /images/user-guide/github/github-header.png
+---
+<Frame>
+  <img src="/images/user-guide/github/github-header.png" alt="Header" />
+</Frame>
+
+Bộ chọn biểu tượng dạng dropdown cho phép người dùng chọn một biểu tượng từ danh sách.
+
+<Tabs>
+
+<Tab title="Cách sử dụng">
+
+```jsx
+import React, { useState } from "react";
+import { IconPicker } from "@/ui/input/components/IconPicker";
+
+export const MyComponent = () => {
+
+   const [selectedIcon, setSelectedIcon] = useState("");
+   const handleIconChange = ({ iconKey, Icon }) => {
+     console.log("Selected Icon:", iconKey);
+     setSelectedIcon(iconKey);
+   };
+
+  return (
+    <IconPicker
+      disabled={false}
+      onChange={handleIconChange}
+      selectedIconKey={selectedIcon}
+      variant="primary"
+    />
+  );
+};
+```
+
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| disabled | boolean | Vô hiệu hóa bộ chọn biểu tượng nếu được đặt thành `true` |
+| onChange | function | Hàm callback được kích hoạt khi người dùng chọn một biểu tượng. Nhận một đối tượng có thuộc tính `iconKey` và `Icon` |
+| selectedIconKey | string | Key của biểu tượng đang được chọn ban đầu |
+| onClickOutside | function | Hàm callback được kích hoạt khi người dùng nhấp bên ngoài dropdown |
+| onClose | function | Hàm callback được kích hoạt khi dropdown bị đóng |
+| onOpen | function | Hàm callback được kích hoạt khi dropdown được mở |
+| variant | string | Biến thể kiểu dáng trực quan của biểu tượng có thể nhấp. Các tùy chọn bao gồm: `primary`, `secondary`, và `tertiary` |
+
+
+
+
+</Tab>
+</Tabs>

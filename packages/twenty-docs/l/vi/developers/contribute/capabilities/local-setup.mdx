@@ -1,0 +1,297 @@
+---
+title: Thiết lập cục bộ
+description: "Hướng dẫn cho người đóng góp (hoặc nhà phát triển tò mò) muốn chạy Twenty cục bộ."
+---
+
+
+## Điều kiện tiên quyết
+
+<Tabs>
+<Tab title="Linux và macOS">
+
+Trước khi có thể cài đặt và sử dụng Twenty, đảm bảo cài đặt các phần mềm sau trên máy tính:
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Node v24.5.0](https://nodejs.org/en/download)
+- [yarn v4](https://yarnpkg.com/getting-started/install)
+- [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
+
+<Warning>
+`npm` sẽ không hoạt động, bạn nên sử dụng `yarn` thay thế. Yarn bây giờ được đi kèm với Node.js, nên bạn không cần cài đặt riêng.
+Bạn chỉ cần chạy `corepack enable` để bật Yarn nếu chưa làm.
+</Warning>
+
+</Tab>
+
+<Tab title="Windows (WSL)">
+
+1. Cài đặt WSL
+Mở PowerShell với quyền Administrator và chạy:
+```powershell
+wsl --install
+```
+Bạn sẽ thấy yêu cầu khởi động lại máy tính. Nếu không, khởi động lại thủ công.
+
+Khi khởi động lại, cửa sổ PowerShell sẽ mở và cài đặt Ubuntu. Có thể mất một thời gian.
+Bạn sẽ thấy yêu cầu tạo tên người dùng và mật khẩu cho cài đặt Ubuntu.
+
+2. Cài đặt và cấu hình git
+
+```bash
+sudo apt-get install git
+
+git config --global user.name "Tên của bạn"
+
+git config --global user.email "email@domain.com"
+```
+
+3. Cài đặt nvm, node.js và yarn
+
+<Warning>
+Sử dụng `nvm` để cài đặt phiên bản `node` đúng. File `.nvmrc` đảm bảo tất cả người đóng góp sử dụng cùng phiên bản.
+</Warning>
+
+```bash
+sudo apt-get install curl
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+```
+Đóng và mở lại terminal để sử dụng nvm. Sau đó chạy các lệnh sau.
+
+```bash
+
+nvm install # cài đặt phiên bản node khuyến nghị
+
+nvm use # sử dụng phiên bản node khuyến nghị
+
+corepack enable
+```
+
+</Tab>
+</Tabs>
+
+---
+
+## Bước 1: Git Clone
+
+Trong terminal, chạy lệnh sau.
+
+<Tabs>
+<Tab title="SSH (Khuyến nghị)">
+Nếu chưa thiết lập SSH key, bạn có thể học cách làm [tại đây](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/about-ssh).
+```bash
+git clone git@github.com:twentyhq/twenty.git
+```
+</Tab>
+<Tab title="HTTPS">
+
+```bash
+git clone https://github.com/twentyhq/twenty.git
+```
+
+</Tab>
+</Tabs>
+
+## Bước 2: Di chuyển đến thư mục gốc
+
+```bash
+cd twenty
+```
+
+Bạn nên chạy tất cả lệnh trong các bước sau từ thư mục gốc của dự án.
+
+## Bước 3: Thiết lập Database PostgreSQL
+
+<Tabs>
+  <Tab title="Linux">
+    **Tùy chọn 1 (ưu tiên):** Để trang bị database cục bộ:
+    Sử dụng liên kết sau để cài đặt PostgreSQL trên máy Linux: [Cài đặt PostgreSQL](https://www.postgresql.org/download/linux/)
+    ```bash
+      psql postgres -c "CREATE DATABASE \"default\";" -c "CREATE DATABASE test;"
+    ```
+    Ghi chú: Bạn có thể cần thêm `sudo -u postgres` trước lệnh `psql` để tránh lỗi quyền.
+
+    **Tùy chọn 2:** Nếu bạn đã cài Docker:
+    ```bash
+      make -C packages/twenty-docker postgres-on-docker
+    ```
+  </Tab>
+  <Tab title="Mac OS">
+    **Tùy chọn 1 (ưu tiên):** Để trang bị database cục bộ với `brew`:
+
+    ```bash
+      brew install postgresql@16
+      export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+      brew services start postgresql@16
+      psql postgres -c "CREATE DATABASE \"default\";" -c "CREATE DATABASE test;"
+    ```
+
+    Bạn có thể kiểm tra PostgreSQL server đang chạy bằng:
+    ```bash
+      brew services list
+    ```
+
+    Trình cài đặt có thể không tạo user `postgres` mặc định khi cài qua Homebrew trên macOS. Thay vào đó, nó tạo role PostgreSQL khớp với tên người dùng macOS (ví dụ: "john").
+    Để kiểm tra và tạo user `postgres` nếu cần, làm theo các bước:
+    ```bash
+      # Kết nối PostgreSQL
+      psql postgres
+      hoặc
+      psql -U $(whoami) -d postgres
+    ```
+
+    Tại psql prompt (postgres=#), chạy:
+     ```bash
+      # Liệt kê role PostgreSQL hiện có
+      \du
+    ```
+
+    Nếu không thấy role `postgres`, tạo thủ công:
+     ```bash
+      CREATE ROLE postgres WITH SUPERUSER LOGIN;
+    ```
+
+    **Tùy chọn 2:** Nếu bạn đã cài Docker:
+    ```bash
+      make -C packages/twenty-docker postgres-on-docker
+    ```
+  </Tab>
+  <Tab title="Windows (WSL)">
+    Tất cả các bước sau chạy trong terminal WSL (trong máy ảo)
+
+    **Tùy chọn 1:** Để trang bị PostgreSQL cục bộ:
+    Sử dụng liên kết sau để cài đặt PostgreSQL trên máy ảo Linux: [Cài đặt PostgreSQL](https://www.postgresql.org/download/linux/)
+    ```bash
+      psql postgres -c "CREATE DATABASE \"default\";" -c "CREATE DATABASE test;"
+    ```
+    Ghi chú: Bạn có thể cần thêm `sudo -u postgres` trước lệnh `psql` để tránh lỗi quyền.
+
+    **Tùy chọn 2:** Nếu bạn đã cài Docker:
+    Chạy Docker trên WSL thêm một lớp phức tạp.
+    Chỉ sử dụng tùy chọn này nếu bạn thoải mái với các bước thêm, bao gồm bật [Docker Desktop WSL2](https://docs.docker.com/desktop/wsl).
+    ```bash
+      make -C packages/twenty-docker postgres-on-docker
+    ```
+  </Tab>
+</Tabs>
+
+Bạn có thể truy cập database tại `localhost:5432`.
+
+Nếu bạn sử dụng tùy chọn Docker ở trên, thông tin xác thực mặc định là user `postgres` và mật khẩu `postgres`. Cho cài đặt PostgreSQL tự nhiên, sử dụng thông tin xác thực và role đã cấu hình trên máy.
+
+## Bước 4: Thiết lập Database Redis (cache)
+Twenty yêu cầu Redis cache để cung cấp hiệu năng tốt nhất.
+
+<Tabs>
+  <Tab title="Linux">
+    **Tùy chọn 1:** Để trang bị Redis cục bộ:
+    Sử dụng liên kết sau để cài đặt Redis trên máy Linux: [Cài đặt Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/)
+
+    **Tùy chọn 2:** Nếu bạn đã cài Docker:
+    ```bash
+      make -C packages/twenty-docker redis-on-docker
+    ```
+  </Tab>
+  <Tab title="Mac OS">
+    **Tùy chọn 1 (ưu tiên):** Để trang bị Redis cục bộ với `brew`:
+    ```bash
+    brew install redis
+    ```
+    Khởi động Redis server:
+    ```bash
+    brew services start redis
+    ```
+
+    **Tùy chọn 2:** Nếu bạn đã cài Docker:
+    ```bash
+      make -C packages/twenty-docker redis-on-docker
+    ```
+  </Tab>
+  <Tab title="Windows (WSL)">
+    **Tùy chọn 1:** Để trang bị Redis cục bộ:
+    Sử dụng liên kết sau để cài đặt Redis trên máy ảo Linux: [Cài đặt Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/)
+
+    **Tùy chọn 2:** Nếu bạn đã cài Docker:
+    ```bash
+      make -C packages/twenty-docker redis-on-docker
+    ```
+  </Tab>
+</Tabs>
+
+Nếu bạn cần GUI client, chúng tôi khuyến nghị [Redis Insight](https://redis.io/insight/) (phiên bản miễn phí có sẵn).
+
+## Bước 5: Thiết lập biến môi trường
+
+Sử dụng biến môi trường hoặc file `.env` để cấu hình dự án. Thêm thông tin [tại đây](/l/vi/developers/self-host/capabilities/setup).
+
+Sao chép file `.env.example` trong `/front` và `/server`:
+```bash
+cp ./packages/twenty-front/.env.example ./packages/twenty-front/.env
+cp ./packages/twenty-server/.env.example ./packages/twenty-server/.env
+```
+
+<Info>
+**Chế độ nhiều Workspace:** Mặc định, Twenty chạy ở chế độ một workspace nơi chỉ một workspace có thể được tạo. Để bật hỗ trợ nhiều workspace (hữu ích cho kiểm thử tính năng dựa trên subdomain), đặt `IS_MULTIWORKSPACE_ENABLED=true` trong file `.env` server. Xem [Chế độ nhiều Workspace](/l/vi/developers/self-host/capabilities/setup#multi-workspace-mode) để biết chi tiết.
+</Info>
+
+## Bước 6: Cài đặt dependency
+Để build Twenty server và gieo dữ liệu vào database, chạy lệnh sau:
+```bash
+yarn
+```
+Lưu ý `npm` hoặc `pnpm` sẽ không hoạt động
+
+## Bước 7: Chạy dự án
+
+<Tabs>
+  <Tab title="Linux">
+    Tùy thuộc vào bản phân phối Linux, Redis server có thể đã được khởi động tự động.
+    Nếu không, kiểm tra [hướng dẫn cài đặt Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) cho bản phân phối của bạn.
+  </Tab>
+  <Tab title="Mac OS">
+  Redis nên đã đang chạy. Nếu không, chạy:
+    ```bash
+    brew services start redis
+    ```
+  </Tab>
+  <Tab title="Windows (WSL)">
+    Tùy thuộc vào bản phân phối Linux, Redis server có thể đã được khởi động tự động.
+    Nếu không, kiểm tra [hướng dẫn cài đặt Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) cho bản phân phối của bạn.
+  </Tab>
+</Tabs>
+
+
+Thiết lập database với lệnh sau:
+```bash
+npx nx database:reset twenty-server
+```
+
+Khởi động server, worker và các dịch vụ frontend:
+```bash
+npx nx start twenty-server
+npx nx worker twenty-server
+npx nx start twenty-front
+```
+
+Hoặc bạn có thể khởi động tất cả dịch vụ cùng lúc:
+```bash
+npx nx start
+```
+
+## Bước 8: Sử dụng Twenty
+
+**Frontend**
+
+Frontend của Twenty sẽ chạy tại [http://localhost:3001](http://localhost:3001).
+Bạn có thể đăng nhập bằng tài khoản demo mặc định: `tim@apple.dev` (mật khẩu: `tim@apple.dev`)
+
+**Backend**
+
+- Server của Twenty sẽ chạy tại [http://localhost:3000](http://localhost:3000)
+- GraphQL API có thể truy cập tại [http://localhost:3000/graphql](http://localhost:3000/graphql)
+- REST API có thể truy cập tại [http://localhost:3000/rest](http://localhost:3000/rest)
+
+
+
+## Xử lý sự cố
+
+Nếu gặp bất kỳ vấn đề nào, kiểm tra [Xử lý sự cố](/l/vi/developers/self-host/capabilities/troubleshooting) để tìm giải pháp.

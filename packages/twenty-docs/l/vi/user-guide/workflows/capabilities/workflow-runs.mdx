@@ -1,0 +1,84 @@
+---
+title: Lần chạy Workflow
+description: Giám sát và quản lý thực thi workflow.
+image: /images/user-guide/workflows/workflow.png
+---
+
+## Về lần chạy
+
+**Lần chạy** là bản ghi của một lần thực thi workflow. Mỗi khi workflow được kích hoạt — dù bởi sự kiện bản ghi, lịch trình, hành động thủ công hay webhook — một lần chạy mới được tạo.
+
+## Xem lần chạy
+
+### Từ trình chỉnh sửa Workflow
+1. Mở workflow bạn muốn giám sát
+2. Nhấp bảng **Lần chạy** ở bên phải
+3. Xem danh sách lần chạy gần đây với trạng thái
+
+### Từ chế độ xem Lần chạy Workflow
+1. Vào **Lần chạy Workflow** trong thanh bên
+2. Xem lần chạy trên tất cả workflow
+3. Lọc theo trạng thái, workflow hoặc ngày
+
+## Trạng thái lần chạy
+
+| Trạng thái | Mô tả |
+|--------|-------------|
+| **Đang chạy** | Workflow hiện đang thực thi |
+| **Hoàn thành** | Workflow hoàn thành thành công |
+| **Thất bại** | Workflow gặp lỗi và dừng |
+| **Đang chờ** | Workflow tạm dừng (ví dụ: chờ hành động Trì hoãn hoặc gửi Biểu mẫu) |
+
+## Chi tiết lần chạy
+
+Nhấp vào bất kỳ lần chạy nào để xem:
+- **Trạng thái**: Trạng thái hiện tại của lần chạy
+- **Bắt đầu lúc**: Khi nào lần chạy bắt đầu
+- **Thời lượng**: Lần chạy mất bao lâu
+- **Dữ liệu trigger**: Đầu vào khởi động workflow
+- **Đầu ra bước**: Dữ liệu trả về bởi mỗi bước
+- **Thông báo lỗi**: Nếu lần chạy thất bại, lỗi gì xảy ra
+
+## Thực thi từng bước
+
+Mỗi lần chạy hiển thị tiến trình qua workflow:
+1. Xem bước nào hoàn thành thành công
+2. Xác định nơi thất bại xảy ra
+3. Xem dữ liệu truyền giữa các bước
+4. Gỡ lỗi bằng cách kiểm tra đầu vào và đầu ra bước
+
+## Xử lý lỗi
+
+Khi lần chạy thất bại:
+1. Mở lần chạy thất bại
+2. Tìm bước gây ra thất bại
+3. Kiểm tra thông báo lỗi để biết chi tiết
+4. Các vấn đề phổ biến:
+   - Thiếu trường bắt buộc
+   - Định dạng dữ liệu không hợp lệ
+   - Lỗi API bên ngoài
+   - Vấn đề quyền
+
+## Chạy lại Workflow
+
+Nếu lần chạy thất bại, bạn có thể:
+- Sửa vấn đề cơ bản và chờ trigger tiếp theo
+- Đối với workflow thủ công, kích hoạt lại với dữ liệu giống hoặc cập nhật
+- Xem lại logic workflow để ngăn thất bại tương lai
+
+## Mẹo hiệu suất
+
+### Quản lý lịch sử lần chạy
+- Lần chạy được giữ lại để tham khảo lịch sử
+- Lần chạy rất cũ có thể được lưu trữ tự động
+- Xuất dữ liệu lần chạy nếu bạn cần giữ bản ghi
+
+### Thực hành giám sát tốt nhất
+- Kiểm tra lần chạy thường xuyên sau khi kích hoạt workflow mới
+- Xem lại lần chạy thất bại để xác định mẫu
+
+## Liên quan
+
+- [Trigger Workflow](/l/vi/user-guide/workflows/capabilities/workflow-triggers)
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Khắc phục sự cố Workflow](/l/vi/user-guide/workflows/how-tos/need-more-help/workflow-troubleshooting)

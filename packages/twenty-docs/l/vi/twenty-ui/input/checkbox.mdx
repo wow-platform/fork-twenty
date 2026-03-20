@@ -1,0 +1,49 @@
+---
+title: Checkbox
+image: /images/user-guide/tasks/tasks_header.png
+---
+<Frame>
+  <img src="/images/user-guide/tasks/tasks_header.png" alt="Header" />
+</Frame>
+
+Được sử dụng khi người dùng cần chọn nhiều giá trị từ nhiều tùy chọn.
+
+<Tabs>
+<Tab title="Cách sử dụng">
+
+```jsx
+import { Checkbox } from "twenty-ui/display";
+
+export const MyComponent = () => {
+  return (
+    <Checkbox
+      checked={true}
+      indeterminate={false}
+      onChange={() => console.log("onChange function fired")}
+      onCheckedChange={() => console.log("onCheckedChange function fired")}
+      variant="primary"
+      size="small"
+      shape="squared"
+    />
+  );
+};
+```
+
+</Tab>
+<Tab title="Props">
+
+
+| Props | Type | Mô tả |
+|-------|------|-------|
+| checked | boolean | Chỉ ra xem checkbox có được chọn hay không |
+| indeterminate | boolean | Chỉ ra xem checkbox có đang ở trạng thái không xác định (không được chọn cũng không bỏ chọn) |
+| onChange | function | Hàm callback bạn muốn kích hoạt khi trạng thái checkbox thay đổi |
+| onCheckedChange | function | Hàm callback bạn muốn kích hoạt khi trạng thái `checked` thay đổi |
+| variant | string | Biến thể kiểu dáng trực quan của ô chọn. Các tùy chọn bao gồm: `primary`, `secondary`, và `tertiary` |
+| size | string | Kích thước của checkbox. Có hai tùy chọn: `small` và `large` |
+| shape | string | Hình dạng của checkbox. Có hai tùy chọn: `squared` và `rounded` |
+
+
+
+</Tab>
+</Tabs>

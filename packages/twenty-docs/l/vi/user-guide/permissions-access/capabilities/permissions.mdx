@@ -1,0 +1,194 @@
+---
+title: Quyền
+description: Kiểm soát truy cập vào đối tượng, trường và cài đặt với quyền dựa trên vai trò.
+image: /images/user-guide/permissions/permissions.png
+---
+
+
+Hệ thống quyền của Twenty cho phép bạn kiểm soát truy cập vào ba lĩnh vực chính:
+- **Đối tượng và Trường**: Kiểm soát ai có thể xem, chỉnh sửa hoặc xóa bản ghi và từng trường riêng lẻ
+- **Cài đặt**: Quản lý truy cập vào cấu hình workspace và chức năng quản trị
+- **Hành động**: Kiểm soát các hành động chung trong workspace như nhập dữ liệu hoặc gửi email
+
+## Tạo vai trò
+
+Để tạo vai trò mới:
+
+1. Đi tới **Cài đặt → Vai trò**
+2. Trong phần **Tất cả vai trò**, nhấp **+ Tạo vai trò**
+3. Nhập tên vai trò
+4. Trong tab **Quyền** mặc định, [cấu hình quyền](#tùy-chỉnh-quyền)
+5. Nhấp **Lưu** để hoàn tất
+
+## Xóa vai trò
+
+Để xóa vai trò:
+
+1. Đi tới **Cài đặt → Vai trò**
+2. Nhấp vào vai trò bạn muốn xóa
+3. Mở tab **Cài đặt**, sau đó nhấp **Xóa vai trò**
+4. Nhấp **Xác nhận** trong hộp thoại
+
+<Note>
+Nếu vai trò bị xóa, bất kỳ thành viên workspace nào được gán vai trò đó sẽ tự động được chuyển sang vai trò mặc định. Tất cả ngoại trừ vai trò **Admin** đều có thể bị xóa. Luôn phải có ít nhất một thành viên được gán vai trò **Admin**.
+</Note>
+
+## Gán vai trò cho thành viên
+
+### Xem phân công hiện tại
+- Đi tới **Cài đặt → Vai trò**
+- Xem tất cả vai trò và số thành viên được gán
+- Xem thành viên nào có vai trò nào
+
+### Gán vai trò cho thành viên
+1. Đi tới **Cài đặt → Vai trò**
+2. Nhấp vào vai trò bạn muốn gán
+3. Mở tab **Phân công**
+4. Nhấp **+ Gán cho thành viên**
+5. Chọn thành viên workspace từ danh sách
+6. Xác nhận phân công
+
+### Đặt vai trò mặc định
+1. Đi tới **Cài đặt → Vai trò**
+2. Trong phần **Tùy chọn**, tìm **Vai trò mặc định**
+3. Chọn vai trò nào thành viên mới sẽ tự động nhận
+4. Thành viên workspace mới sẽ được gán vai trò này khi tham gia
+
+<Note>
+Bạn chỉ có thể gán vai trò cho thành viên workspace hiện có. Để mời thành viên mới, sử dụng [Quản lý thành viên](/l/vi/user-guide/settings/capabilities/member-management).
+</Note>
+
+## Tùy chỉnh quyền
+
+Quyền xác định những gì mỗi vai trò có thể truy cập hoặc chỉnh sửa trong workspace, bao gồm bản ghi đối tượng workspace, cài đặt và hành động.
+
+### Quyền đối tượng
+
+Phần **Đối tượng** kiểm soát những gì vai trò này có thể làm với bản ghi trong workspace.
+
+#### Đặt quyền mặc định (Tất cả đối tượng)
+
+Đầu tiên, cấu hình quyền cơ bản áp dụng cho **tất cả đối tượng** theo mặc định:
+
+| Quyền | Mô tả |
+|------------|-------------|
+| **Xem bản ghi trên tất cả đối tượng** | Xem bản ghi trong danh sách và trang chi tiết |
+| **Chỉnh sửa bản ghi trên tất cả đối tượng** | Sửa đổi bản ghi hiện có |
+| **Xóa bản ghi trên tất cả đối tượng** | Xóa mềm bản ghi (có thể khôi phục) |
+| **Xóa vĩnh viễn bản ghi trên tất cả đối tượng** | Xóa vĩnh viễn bản ghi |
+
+Chọn hoặc bỏ chọn dựa trên hành vi mặc định mong muốn cho vai trò này.
+
+<Note>
+**Ví dụ — Vai trò thực tập sinh**: Thực tập sinh nên xem tất cả đối tượng nhưng không chỉnh sửa theo mặc định. Bật "Xem bản ghi trên tất cả đối tượng" nhưng bỏ "Chỉnh sửa bản ghi trên tất cả đối tượng".
+</Note>
+
+#### Thêm ngoại lệ cấp đối tượng
+
+Sau khi đặt mặc định, sử dụng phần **Cấp đối tượng** để thêm quy tắc ghi đè mặc định cho đối tượng cụ thể.
+
+Nhấp **+ Thêm quy tắc** và chọn đối tượng để tạo ngoại lệ.
+
+**Ví dụ quy tắc cho vai trò Thực tập sinh:**
+
+| Quy tắc | Hiệu lực |
+|------|--------|
+| Cơ hội → tắt "Xem bản ghi" | Thực tập sinh không thể xem đối tượng Cơ hội |
+| Người → bật "Chỉnh sửa bản ghi" | Thực tập sinh có thể chỉnh sửa bản ghi Người (nhưng không phải đối tượng khác) |
+
+### Quyền trường
+
+Trong mỗi quy tắc cấp đối tượng, bạn có thể đi sâu hơn và cấu hình **quyền cấp trường** để kiểm soát truy cập vào trường cụ thể.
+
+| Quyền | Mô tả |
+|------------|-------------|
+| **Xem trường** | Xem giá trị trường |
+| **Chỉnh sửa trường** | Sửa đổi giá trị trường |
+| **Không có quyền truy cập** | Trường bị ẩn hoàn toàn |
+
+**Ví dụ — Giới hạn trường nhạy cảm:**
+
+Cho vai trò Thực tập sinh có quyền chỉnh sửa Người, bạn có thể muốn giới hạn một số trường:
+- Người → Email → Chỉ **Xem trường** (không thể chỉnh sửa)
+- Người → Địa chỉ → **Không có quyền truy cập** (ẩn hoàn toàn)
+
+Điều này cho phép thực tập sinh chỉnh sửa hầu hết trường Người trong khi bảo vệ thông tin nhạy cảm.
+
+### Cách kế thừa quyền hoạt động
+
+Quyền được truyền từ chung đến cụ thể:
+
+1. **Tất cả đối tượng** → đặt cơ bản cho tất cả đối tượng
+2. **Quy tắc cấp đối tượng** → ghi đè cơ bản cho đối tượng cụ thể
+3. **Quy tắc cấp trường** → ghi đè cài đặt đối tượng cho trường cụ thể
+
+Cài đặt cụ thể hơn luôn được ưu tiên.
+
+### Quản lý ghi đè quyền
+
+Để ghi đè quyền kế thừa:
+
+1. Nhấp **X** để xóa quy tắc kế thừa
+2. Chọn quyền cụ thể bạn muốn
+3. Nhấp biểu tượng **Hoàn tác** màu cam (mũi tên tròn) để khôi phục thay đổi
+
+Khi hoàn tất, nhấp **Hoàn thành**, sau đó **Lưu** khi được chuyển về trang vai trò.
+
+### Quyền cài đặt workspace
+
+Kiểm soát truy cập vào cài đặt workspace theo hai cách:
+
+- Bật/tắt **Truy cập tất cả cài đặt** để cấp quyền truy cập đầy đủ
+- Hoặc bật quyền cụ thể (ví dụ: tạo API key, tùy chọn workspace, gán vai trò, cấu hình mô hình dữ liệu, cài đặt bảo mật và quản lý workflow)
+
+<Note>
+**Hạn chế hiện tại**: Quyền truy cập quản lý workflow hiện được yêu cầu để kích hoạt workflow thủ công. Hành vi này có thể thay đổi trong các bản phát hành tương lai.
+</Note>
+
+### Quyền hành động workspace
+
+Kiểm soát truy cập vào các hành động chung trong workspace:
+
+- Bật/tắt **Truy cập tất cả ứng dụng** để cấp đầy đủ quyền
+- Hoặc bật từng hành động như **Gửi email**, **Nhập CSV** và **Xuất CSV**
+
+## Gán vai trò cho API Key và AI Agent
+
+Ngoài thành viên workspace, vai trò cũng có thể được gán cho **API Key** và **AI Agent**. Điều này đặc biệt hữu ích cho các nhóm muốn kiểm soát chính xác "ai" có thể làm gì trong workspace — bao gồm cả quy trình tự động và tích hợp.
+
+### Tại sao gán vai trò cho API Key và AI Agent?
+
+- **Bảo mật**: Giới hạn quy trình tự động có thể truy cập hoặc chỉnh sửa gì
+- **Tuân thủ**: Đảm bảo tích hợp chỉ tiếp cận dữ liệu cần thiết
+- **Kiểm soát**: Ngăn thay đổi dữ liệu ngẫu nhiên từ tự động hóa cấu hình sai
+- **Kiểm toán**: Theo dõi hành động nào được thực hiện bởi tích hợp hoặc agent nào
+
+### Gán vai trò cho API Key
+
+1. Đi tới **Cài đặt → Vai trò**
+2. Nhấp vào vai trò bạn muốn gán
+3. Mở tab **Phân công**
+4. Trong phần **API Key**, nhấp **+ Gán cho API key**
+5. Chọn API key từ danh sách
+6. Xác nhận phân công
+
+API key sẽ kế thừa tất cả quyền được định nghĩa bởi vai trò đó. Mọi lệnh gọi API được thực hiện với key này sẽ bị giới hạn tương ứng.
+
+<Note>
+API key không có vai trò được gán sẽ sử dụng quyền mặc định. Để bảo mật chặt chẽ hơn, luôn gán vai trò cụ thể cho API key sản phẩm.
+</Note>
+
+### Gán vai trò cho AI Agent
+
+1. Đi tới **Cài đặt → Vai trò**
+2. Nhấp vào vai trò bạn muốn gán
+3. Mở tab **Phân công**
+4. Trong phần **AI Agent**, nhấp **+ Gán cho AI agent**
+5. Chọn AI agent từ danh sách
+6. Xác nhận phân công
+
+AI agent chỉ có thể truy cập dữ liệu và thực hiện hành động được phép bởi vai trò được gán.
+
+<Note>
+Cho AI agent chạy trong workflow, điều này đảm bảo agent không thể truy cập hoặc chỉnh sửa dữ liệu ngoài phạm vi dự kiến — ngay cả khi workflow có quyền rộng hơn.
+</Note>

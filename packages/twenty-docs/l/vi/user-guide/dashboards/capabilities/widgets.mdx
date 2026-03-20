@@ -1,0 +1,132 @@
+---
+title: Widget
+description: Khám phá các loại widget và tùy chọn trực quan hóa trong Twenty.
+---
+
+import { ChartIcon } from '/snippets/chart-icon.mdx';
+
+## Các widget khả dụng
+
+Twenty cung cấp nhiều loại widget để trực quan hóa dữ liệu CRM.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon icon="chart-bar-popular" />Biểu đồ cột</span>
+Hiển thị dữ liệu dưới dạng cột ngang hoặc dọc.
+
+<Frame>
+<img src="/images/user-guide/dashboard/dashboard-widget-bar-chart.png" alt="Biểu đồ cột" />
+</Frame>
+
+**Phù hợp nhất cho:**
+- So sánh giá trị giữa các danh mục
+- Hiển thị xếp hạng
+- Theo dõi chỉ số theo khoảng thời gian
+
+**Ví dụ sử dụng:**
+- Giao dịch theo giai đoạn
+- Doanh thu theo nhân viên bán hàng
+- Liên hệ được thêm mỗi tháng
+
+<Note>
+**Giới hạn hiển thị**: Biểu đồ cột có thể hiển thị tối đa 100 cột và 50 nhóm mỗi cột khi sử dụng Nhóm theo. Nếu bạn thấy cảnh báo "Dữ liệu không hiển thị: tối đa X cột mỗi biểu đồ", hãy thêm bộ lọc để thu hẹp dữ liệu hoặc thay đổi cách nhóm (ví dụ: nhóm theo tuần thay vì theo ngày).
+</Note>
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon icon="chart-pie" />Biểu đồ tròn</span>
+Hiển thị tỷ lệ của tổng thể.
+
+<Frame>
+<img src="/images/user-guide/dashboard/dashboard-widget-pie-chart.png" alt="Biểu đồ tròn" />
+</Frame>
+
+**Phù hợp nhất cho:**
+- Hiển thị thành phần hoặc phân bổ
+- So sánh các phần với tổng thể
+- Làm nổi bật các phân khúc chính
+
+**Ví dụ sử dụng:**
+- Phân bổ giao dịch theo nguồn
+- Phân tích liên hệ theo ngành
+- Thành phần pipeline theo chủ sở hữu
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon icon="chart-line" />Biểu đồ đường</span>
+Hiển thị xu hướng theo thời gian.
+
+<Frame>
+<img src="/images/user-guide/dashboard/dashboard-widget-line-chart.png" alt="Biểu đồ đường" />
+</Frame>
+
+**Phù hợp nhất cho:**
+- Theo dõi thay đổi theo thời gian
+- Xác định xu hướng
+- So sánh nhiều chỉ số
+
+**Ví dụ sử dụng:**
+- Xu hướng số giao dịch hàng tháng
+- Tăng trưởng doanh thu theo quý
+- Mức độ hoạt động theo thời gian
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon icon="sum" />Biểu đồ tổng hợp</span>
+Hiển thị nổi bật các giá trị chính đơn lẻ.
+
+<Frame>
+<img src="/images/user-guide/dashboard/dashboard-widget-aggregate-chart.png" alt="Biểu đồ tổng hợp" />
+</Frame>
+
+**Phù hợp nhất cho:**
+- Làm nổi bật KPI
+- Hiển thị tổng hoặc trung bình
+- Kiểm tra trạng thái nhanh
+
+**Ví dụ sử dụng:**
+- Tổng giá trị pipeline
+- Số lượng cơ hội đang mở
+- Tỷ lệ chuyển đổi
+
+**Tùy chọn nâng cao:**
+- **Tỷ lệ**: Cho trường Lựa chọn, tính tỷ lệ giữa các giá trị. Đi tới **Dữ liệu hiển thị** → chọn trường → bật tùy chọn **Tỷ lệ**.
+- **Tiền tố & Hậu tố**: Thêm văn bản tùy chỉnh trước hoặc sau số (ví dụ: tiền tố "$" hoặc hậu tố "%") để dễ đọc hơn.
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon icon="frame" />iFrame</span>
+Nhúng công cụ và nội dung bên ngoài trực tiếp vào dashboard.
+
+<Frame>
+<img src="/images/user-guide/dashboard/dashboard-widget-iframe.png" alt="iFrame" />
+</Frame>
+
+**Phù hợp nhất cho:**
+- Hiển thị báo cáo hoặc dashboard bên ngoài
+- Tích hợp công cụ bán hàng bên thứ ba
+- Hiển thị nội dung trực tiếp từ hệ thống khác
+
+**Ví dụ sử dụng:**
+- Chỉ số từ công cụ Hỗ trợ
+- Chỉ số từ trình gọi điện
+- Nội dung trực tiếp từ công cụ Chuỗi bán hàng
+
+### <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon icon="align-box-left-top" />Văn bản có định dạng</span>
+Thêm văn bản và nội dung có định dạng trực tiếp vào dashboard.
+
+<Frame>
+<img src="/images/user-guide/dashboard/dashboard-widget-rich-text.png" alt="Văn bản có định dạng" />
+</Frame>
+
+**Phù hợp nhất cho:**
+- Thêm ngữ cảnh hoặc hướng dẫn
+- Mô tả dashboard
+- Ghi chú và chú thích
+
+**Tính năng:**
+- Định dạng văn bản phong phú (đậm, nghiêng, danh sách, v.v.)
+- Tải lên hình ảnh và tệp
+- Chỉnh sửa kiểu Markdown
+
+<Note>
+**Sắp ra mắt**: Biểu đồ đồng hồ và bảng chưa khả dụng nhưng nằm trong lộ trình phát triển.
+</Note>
+
+
+### Nhân bản widget
+
+1. Nhấp vào widget
+2. Mở **Tùy chọn**
+3. Nhấp **Nhân bản widget**
+

@@ -1,0 +1,73 @@
+---
+title: Hiển thị số email đã nhận
+description: Tạo workflow tự động đếm và hiển thị số email nhận từ mỗi liên hệ.
+---
+import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
+
+<img src="/images/user-guide/workflows/workflow-number-of-emails-received.png" style={{width:'100%'}}/>
+
+## Tổng quan
+
+Workflow này kích hoạt mỗi khi email mới được nhận và cập nhật trường tùy chỉnh trên bản ghi Người với tổng số email từ người gửi đó.
+
+## Điều kiện tiên quyết
+
+Trước khi thiết lập workflow, tạo trường tùy chỉnh trên đối tượng **Người**:
+1. Vào **Cài đặt → Mô hình dữ liệu → Người**
+2. Thêm trường **Số** mới
+3. Đặt tên như "Số email nhận từ người này"
+
+## Thiết lập từng bước
+
+<VimeoEmbed videoId="1148700336" title="Video minh họa" />
+
+### Bước 1: Cấu hình Trigger
+
+1. Vào **Workflow** và tạo workflow mới
+2. Chọn **Bản ghi được tạo** làm trigger
+3. Chọn **Message Participants** (khả dụng trong Đối tượng nâng cao)
+
+<Note>
+Message Participant là tổ hợp của ID tin nhắn và ID người, tạo một bản ghi duy nhất cho mỗi tin nhắn. Dễ theo dõi hơn Messages trực tiếp vì chúng ta có thể truy cập trường `handle`, chứa địa chỉ email người gửi (hoặc người nhận).
+</Note>
+
+### Bước 2: Lọc theo vai trò
+
+1. Thêm hành động **Bộ lọc**
+2. Đặt điều kiện: **Role** bằng **FROM**
+
+Điều này đảm bảo bạn chỉ đếm tin nhắn gửi bởi người này, không phải tin nhắn gửi cho họ.
+
+### Bước 3: Tìm tất cả Message Participant có cùng Handle
+
+1. Thêm hành động **Tìm kiếm bản ghi**
+2. Chọn **Message Participants** làm đối tượng
+3. Thêm bộ lọc: **Handle** bằng handle từ trigger (địa chỉ email người gửi) và **Role** bằng **FROM**
+4. Tăng **Giới hạn** từ 1 lên **200** (tối đa)
+
+Tìm tất cả tin nhắn từ địa chỉ email này để lấy tổng số.
+
+<Note>
+Hành động Tìm kiếm bản ghi giới hạn trả về tối đa 200 bản ghi. Tuy nhiên, vì bạn chỉ sử dụng giá trị `totalCount` (không phải các bản ghi riêng lẻ), bước này sẽ trả về tổng số email gửi bởi người này.
+</Note>
+
+### Bước 4: Cập nhật bản ghi Người bằng hành động Tạo hoặc Cập nhật bản ghi
+
+1. Thêm hành động **Tạo hoặc Cập nhật bản ghi**
+<Warning>
+Sử dụng **Upsert bản ghi** thay vì **Cập nhật bản ghi** ở đây. Điều này cho phép bạn xác định người bằng địa chỉ email (trường `handle`) thay vì yêu cầu ID bản ghi từ bước trước.
+</Warning>
+2. Chọn **Người** làm đối tượng
+3. Tìm người bằng cách khớp email với `handle` từ Message Participant
+4. Đặt trường tùy chỉnh "Số email đã nhận" thành `{{searchRecords.totalCount}}`
+
+Giá trị `totalCount` từ hành động Tìm kiếm bản ghi đại diện cho tổng số email nhận từ người này.
+
+
+
+
+## Liên quan
+
+- [Hành động Workflow](/l/vi/user-guide/workflows/capabilities/workflow-actions)
+- [Tạo trường tùy chỉnh](/l/vi/user-guide/data-model/how-tos/customize-your-data-model)
+- [Hành động Tìm kiếm bản ghi](/l/vi/user-guide/workflows/capabilities/workflow-actions#search-records)
