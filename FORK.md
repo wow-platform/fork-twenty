@@ -241,6 +241,30 @@ Fixed `cols={٢}` (Arabic numeral) → `cols={2}` in 8 Arabic-locale MDX files. 
 - `packages/twenty-docs/l/ar/user-guide/introduction.mdx`
 - `packages/twenty-docs/l/ar/user-guide/permissions-access/overview.mdx`
 
+### fix: twenty-sdk build on Windows (2026-03-21)
+
+Fixed `isExternal()` in Vite config not recognizing Windows absolute paths (`C:\...`) and backslash separators (`src\`), causing `Entry module "src/sdk/index.ts" cannot be external` build error.
+
+**Modified files (exact diff from upstream):**
+
+`packages/twenty-sdk/vite.config.sdk.ts`
+```diff
+ const isExternal = (id: string): boolean => {
+-  if (id.startsWith('.') || id.startsWith('/') || id.startsWith('\0')) {
++  if (
++    id.startsWith('.') ||
++    id.startsWith('/') ||
++    id.startsWith('\0') ||
++    /^[a-zA-Z]:[\\/]/.test(id)
++  ) {
+     return false;
+   }
+-  if (id.startsWith('src/') || id.startsWith('@/')) {
++  if (id.startsWith('src/') || id.startsWith('src\\') || id.startsWith('@/')) {
+     return false;
+   }
+```
+
 ### scripts: detect-vi-changes (2026-03-21)
 
 Added tooling to detect English source changes for vi translation sync.
