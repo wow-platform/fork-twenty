@@ -66,6 +66,122 @@ git diff --diff-filter=A --name-only $PREV..$CURR -- packages/twenty-server/src/
 
 ---
 
+## 2026-03-27 — upstream-sync-2026-03-27-v1.19.11
+
+| Item | Value |
+|------|-------|
+| **Upstream tag** | `v1.19.11` |
+| **Merge commit** | `cf69e05759` |
+| **Upstream HEAD** | `7f1814805d` — Fix backfill record page layout command (#19043) |
+| **Previous tag** | `upstream-sync-2026-03-27` (`16acf6ae58`) |
+| **New tag** | `upstream-sync-2026-03-27-v1.19.11` |
+| **Total commits** | 18 (17 non-merge + 1 merge) |
+| **Files changed** | 472 |
+| **New files (A)** | 199 |
+| **Modified (M)** | 256 |
+| **Deleted (D)** | 9 |
+| **Renamed (R)** | 8 |
+| **Insertions** | +14,368 |
+| **Deletions** | -2,966 |
+| **Contributors** | 12 |
+
+### Security
+
+| Commit | Description | Impact |
+|--------|-------------|--------|
+| `08077476f3` | Remove remaining direct cookie writes that make tokenPair a session cookie on renewal (#19031) | **Medium** — session token persisted as session cookie instead of expiring properly |
+| `5efe69f8d3` | Migrate field permission to syncable entity (#18751) | **Low** — permission model hardened, now syncable across workspaces |
+| `281bb6d783` | Guard `yarn database:migrate:prod` (#19008) | **Low** — prevents accidental migration in non-prod environments |
+
+### Database Migrations (2 new + 1 util)
+
+```bash
+npx nx run twenty-server:database:migrate:prod
+```
+
+| Migration | Description |
+|-----------|-------------|
+| `1773400000000-add-universal-identifier-and-application-id-to-field-permission` | Add `universalIdentifier` and `applicationId` columns to field permission table |
+| `1773400000001-make-field-permission-universal-identifier-and-application-id-not-null` | Make those new columns NOT NULL |
+| `1773400000000-make-field-permission-universal-identifier-and-application-id-not-null.util` | Shared util for the migration |
+
+### Features
+
+**New Twenty Website** (#19035)
+- First PR introducing `twenty-website-new` package (144 new files)
+- Next.js-based redesign with new hero, problem statement, three-cards feature sections
+- New images, theme system (colors, spacing, radius, typography)
+- Separate from existing `twenty-website` — runs in parallel during transition
+
+**Workspace Management** (#19036)
+- Enforce workspace count limit for multi-workspace setups
+
+**Workflow** (#18909)
+- Seed company workflow for email upserts — automated company creation from incoming emails
+
+**Field Permissions** (#18751)
+- Field permissions migrated to syncable entity pattern
+- Adds `universalIdentifier` and `applicationId` to field permissions
+- Enables cross-workspace permission synchronization
+
+### Bug Fixes
+
+| Category | Commit | Description |
+|----------|--------|-------------|
+| Auth/Cookie | `08077476f3` | Remove direct cookie writes that cause session cookie on token renewal (#19031) |
+| Data integrity | `c2b058a6a7` | Use workspace-generated id for core dual-write in message folder save (#19038) |
+| Data integrity | `6f0ac88e20` | Batch viewGroup mutations sequentially to prevent race conditions (#19027) |
+| File handling | `68f5e70ade` | Sign file URLs in timeline + fix file loss on click outside (#19001) |
+| Backfill | `7f1814805d` | Fix backfill record page layout command (#19043) |
+| Backfill | `fb21f3ccf5` | Resolve availabilityObjectMetadataUniversalIdentifier in backfill (#19041) |
+| Feature gate | `17424320e3` | Gate command-menu-items query behind feature flag (#19029) |
+
+### Refactoring
+
+| Commit | Description |
+|--------|-------------|
+| `56056b885d` | Remove `@hello-pangea/dnd` from navigation-menu-item module (#19033) — lighter dependency tree |
+| `db9da3194f` | Refactor client auto heal (#19032) — cleaner reconnection logic |
+
+### Infrastructure
+
+**CI/CD:**
+- Guard `yarn database:migrate:prod` — safety check before running migrations (#19008)
+
+**Docker:**
+- Migration guard also applied to Docker entrypoint scripts (#19008)
+
+**AI Catalog:**
+- Sync AI model catalog from models.dev (#19028)
+
+### i18n
+
+3 automated translation commits (#19046, #19040, and locale files).
+
+### Packages Affected
+
+| Package | Files | Key changes |
+|---------|-------|-------------|
+| `twenty-server` | ~80 | Field permission migration, workspace limit, migration guard, backfill fixes, email upsert workflow |
+| `twenty-front` | ~75 | Permission sync, DnD removal, cookie fix, file URL signing, feature gating |
+| `twenty-website-new` | 144 (all new) | Entirely new Next.js website package |
+| `twenty-shared` | ~5 | Field permission types, backfill command types |
+| `twenty-docker` | ~3 | Dockerfile cleanup, migration guard in entrypoint |
+| `.github` | 1 | CI breaking changes workflow update |
+
+### Post-merge Checklist
+
+- [ ] `yarn install` (new `twenty-website-new` workspace)
+- [ ] Run database migrations: `npx nx run twenty-server:database:migrate:prod`
+- [ ] Rebuild twenty-shared: `npx nx build twenty-shared`
+- [ ] Verify field permissions after migration (universalIdentifier NOT NULL)
+- [ ] Test file URL signing in timeline views
+- [ ] Check workspace count limit if running multi-workspace
+
+*Full diff: `git diff upstream-sync-2026-03-27..upstream-sync-2026-03-27-v1.19.11`*
+
+---
+
 ## 2026-03-27 — upstream-sync-2026-03-27
 
 | Item | Value |
