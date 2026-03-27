@@ -66,6 +66,125 @@ git diff --diff-filter=A --name-only $PREV..$CURR -- packages/twenty-server/src/
 
 ---
 
+## 2026-03-27 — upstream-sync-2026-03-27
+
+| Item | Value |
+|------|-------|
+| **Merge commit** | `16acf6ae58` |
+| **Previous tag** | `upstream-sync-2026-03-25` (`03e1ee9f96`) |
+| **New tag** | `upstream-sync-2026-03-27` |
+| **Total commits** | 73 (71 non-merge + 2 merge) |
+| **Files changed** | 577 |
+| **Insertions** | +157,158 |
+| **Deletions** | -58,418 |
+
+### Security
+
+| Commit | Description | Impact |
+|--------|-------------|--------|
+| `2e015ee68d` | Add missing row-level permission check on Kanban view (#19002) | **Medium** — unauthorized read in board view |
+| `7a341c6475` | Support authType on AI providers for IAM role authentication (#19016) | **Low** — new auth method, no regression |
+| `bf22373315` | Use user role for OAuth tokens bearing user context (#18954) | **Medium** — correct role resolution |
+| `e1374e34a7` | Fix object permission override (#18948) | **Medium** — permission bypass |
+
+### Database Migrations
+
+No new core migration files. One existing migration modified:
+- `1773900000000-migrate-model-ids-to-composite-format.ts` — minor fix
+
+### Features
+
+**AI Provider Enhancements** (#19016, #18876, #18874, #18999, #19003)
+- IAM role authentication support for AI providers (`authType` field)
+- Settings search refactored to use SearchInput, Skills tab restructured
+- AI chat composer UI matched to Figma designs
+- Navigation panel scroll refactor + non-chat placeholder
+
+**Dashboard & Widgets** (#18960, #19017, #18965)
+- Record table widget feature flag added
+- Rich text widget fix (again)
+- Dashboard widget edit mode content fix
+- Handle dashboard filters referencing deleted fields (#18512)
+
+**Workflow** (#18906, #19015)
+- Workflow objects now searchable
+- Fix: cannot create two workflow agent nodes with same name
+
+**Navigation & Layout** (#18764, #18940, #19004, #18961)
+- Add command menu item to layout customization
+- Clear navbar edit selection when closing side panel
+- Combine and clean upgrade commands for record page layouts
+- Use record page layouts in merge records feature
+
+**SDK** (#18963, #19010, #19006, #19000)
+- Refactor dependency graph for SDK, client-sdk and create-app
+- twenty-ui/display selective re-export to avoid bloating icons
+- Add error message if relationType is missing
+- Bump prerelease version sdk, sdk-client, create-twenty-app
+
+**S3 & File Downloads** (#18864)
+- S3 presigned URL redirect for file downloads
+
+**Form & Record Picker** (#18979, #18912)
+- Multiselect option in form step
+- Object type filter dropdown in side panel record searches
+
+### Bug Fixes
+
+| Category | Commits | Key fixes |
+|----------|---------|-----------|
+| Board/Kanban | 3 | Drag-and-drop (#19005), no-value column fetch (#18977), row-level permission (#19002) |
+| Dashboard | 3 | Widget edit mode (#18965), deleted field filters (#18512), rich text (#19017) |
+| Navigation | 4 | Menu item overflow (#18937), folder visibility (#18992, #18993), side panel clear (#18940) |
+| Records | 3 | Create with filters (#18969), single record picker (#18995), format result (#18975) |
+| Auth/Permissions | 4 | Object permission override (#18948), OAuth role (#18954), allow-read default (#18971), SSE impersonation (#18966) |
+| UI | 3 | SVG sizing Chrome 142 (#18974), chip height (#19020), settings mobile viewport (#18991) |
+| Other | 4 | Logo upload onboarding (#18905), API key empty name (#18970), channel throttle (#18843), loop iterator skip (#18964) |
+
+### Refactoring
+
+- Connected accounts follow up (#18998)
+- Record page layout upgrade commands combined (#19004, #18962)
+- Command menu items backfill split into separate migration runs (#18957)
+- Migrate twenty-companion from npm to yarn workspaces (#18946)
+- Cache invalidation failure no longer triggers rollback in workspace migration runner (#18947)
+
+### Infrastructure
+
+**Dependencies:**
+- `@microsoft/microsoft-graph-types` 2.40.0 → 2.43.1
+- `@ai-sdk/xai` 3.0.59 → 3.0.74
+- `@linaria/core` 6.2.0 → 6.3.0
+
+### i18n
+
+18 automated translation commits (frontend + docs).
+
+### Packages Affected
+
+| Package | Files | Key changes |
+|---------|-------|-------------|
+| `twenty-front` | ~438 | AI chat UI, dashboard widgets, navigation, board fixes, SDK re-exports |
+| `twenty-server` | ~34 | Permissions, migration runner, S3 presigned URLs, command backfill |
+| `twenty-sdk` | 7 | Dependency graph refactor, selective re-exports |
+| `twenty-shared` | 4 | Channel visibility constraints, auto-select model utils |
+| `twenty-ui` | 3 | Animated icon crossfade, animation utilities |
+| `twenty-companion` | 2 | Migrated from npm to yarn workspaces |
+| `twenty-emails` | 2 | i18n updates |
+| `create-twenty-app` | 3 | SDK dependency refactor |
+
+### Post-merge Checklist
+
+- [ ] `yarn install` (twenty-companion workspace migration)
+- [ ] Rebuild twenty-shared: `npx nx build twenty-shared`
+- [ ] Check vi translation changes: `npx tsx packages/twenty-docs/scripts/detect-vi-changes.ts`
+- [ ] Verify AI provider settings if using IAM auth
+- [ ] Test Kanban view with restricted roles (permission fix)
+
+*Full diff: `git diff upstream-sync-2026-03-25..upstream-sync-2026-03-27`*
+
+---
+
 ## 2026-03-25 — upstream-sync-2026-03-25
 
 | Item | Value |
